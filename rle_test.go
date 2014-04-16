@@ -23,8 +23,12 @@ func TestDecompress(t *testing.T) {
 	fmt.Println(z)
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
-	fmt.Println(string(bitbuffer.Bytes()))
-	t.Fatalf("foo")
+	out := bitbuffer.Bytes()
+	fmt.Println(out)
+	fmt.Println(len(out))
+	if string(out) != "Good job!" {
+		t.Fatalf("expected \"Good job!\" but got %s", out)
+	}
 }
 
 //func TestMSB(t *testing.T) {
