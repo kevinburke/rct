@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/hex"
-	"fmt"
 	"testing"
 )
 
@@ -13,19 +12,14 @@ func TestDecompress(t *testing.T) {
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	fmt.Println(bits)
-	fmt.Printf("start is %s\n", bits)
 	bitreader := bytes.NewReader(bits)
 	z, err := NewReader(bitreader)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}
-	fmt.Println(z)
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	out := bitbuffer.Bytes()
-	fmt.Println(out)
-	fmt.Println(len(out))
 	if string(out) != "Good job!" {
 		t.Fatalf("expected \"Good job!\" but got %s", out)
 	}
