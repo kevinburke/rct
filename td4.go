@@ -103,143 +103,14 @@ type Ride struct {
 	TrackData     TrackData
 }
 
-type TrackSegment struct {
-	Type          SegmentType
-	ElevationGain int
-
-	// Change in tile position. A positive number indicates after the track
-	// segment, we're that many tiles forward. A negative number indicates we
-	// moved backwards
-	ForwardDelta int
-
-	// How far we moved side to side. Negative numbers indicate the track
-	// turned left.
-	SidewaysDelta int
-}
+type StationType int
 
 const (
-	ELEM_FLAT                              SegmentType = 0
-	ELEM_END_STATION                                   = 0x1
-	ELEM_BEGIN_STATION                                 = 0x2
-	ELEM_MIDDLE_STATION                                = 0x3
-	ELEM_25_DEG_UP                                     = 0x4
-	ELEM_60_DEG_UP                                     = 0x5
-	ELEM_FLAT_TO_25_DEG_UP                             = 0x6
-	ELEM_25_DEG_TO_60_DEG_UP                           = 0x7
-	ELEM_60_DEG_TO_25_DEG_UP                           = 0x8
-	ELEM_25_DEG_UP_TO_FLAT                             = 0x9
-	ELEM_25_DEG_DOWN                                   = 0x0a
-	ELEM_60_DEG_DOWN                                   = 0x0b
-	ELEM_FLAT_TO_25_DOWN                               = 0x0c
-	ELEM_25_DEG_TO_60_DEG_DOWN                         = 0x0d
-	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN                    = 0x0e
-	ELEM_25_DEG_DOWN_TO_FLAT                           = 0x0f
-	ELEM_LEFT_QUARTER_TURN_5_TILES                     = 0x10
-	ELEM_RIGHT_QUARTER_TURN_5_TILES                    = 0x11
-	ELEM_FLAT_TO_LEFT_BANK                             = 0x12
-	ELEM_FLAT_TO_RIGHT_BANK                            = 0x13
-	ELEM_LEFT_BANK_TO_FLAT                             = 0x14
-	ELEM_RIGHT_BANK_TO_FLAT                            = 0x15
-	ELEM_BANKED_LEFT_QUARTER_TURN_5_TILES              = 0x16
-	ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES             = 0x17
-	ELEM_LEFT_BANK_TO_25_DEG_UP                        = 0x18
-	ELEM_RIGHT_BANK_TO_25_DEG_UP                       = 0x19
-	ELEM_25_DEG_UP_TO_LEFT_BANK                        = 0x1a
-	ELEM_25_DEG_UP_TO_RIGHT_BANK                       = 0x1b
-	ELEM_LEFT_BANK_TO_25_DEG_DOWN                      = 0x1c
-	ELEM_RIGHT_BANK_TO_25_DEG_DOWN                     = 0x1d
-	ELEM_25_DEG_DOWN_TO_LEFT_BANK                      = 0x1e
-	ELEM_25_DEG_DOWN_TO_RIGHT_BANK                     = 0x1f
-
-	// Not banked, just turning and sliding downward
-	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_DOWN  = 0x24
-	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_DOWN = 0x25
-
-	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK = 0x2c
-
-	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN = 0x30
-
-	ELEM_RIGHT_TWIST_UP_TO_DOWN = 0x35
-
-	ELEM_RIGHT_TWIST_UP_TO_DOWN = 0x37
-
-	ELEM_LEFT_CORKSCREW_UP    = 0x3a
-	ELEM_RIGHT_CORKSCREW_UP   = 0x3b
-	ELEM_LEFT_CORKSCREW_DOWN  = 0x3c
-	ELEM_RIGHT_CORKSCREW_DOWN = 0x3d
-
-	ELEM_BRAKES  = 0x63
-	ELEM_BOOSTER = 0x64
-	// This should only be used in RCT2, I think.
-	ELEM_INVERTED_90_DEG_UP_TO_FLAT_QUARTER_LOOP = 0x65
-	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_UP      = 0x66
-	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_UP     = 0x67
-	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_DOWN    = 0x68
-	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_DOWN   = 0x69
-	ELEM_WATERFALL                               = 0x70
-	ELEM_ON_RIDE_PHOTO                           = 0x72
-
-	ELEM_RIGHT_EIGHTH_BANK_TO_DIAG      = 0x8a
-	ELEM_LEFT_EIGHTH_BANK_TO_ORTHOGONAL = 0x8b
-
-	ELEM_DIAG_25_DEG_UP = 0x8e
-
-	ELEM_DIAG_25_DEG_TO_FLAT             = 0x93
-	ELEM_DIAG_FLAT_TO_25_DEG_DOWN        = 0x96
-	ELEM_DIAG_25_DEG_DOWN_TO_60_DEG_DOWN = 0x97
-	ELEM_DIAG_60_DEG_DOWN_TO_25_DEG_DOWN = 0x98
-	ELEM_DIAG_25_DEG_DOWN_TO_FLAT        = 0x99
-
-	ELEM_DIAG_FLAT_TO_LEFT_BANK = 0x9e
-
-	ELEM_DIAG_RIGHT_BANK_TO_25_DEG_UP = 0xa3
-
-	ELEM_RIGHT_LARGE_HALF_LOOP_UP   = 0xb8
-	ELEM_RIGHT_LARGE_HALF_LOOP_DOWN = 0xb9
-
-	ELEM_LEFT_LARGE_HALF_LOOP_DOWN = 0xba
-
-	ELEM_END_OF_RIDE = 0xff
+	STATION_ONE   StationType = 0
+	STATION_TWO               = 1
+	STATION_THREE             = 2
+	STATION_FOUR              = 3
 )
-
-type TrackElement struct {
-	// XXX, add color schemes
-
-	Segment       SegmentType
-	ChainLift     bool
-	InvertedTrack bool
-	Station       bool
-	StationNumber int
-
-	// bits 3, 2, 1 and 0 are a magnitude value (0..15) for brake and booster
-	// track segments. The value obtained from these four bits is multiplied
-	// by 7.6 km/hr = 4.5 mph.
-	//
-	// We store the value in km/h
-	BoostMagnitude float32
-
-	// For RCT2 "Multi Dimensional Coaster", these four bits specify the amount
-	// of rotation.
-	Rotation int
-}
-
-func (te TrackElement) String() string {
-	if te.Segment > 0x17 {
-		return hex.EncodeToString([]byte{byte(te.Segment)})
-	}
-	return ""
-}
-
-const (
-	STATION_ONE   = 0
-	STATION_TWO   = 1
-	STATION_THREE = 2
-	STATION_FOUR  = 3
-)
-
-type TrackData struct {
-	Elements []TrackElement
-}
 
 // Take a compressed byte stream representing a ride and turn it into a Ride
 // struct.
