@@ -20,9 +20,21 @@ const (
 	DEGREE_60_DOWN = -60
 )
 
+type DirectionDelta int
+
+const (
+	DIRECTION_90_DEG_LEFT  DirectionDelta = iota
+	DIRECTION_45_DEG_LEFT                 = iota
+	DIRECTION_90_DEG_RIGHT                = iota
+	DIRECTION_45_DEG_RIGHT                = iota
+	DIRECTION_STRAIGHT                    = iota
+	DIRECTION_180_DEG                     = iota
+)
+
 type TrackSegment struct {
-	Type          SegmentType
-	ElevationGain int
+	Type           SegmentType
+	ElevationGain  int
+	DirectionDelta DirectionDelta
 
 	InputDegree  Degree
 	OutputDegree Degree
@@ -37,7 +49,28 @@ type TrackSegment struct {
 	SidewaysDelta int
 }
 
-var TE_MAP = map[SegmentType]TrackSegment{
+type TrackElement struct {
+	// XXX, add color schemes
+
+	Segment       TrackSegment
+	ChainLift     bool
+	InvertedTrack bool
+	Station       bool
+	StationNumber int
+
+	// bits 3, 2, 1 and 0 are a magnitude value (0..15) for brake and booster
+	// track segments. The value obtained from these four bits is multiplied
+	// by 7.6 km/hr = 4.5 mph.
+	//
+	// We store the value in km/h
+	BoostMagnitude float32
+
+	// For RCT2 "Multi Dimensional Coaster", these four bits specify the amount
+	// of rotation.
+	Rotation int
+}
+
+var TS_MAP = map[SegmentType]TrackSegment{
 	ELEM_FLAT: TrackSegment{
 		InputDegree:   0,
 		OutputDegree:  0,
@@ -208,6 +241,27 @@ var TE_MAP = map[SegmentType]TrackSegment{
 	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN: TrackSegment{
 		Type: 0x30,
 	},
+	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN: TrackSegment{
+		Type: 0x31,
+	},
+	ELEM_LEFT_QUARTER_TURN_1_TILE: TrackSegment{
+		Type:           0x32,
+		InputDegree:    DEGREE_FLAT,
+		OutputDegree:   DEGREE_FLAT,
+		ElevationGain:  0,
+		ForwardDelta:   1,
+		SidewaysDelta:  0,
+		DirectionDelta: DIRECTION_90_DEG_LEFT,
+	},
+	ELEM_RIGHT_QUARTER_TURN_1_TILE: TrackSegment{
+		Type:           0x33,
+		InputDegree:    DEGREE_FLAT,
+		OutputDegree:   DEGREE_FLAT,
+		ElevationGain:  0,
+		ForwardDelta:   1,
+		SidewaysDelta:  0,
+		DirectionDelta: DIRECTION_90_DEG_RIGHT,
+	},
 
 	ELEM_LEFT_TWIST_DOWN_TO_UP: TrackSegment{
 		Type: 0x34,
@@ -367,7 +421,10 @@ const (
 
 	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK = 0x2c
 
-	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN = 0x30
+	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN  = 0x30
+	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN = 0x31
+	ELEM_LEFT_QUARTER_TURN_1_TILE               = 0x32
+	ELEM_RIGHT_QUARTER_TURN_1_TILE              = 0x33
 
 	ELEM_LEFT_TWIST_DOWN_TO_UP  = 0x34
 	ELEM_RIGHT_TWIST_DOWN_TO_UP = 0x35
@@ -416,30 +473,9 @@ const (
 	ELEM_END_OF_RIDE = 0xff
 )
 
-type TrackElement struct {
-	// XXX, add color schemes
-
-	Segment       SegmentType
-	ChainLift     bool
-	InvertedTrack bool
-	Station       bool
-	StationNumber int
-
-	// bits 3, 2, 1 and 0 are a magnitude value (0..15) for brake and booster
-	// track segments. The value obtained from these four bits is multiplied
-	// by 7.6 km/hr = 4.5 mph.
-	//
-	// We store the value in km/h
-	BoostMagnitude float32
-
-	// For RCT2 "Multi Dimensional Coaster", these four bits specify the amount
-	// of rotation.
-	Rotation int
-}
-
 func (te TrackElement) String() string {
-	if te.Segment > 0x17 {
-		return hex.EncodeToString([]byte{byte(te.Segment)})
+	if te.Segment.Type > 0x17 {
+		return hex.EncodeToString([]byte{byte(te.Segment.Type)})
 	}
 	return ""
 }

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 )
 
@@ -149,8 +150,10 @@ func parseElement(rawElement []byte) (te TrackElement, e error) {
 	if len(rawElement) != 2 {
 		return TrackElement{}, errors.New("invalid length for element input")
 	}
-	te.Segment = SegmentType(rawElement[0])
-	if te.Segment == ELEM_END_OF_RIDE {
+	te.Segment = TrackSegment{
+		Type: SegmentType(rawElement[0]),
+	}
+	if te.Segment.Type == ELEM_END_OF_RIDE {
 		return TrackElement{}, EndOfRide
 	}
 	q := int(rawElement[1])
@@ -177,6 +180,47 @@ func parseTrackData(trackData []byte) TrackData {
 		td.Elements = append(td.Elements, elem)
 	}
 	return *td
+}
+
+// Test whether the ride's track forms a continuous circuit. Does not test
+// whether the ride collides with itself.
+func IsCircuit(t *TrackData) bool {
+	ΔE := 0
+	// X and Y don't really make sense as variable names.
+	ΔForward := 0
+	ΔSideways := 0
+	var direction float64
+	direction = 0.0
+	if len(t.Elements) == 0 {
+		return false
+	}
+	for i := 0; i < len(t.Elements); i++ {
+		ts := t.Elements[i].Segment
+		ΔE += ts.ElevationGain
+
+		ΔForward += int(math.Cos(direction)) * ts.ForwardDelta
+		ΔForward += int(math.Sin(direction)) * ts.SidewaysDelta
+
+		ΔSideways += int(math.Sin(direction)) * ts.ForwardDelta
+		ΔSideways += int(math.Cos(direction)) * ts.SidewaysDelta
+	}
+	fmt.Println(ΔForward)
+	fmt.Println(ΔSideways)
+	return ΔForward == 0 && ΔSideways == 0 && ΔE == 0
+}
+
+// computes sines in degrees
+func sindeg(deg int) int {
+	for ; deg >= 360; deg -= 360 {
+	}
+	if deg%180 == 0 {
+		return 0
+	} else if deg == 90 {
+		return 1
+	} else if deg == 270 {
+		return -1
+	}
+	return 0
 }
 
 func main() {
