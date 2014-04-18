@@ -120,12 +120,12 @@ var TS_MAP = map[SegmentType]TrackSegment{
 	ELEM_FLAT_TO_25_DEG_UP: TrackSegment{
 		Type:          0x6,
 		InputDegree:   0,
-		OutputDegree:  DEGREE_60_UP,
-		ElevationGain: 3,
+		OutputDegree:  DEGREE_25_UP,
+		ElevationGain: 0,
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_TO_60_DEG_UP: TrackSegment{
+	ELEM_25_DEG_UP_TO_60_DEG_UP: TrackSegment{
 		Type:          0x7,
 		InputDegree:   DEGREE_25_UP,
 		OutputDegree:  DEGREE_60_UP,
@@ -155,17 +155,27 @@ var TS_MAP = map[SegmentType]TrackSegment{
 	ELEM_60_DEG_DOWN: TrackSegment{
 		Type: 0x0b,
 	},
-	ELEM_FLAT_TO_25_DOWN: TrackSegment{
-		Type: 0x0c,
+	ELEM_FLAT_TO_25_DEG_DOWN: TrackSegment{
+		Type:          0x0c,
+		InputDegree:   DEGREE_FLAT,
+		OutputDegree:  DEGREE_25_DOWN,
+		ElevationGain: -1,
+		ForwardDelta:  1,
+		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_TO_60_DEG_DOWN: TrackSegment{
+	ELEM_25_DEG_DOWN_TO_60_DEG_DOWN: TrackSegment{
 		Type: 0x0d,
 	},
 	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN: TrackSegment{
 		Type: 0x0e,
 	},
 	ELEM_25_DEG_DOWN_TO_FLAT: TrackSegment{
-		Type: 0x0f,
+		Type:          0x0f,
+		InputDegree:   DEGREE_25_DOWN,
+		OutputDegree:  DEGREE_FLAT,
+		ElevationGain: 0,
+		ForwardDelta:  1,
+		SidewaysDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_5_TILES: TrackSegment{
 		Type: 0x10,
@@ -330,7 +340,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		Type: 0x8e,
 	},
 
-	ELEM_DIAG_25_DEG_TO_FLAT: TrackSegment{
+	ELEM_DIAG_25_DEG_UP_TO_FLAT: TrackSegment{
 		Type: 0x93,
 	},
 	ELEM_DIAG_FLAT_TO_25_DEG_DOWN: TrackSegment{
@@ -387,13 +397,13 @@ const (
 	ELEM_25_DEG_UP                                     = 0x4
 	ELEM_60_DEG_UP                                     = 0x5
 	ELEM_FLAT_TO_25_DEG_UP                             = 0x6
-	ELEM_25_DEG_TO_60_DEG_UP                           = 0x7
+	ELEM_25_DEG_UP_TO_60_DEG_UP                        = 0x7
 	ELEM_60_DEG_UP_TO_25_DEG_UP                        = 0x8
 	ELEM_25_DEG_UP_TO_FLAT                             = 0x9
 	ELEM_25_DEG_DOWN                                   = 0x0a
 	ELEM_60_DEG_DOWN                                   = 0x0b
-	ELEM_FLAT_TO_25_DOWN                               = 0x0c
-	ELEM_25_DEG_TO_60_DEG_DOWN                         = 0x0d
+	ELEM_FLAT_TO_25_DEG_DOWN                           = 0x0c
+	ELEM_25_DEG_DOWN_TO_60_DEG_DOWN                    = 0x0d
 	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN                    = 0x0e
 	ELEM_25_DEG_DOWN_TO_FLAT                           = 0x0f
 	ELEM_LEFT_QUARTER_TURN_5_TILES                     = 0x10
@@ -452,8 +462,11 @@ const (
 	ELEM_LEFT_EIGHTH_BANK_TO_ORTHOGONAL = 0x8b
 
 	ELEM_DIAG_25_DEG_UP = 0x8e
+	ELEM_DIAG_60_DEG_UP = 0x8e
 
-	ELEM_DIAG_25_DEG_TO_FLAT             = 0x93
+	ELEM_DIAG_25_DEG_UP_TO_FLAT          = 0x93
+	ELEM_DIAG_25_DEG_DOWN                = 0x94
+	ELEM_DIAG_60_DEG_DOWN                = 0x95
 	ELEM_DIAG_FLAT_TO_25_DEG_DOWN        = 0x96
 	ELEM_DIAG_25_DEG_DOWN_TO_60_DEG_DOWN = 0x97
 	ELEM_DIAG_60_DEG_DOWN_TO_25_DEG_DOWN = 0x98
