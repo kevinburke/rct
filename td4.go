@@ -189,8 +189,7 @@ func IsCircuit(t *TrackData) bool {
 	// X and Y don't really make sense as variable names.
 	ΔForward := 0
 	ΔSideways := 0
-	var direction float64
-	direction = 0.0
+	direction := DIRECTION_STRAIGHT
 	if len(t.Elements) == 0 {
 		return false
 	}
@@ -198,19 +197,21 @@ func IsCircuit(t *TrackData) bool {
 		ts := t.Elements[i].Segment
 		ΔE += ts.ElevationGain
 
-		ΔForward += int(math.Cos(direction)) * ts.ForwardDelta
-		ΔForward += int(math.Sin(direction)) * ts.SidewaysDelta
+		ΔForward += cosdeg(direction) * ts.ForwardDelta
+		ΔForward += sindeg(direction) * ts.SidewaysDelta
 
-		ΔSideways += int(math.Sin(direction)) * ts.ForwardDelta
-		ΔSideways += int(math.Cos(direction)) * ts.SidewaysDelta
+		ΔSideways += sindeg(direction) * ts.ForwardDelta
+		ΔSideways += cosdeg(direction) * ts.SidewaysDelta
+
+		direction += ts.DirectionDelta
+		for ; direction >= 360; direction -= 360 {
+		}
 	}
-	fmt.Println(ΔForward)
-	fmt.Println(ΔSideways)
 	return ΔForward == 0 && ΔSideways == 0 && ΔE == 0
 }
 
 // computes sines in degrees
-func sindeg(deg int) int {
+func sindeg(deg DirectionDelta) int {
 	for ; deg >= 360; deg -= 360 {
 	}
 	if deg%180 == 0 {
@@ -219,8 +220,24 @@ func sindeg(deg int) int {
 		return 1
 	} else if deg == 270 {
 		return -1
+	} else {
+		return int(math.Sin(float64(deg) * math.Pi / 180))
 	}
-	return 0
+}
+
+// computes sines in degrees
+func cosdeg(deg DirectionDelta) int {
+	for ; deg >= 360; deg -= 360 {
+	}
+	if deg == 0 {
+		return 1
+	} else if deg == 90 || deg == 270 {
+		return 0
+	} else if deg == 180 {
+		return -1
+	} else {
+		return int(math.Sin(float64(deg) * math.Pi / 180))
+	}
 }
 
 func main() {

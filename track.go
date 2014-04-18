@@ -23,12 +23,13 @@ const (
 type DirectionDelta int
 
 const (
-	DIRECTION_90_DEG_LEFT  DirectionDelta = iota
-	DIRECTION_45_DEG_LEFT                 = iota
-	DIRECTION_90_DEG_RIGHT                = iota
-	DIRECTION_45_DEG_RIGHT                = iota
-	DIRECTION_STRAIGHT                    = iota
-	DIRECTION_180_DEG                     = iota
+	// All of these expressed in positives to help with degree calculations
+	DIRECTION_STRAIGHT     DirectionDelta = 0
+	DIRECTION_45_DEG_RIGHT                = 45
+	DIRECTION_90_DEG_RIGHT                = 90
+	DIRECTION_180_DEG                     = 180
+	DIRECTION_90_DEG_LEFT                 = 270
+	DIRECTION_45_DEG_LEFT                 = 315
 )
 
 type TrackSegment struct {
