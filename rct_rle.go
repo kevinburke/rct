@@ -1,4 +1,7 @@
-// Decompress a td4 ride file
+// Dealing with RCT's run length encoding
+
+// This should follow the API laid out by the gzip package.
+// Author: Kevin Burke
 
 package main
 
@@ -6,7 +9,6 @@ import (
 	"bufio"
 	"bytes"
 	"io"
-	//"os"
 )
 
 type Reader struct {
@@ -14,11 +16,23 @@ type Reader struct {
 	off int
 }
 
-func NewReader(r io.Reader) (*Reader, error) {
+type Writer struct {
+	w      io.Writer
+	closed bool
+	err    error
+}
+
+func NewWriter(w io.Writer) *Writer {
+	z := new(Writer)
+	z.w = w
+	return z
+}
+
+func NewReader(r io.Reader) *Reader {
 	z := new(Reader)
 	z.r = bufio.NewReader(r)
 	z.off = 0
-	return z, nil
+	return z
 }
 
 func min(a int, b int) int {
@@ -60,4 +74,8 @@ func (z *Reader) Read(ride []byte) (int, error) {
 		}
 	}
 	return n, nil
+}
+
+func (z *Writer) Write(ride []byte) (int, error) {
+	return 5, nil
 }

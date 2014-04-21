@@ -13,7 +13,7 @@ func TestDecompress(t *testing.T) {
 		t.Fatalf(err.Error())
 	}
 	bitreader := bytes.NewReader(bits)
-	z, err := NewReader(bitreader)
+	z := NewReader(bitreader)
 	if err != nil {
 		t.Fatalf(err.Error())
 	}

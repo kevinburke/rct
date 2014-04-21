@@ -7,8 +7,18 @@ import (
 )
 
 type TrackData struct {
-	Elements []TrackElement
+	Elements           []TrackElement
+	Clearance          int
+	ClearanceDirection ClearanceDirection
 }
+
+type ClearanceDirection int
+
+const (
+	CLEARANCE_ABOVE = iota
+	// For suspended coasters
+	CLEARANCE_BELOW = iota
+)
 
 type Degree int
 
@@ -53,7 +63,7 @@ type TrackSegment struct {
 type TrackElement struct {
 	// XXX, add color schemes
 
-	Segment       TrackSegment
+	Segment       *TrackSegment
 	ChainLift     bool
 	InvertedTrack bool
 	Station       bool
@@ -71,29 +81,29 @@ type TrackElement struct {
 	Rotation int
 }
 
-var TS_MAP = map[SegmentType]TrackSegment{
-	ELEM_FLAT: TrackSegment{
+var TS_MAP = map[SegmentType]*TrackSegment{
+	ELEM_FLAT: &TrackSegment{
 		InputDegree:   0,
 		OutputDegree:  0,
 		ElevationGain: 0,
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_END_STATION: TrackSegment{
+	ELEM_END_STATION: &TrackSegment{
 		InputDegree:   0,
 		OutputDegree:  0,
 		ElevationGain: 0,
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_BEGIN_STATION: TrackSegment{
+	ELEM_BEGIN_STATION: &TrackSegment{
 		InputDegree:   0,
 		OutputDegree:  0,
 		ElevationGain: 0,
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_MIDDLE_STATION: TrackSegment{
+	ELEM_MIDDLE_STATION: &TrackSegment{
 		Type:          0x3,
 		InputDegree:   0,
 		OutputDegree:  0,
@@ -101,7 +111,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_UP: TrackSegment{
+	ELEM_25_DEG_UP: &TrackSegment{
 		Type:          0x4,
 		InputDegree:   0,
 		OutputDegree:  DEGREE_25_UP,
@@ -109,7 +119,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_60_DEG_UP: TrackSegment{
+	ELEM_60_DEG_UP: &TrackSegment{
 		Type:          0x5,
 		InputDegree:   0,
 		OutputDegree:  DEGREE_60_UP,
@@ -117,7 +127,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_FLAT_TO_25_DEG_UP: TrackSegment{
+	ELEM_FLAT_TO_25_DEG_UP: &TrackSegment{
 		Type:          0x6,
 		InputDegree:   0,
 		OutputDegree:  DEGREE_25_UP,
@@ -125,7 +135,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_UP_TO_60_DEG_UP: TrackSegment{
+	ELEM_25_DEG_UP_TO_60_DEG_UP: &TrackSegment{
 		Type:          0x7,
 		InputDegree:   DEGREE_25_UP,
 		OutputDegree:  DEGREE_60_UP,
@@ -133,7 +143,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_60_DEG_UP_TO_25_DEG_UP: TrackSegment{
+	ELEM_60_DEG_UP_TO_25_DEG_UP: &TrackSegment{
 		Type:          0x8,
 		InputDegree:   DEGREE_60_UP,
 		OutputDegree:  DEGREE_25_UP,
@@ -141,7 +151,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_UP_TO_FLAT: TrackSegment{
+	ELEM_25_DEG_UP_TO_FLAT: &TrackSegment{
 		Type:          0x9,
 		InputDegree:   DEGREE_25_UP,
 		OutputDegree:  DEGREE_FLAT,
@@ -149,13 +159,13 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_DOWN: TrackSegment{
+	ELEM_25_DEG_DOWN: &TrackSegment{
 		Type: 0x0a,
 	},
-	ELEM_60_DEG_DOWN: TrackSegment{
+	ELEM_60_DEG_DOWN: &TrackSegment{
 		Type: 0x0b,
 	},
-	ELEM_FLAT_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_FLAT_TO_25_DEG_DOWN: &TrackSegment{
 		Type:          0x0c,
 		InputDegree:   DEGREE_FLAT,
 		OutputDegree:  DEGREE_25_DOWN,
@@ -163,13 +173,13 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_25_DEG_DOWN_TO_60_DEG_DOWN: TrackSegment{
+	ELEM_25_DEG_DOWN_TO_60_DEG_DOWN: &TrackSegment{
 		Type: 0x0d,
 	},
-	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0x0e,
 	},
-	ELEM_25_DEG_DOWN_TO_FLAT: TrackSegment{
+	ELEM_25_DEG_DOWN_TO_FLAT: &TrackSegment{
 		Type:          0x0f,
 		InputDegree:   DEGREE_25_DOWN,
 		OutputDegree:  DEGREE_FLAT,
@@ -177,85 +187,85 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		ForwardDelta:  1,
 		SidewaysDelta: 0,
 	},
-	ELEM_LEFT_QUARTER_TURN_5_TILES: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_5_TILES: &TrackSegment{
 		Type: 0x10,
 	},
-	ELEM_RIGHT_QUARTER_TURN_5_TILES: TrackSegment{
+	ELEM_RIGHT_QUARTER_TURN_5_TILES: &TrackSegment{
 		Type: 0x11,
 	},
-	ELEM_FLAT_TO_LEFT_BANK: TrackSegment{
+	ELEM_FLAT_TO_LEFT_BANK: &TrackSegment{
 		Type: 0x12,
 	},
-	ELEM_FLAT_TO_RIGHT_BANK: TrackSegment{
+	ELEM_FLAT_TO_RIGHT_BANK: &TrackSegment{
 		Type: 0x13,
 	},
-	ELEM_LEFT_BANK_TO_FLAT: TrackSegment{
+	ELEM_LEFT_BANK_TO_FLAT: &TrackSegment{
 		Type: 0x14,
 	},
-	ELEM_RIGHT_BANK_TO_FLAT: TrackSegment{
+	ELEM_RIGHT_BANK_TO_FLAT: &TrackSegment{
 		Type: 0x15,
 	},
-	ELEM_BANKED_LEFT_QUARTER_TURN_5_TILES: TrackSegment{
+	ELEM_BANKED_LEFT_QUARTER_TURN_5_TILES: &TrackSegment{
 		Type: 0x16,
 	},
-	ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES: TrackSegment{
+	ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES: &TrackSegment{
 		Type: 0x17,
 	},
-	ELEM_LEFT_BANK_TO_25_DEG_UP: TrackSegment{
+	ELEM_LEFT_BANK_TO_25_DEG_UP: &TrackSegment{
 		Type: 0x18,
 	},
-	ELEM_RIGHT_BANK_TO_25_DEG_UP: TrackSegment{
+	ELEM_RIGHT_BANK_TO_25_DEG_UP: &TrackSegment{
 		Type: 0x19,
 	},
-	ELEM_25_DEG_UP_TO_LEFT_BANK: TrackSegment{
+	ELEM_25_DEG_UP_TO_LEFT_BANK: &TrackSegment{
 		Type: 0x1a,
 	},
-	ELEM_25_DEG_UP_TO_RIGHT_BANK: TrackSegment{
+	ELEM_25_DEG_UP_TO_RIGHT_BANK: &TrackSegment{
 		Type: 0x1b,
 	},
-	ELEM_LEFT_BANK_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_LEFT_BANK_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0x1c,
 	},
-	ELEM_RIGHT_BANK_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_RIGHT_BANK_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0x1d,
 	},
-	ELEM_25_DEG_DOWN_TO_LEFT_BANK: TrackSegment{
+	ELEM_25_DEG_DOWN_TO_LEFT_BANK: &TrackSegment{
 		Type: 0x1e,
 	},
-	ELEM_25_DEG_DOWN_TO_RIGHT_BANK: TrackSegment{
+	ELEM_25_DEG_DOWN_TO_RIGHT_BANK: &TrackSegment{
 		Type: 0x1f,
 	},
-	ELEM_LEFT_BANK: TrackSegment{
+	ELEM_LEFT_BANK: &TrackSegment{
 		Type: 0x20,
 	},
-	ELEM_RIGHT_BANK: TrackSegment{
+	ELEM_RIGHT_BANK: &TrackSegment{
 		Type: 0x21,
 	},
 	// Not banked, just turning and sliding downward
-	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_UP: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_UP: &TrackSegment{
 		Type: 0x22,
 	},
-	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_UP: TrackSegment{
+	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_UP: &TrackSegment{
 		Type: 0x23,
 	},
-	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_DOWN: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_DOWN: &TrackSegment{
 		Type: 0x24,
 	},
-	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_DOWN: TrackSegment{
+	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_DOWN: &TrackSegment{
 		Type: 0x25,
 	},
 
-	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK: &TrackSegment{
 		Type: 0x2c,
 	},
 
-	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN: &TrackSegment{
 		Type: 0x30,
 	},
-	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN: TrackSegment{
+	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN: &TrackSegment{
 		Type: 0x31,
 	},
-	ELEM_LEFT_QUARTER_TURN_1_TILE: TrackSegment{
+	ELEM_LEFT_QUARTER_TURN_1_TILE: &TrackSegment{
 		Type:           0x32,
 		InputDegree:    DEGREE_FLAT,
 		OutputDegree:   DEGREE_FLAT,
@@ -264,7 +274,7 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		SidewaysDelta:  0,
 		DirectionDelta: DIRECTION_90_DEG_LEFT,
 	},
-	ELEM_RIGHT_QUARTER_TURN_1_TILE: TrackSegment{
+	ELEM_RIGHT_QUARTER_TURN_1_TILE: &TrackSegment{
 		Type:           0x33,
 		InputDegree:    DEGREE_FLAT,
 		OutputDegree:   DEGREE_FLAT,
@@ -274,117 +284,117 @@ var TS_MAP = map[SegmentType]TrackSegment{
 		DirectionDelta: DIRECTION_90_DEG_RIGHT,
 	},
 
-	ELEM_LEFT_TWIST_DOWN_TO_UP: TrackSegment{
+	ELEM_LEFT_TWIST_DOWN_TO_UP: &TrackSegment{
 		Type: 0x34,
 	},
-	ELEM_RIGHT_TWIST_DOWN_TO_UP: TrackSegment{
+	ELEM_RIGHT_TWIST_DOWN_TO_UP: &TrackSegment{
 		Type: 0x35,
 	},
-	ELEM_LEFT_TWIST_UP_TO_DOWN: TrackSegment{
+	ELEM_LEFT_TWIST_UP_TO_DOWN: &TrackSegment{
 		Type: 0x36,
 	},
-	ELEM_RIGHT_TWIST_UP_TO_DOWN: TrackSegment{
+	ELEM_RIGHT_TWIST_UP_TO_DOWN: &TrackSegment{
 		Type: 0x37,
 	},
 
-	ELEM_LEFT_CORKSCREW_UP: TrackSegment{
+	ELEM_LEFT_CORKSCREW_UP: &TrackSegment{
 		Type: 0x3a,
 	},
-	ELEM_RIGHT_CORKSCREW_UP: TrackSegment{
+	ELEM_RIGHT_CORKSCREW_UP: &TrackSegment{
 		Type: 0x3b,
 	},
-	ELEM_LEFT_CORKSCREW_DOWN: TrackSegment{
+	ELEM_LEFT_CORKSCREW_DOWN: &TrackSegment{
 		Type: 0x3c,
 	},
-	ELEM_RIGHT_CORKSCREW_DOWN: TrackSegment{
+	ELEM_RIGHT_CORKSCREW_DOWN: &TrackSegment{
 		Type: 0x3d,
 	},
 
-	ELEM_BRAKES: TrackSegment{
+	ELEM_BRAKES: &TrackSegment{
 		Type: 0x63,
 	},
-	ELEM_BOOSTER: TrackSegment{
+	ELEM_BOOSTER: &TrackSegment{
 		Type: 0x64,
 	},
 	// This should only be used in RCT2, I think.
-	ELEM_INVERTED_90_DEG_UP_TO_FLAT_QUARTER_LOOP: TrackSegment{
+	ELEM_INVERTED_90_DEG_UP_TO_FLAT_QUARTER_LOOP: &TrackSegment{
 		Type: 0x65,
 	},
-	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_UP: TrackSegment{
+	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_UP: &TrackSegment{
 		Type: 0x66,
 	},
-	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_UP: TrackSegment{
+	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_UP: &TrackSegment{
 		Type: 0x67,
 	},
-	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_DOWN: TrackSegment{
+	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_DOWN: &TrackSegment{
 		Type: 0x68,
 	},
-	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_DOWN: TrackSegment{
+	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_DOWN: &TrackSegment{
 		Type: 0x69,
 	},
-	ELEM_WATERFALL: TrackSegment{
+	ELEM_WATERFALL: &TrackSegment{
 		Type: 0x70,
 	},
-	ELEM_ON_RIDE_PHOTO: TrackSegment{
+	ELEM_ON_RIDE_PHOTO: &TrackSegment{
 		Type: 0x72,
 	},
 
-	ELEM_RIGHT_EIGHTH_BANK_TO_DIAG: TrackSegment{
+	ELEM_RIGHT_EIGHTH_BANK_TO_DIAG: &TrackSegment{
 		Type: 0x8a,
 	},
-	ELEM_LEFT_EIGHTH_BANK_TO_ORTHOGONAL: TrackSegment{
+	ELEM_LEFT_EIGHTH_BANK_TO_ORTHOGONAL: &TrackSegment{
 		Type: 0x8b,
 	},
 
-	ELEM_DIAG_25_DEG_UP: TrackSegment{
+	ELEM_DIAG_25_DEG_UP: &TrackSegment{
 		Type: 0x8e,
 	},
 
-	ELEM_DIAG_25_DEG_UP_TO_FLAT: TrackSegment{
+	ELEM_DIAG_25_DEG_UP_TO_FLAT: &TrackSegment{
 		Type: 0x93,
 	},
-	ELEM_DIAG_FLAT_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_DIAG_FLAT_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0x96,
 	},
-	ELEM_DIAG_25_DEG_DOWN_TO_60_DEG_DOWN: TrackSegment{
+	ELEM_DIAG_25_DEG_DOWN_TO_60_DEG_DOWN: &TrackSegment{
 		Type: 0x97,
 	},
-	ELEM_DIAG_60_DEG_DOWN_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_DIAG_60_DEG_DOWN_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0x98,
 	},
-	ELEM_DIAG_25_DEG_DOWN_TO_FLAT: TrackSegment{
+	ELEM_DIAG_25_DEG_DOWN_TO_FLAT: &TrackSegment{
 		Type: 0x99,
 	},
 
-	ELEM_DIAG_FLAT_TO_LEFT_BANK: TrackSegment{
+	ELEM_DIAG_FLAT_TO_LEFT_BANK: &TrackSegment{
 		Type: 0x9e,
 	},
 
-	ELEM_DIAG_LEFT_BANK_TO_FLAT: TrackSegment{
+	ELEM_DIAG_LEFT_BANK_TO_FLAT: &TrackSegment{
 		Type: 0xa0,
 	},
-	ELEM_DIAG_RIGHT_BANK_TO_FLAT: TrackSegment{
+	ELEM_DIAG_RIGHT_BANK_TO_FLAT: &TrackSegment{
 		Type: 0xa1,
 	},
-	ELEM_DIAG_LEFT_BANK_TO_25_DEG_DOWN: TrackSegment{
+	ELEM_DIAG_LEFT_BANK_TO_25_DEG_DOWN: &TrackSegment{
 		Type: 0xa2,
 	},
-	ELEM_DIAG_RIGHT_BANK_TO_25_DEG_UP: TrackSegment{
+	ELEM_DIAG_RIGHT_BANK_TO_25_DEG_UP: &TrackSegment{
 		Type: 0xa3,
 	},
 
-	ELEM_RIGHT_LARGE_HALF_LOOP_UP: TrackSegment{
+	ELEM_RIGHT_LARGE_HALF_LOOP_UP: &TrackSegment{
 		Type: 0xb8,
 	},
-	ELEM_RIGHT_LARGE_HALF_LOOP_DOWN: TrackSegment{
+	ELEM_RIGHT_LARGE_HALF_LOOP_DOWN: &TrackSegment{
 		Type: 0xb9,
 	},
 
-	ELEM_LEFT_LARGE_HALF_LOOP_DOWN: TrackSegment{
+	ELEM_LEFT_LARGE_HALF_LOOP_DOWN: &TrackSegment{
 		Type: 0xba,
 	},
 
-	ELEM_END_OF_RIDE: TrackSegment{
+	ELEM_END_OF_RIDE: &TrackSegment{
 		Type: 0xff,
 	},
 }
