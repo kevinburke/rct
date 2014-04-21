@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -154,7 +155,7 @@ func cosdeg(deg DirectionDelta) int {
 
 // Take a compressed byte stream representing a ride and turn it into a Ride
 // struct. Returns an error if the byte array is too short.
-func Unmarshal(buf []byte, r Ride) error {
+func Unmarshal(buf []byte, r *Ride) error {
 	if len(buf) < IDX_TRACK_DATA {
 		return errors.New("buffer too short to be a ride")
 	}
@@ -168,6 +169,8 @@ func Unmarshal(buf []byte, r Ride) error {
 	r.MinWaitTime = int(buf[IDX_MIN_WAIT_TIME])
 	r.MaxWaitTime = int(buf[IDX_MAX_WAIT_TIME])
 	r.TrackData = parseTrackData(buf[IDX_TRACK_DATA:])
+
+	fmt.Println(r.VehicleType)
 	return nil
 }
 
@@ -293,26 +296,28 @@ func main() {
 	fmt.Println(readRaptor())
 }
 
-func readRaptor() *Ride {
-	bits, err := ioutil.ReadFile("rides/raptor.td4")
+func readRaptor() Ride {
+	encodedBits, err := ioutil.ReadFile("rides/raptor.td4")
 	if err != nil {
 		panic(err)
 	}
-	z, err := NewReader(buf)
+	z := NewReader(bytes.NewReader(encodedBits))
 	if err != nil {
-		return err
+		panic(err)
 	}
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
-	r := new(Ride)
+	decrypted := bitbuffer.Bytes()
 	for i := 0; i < 500; i++ {
 		// encode the value of i as hex
 		ds := hex.EncodeToString([]byte{byte(i)})
-		bitValueInHex := hex.EncodeToString([]byte{bits[i]})
+		bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
 		fmt.Printf("%s: %s\n", ds, bitValueInHex)
 	}
-	decrypted := bitbuffer.Bytes()
 
-	Unmarshal(bitbuffer.Bytes(), *r)
-	return r
+	// r is a pointer
+	r := new(Ride)
+	Unmarshal(decrypted, r)
+	fmt.Println(r.VehicleType)
+	return *r
 }
