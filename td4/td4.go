@@ -11,8 +11,13 @@ import (
 	"math"
 )
 
+func hasBit(n int, pos uint) bool {
+	val := n & (1 << pos)
+	return (val > 0)
+}
+
 func hasLoop(n int) bool {
-	return n>>7 == 1
+	return hasBit(n, 7)
 }
 
 // Set the loop bit.
@@ -308,7 +313,7 @@ func readRaptor() Ride {
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	decrypted := bitbuffer.Bytes()
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 40; i++ {
 		// encode the value of i as hex
 		ds := hex.EncodeToString([]byte{byte(i)})
 		bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
@@ -318,6 +323,7 @@ func readRaptor() Ride {
 	// r is a pointer
 	r := new(Ride)
 	Unmarshal(decrypted, r)
-	fmt.Println(r.VehicleType)
+	bits, err := Marshal(r)
+	fmt.Println(bits)
 	return *r
 }
