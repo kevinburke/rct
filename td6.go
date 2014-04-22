@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/kevinburke/rct-rides/tracks"
 	"io/ioutil"
 )
 
@@ -31,49 +32,6 @@ func parseControlFlags(n int) *ControlFlags {
 		WaitForLoad:                n>>3 == 1,
 		Load:                       LoadType(n & 7),
 	}
-}
-
-var EndOfRide = errors.New("End of ride")
-
-// Parse the serialized data into a TrackElement struct
-// When the end of ride is encountered a EndOfRide error is returned
-func parseElement(rawElement []byte) (te TrackElement, e error) {
-	if len(rawElement) != 2 {
-		return TrackElement{}, errors.New("invalid length for element input")
-	}
-	te.Segment = &TrackSegment{
-		Type: SegmentType(rawElement[0]),
-	}
-	if te.Segment.Type == ELEM_END_OF_RIDE {
-		return TrackElement{}, EndOfRide
-	}
-	q := int(rawElement[1])
-	te.ChainLift = q>>7 == 1
-	te.InvertedTrack = q>>6 == 1
-	te.Station = q>>3 == 1
-	te.StationNumber = q & 3
-
-	te.BoostMagnitude = float32(q&15) * 7.6
-	te.Rotation = (q&15)*45 - 180
-	return
-}
-func parseTrackData(trackData []byte) TrackData {
-	td := new(TrackData)
-	for i := 0; i < len(trackData); i += 2 {
-		elem, err := parseElement(trackData[i : i+2])
-		if err != nil {
-			if err == EndOfRide {
-				break
-			}
-			panic(err)
-		}
-		td.Elements = append(td.Elements, elem)
-	}
-
-	// XXX where is this data actually stored?
-	td.Clearance = 2
-	td.ClearanceDirection = CLEARANCE_ABOVE
-	return *td
 }
 
 // Where to find various pieces of information in the decoded ride.
@@ -108,7 +66,7 @@ type Ride struct {
 	CarsPerTrain  int
 	MinWaitTime   int
 	MaxWaitTime   int
-	TrackData     TrackData
+	TrackData     tracks.Data
 
 	// set in bit 0 of the ride features list
 	HasLoop         bool
@@ -140,7 +98,6 @@ const (
 type VehicleType string
 type LoadType int
 type OperatingMode int
-type SegmentType int
 
 const (
 	VEHICLE_SPIRAL                  VehicleType = "SPDRCR"
@@ -198,7 +155,10 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.CarsPerTrain = int(buf[IDX_CARS_PER_TRAIN])
 	r.MinWaitTime = int(buf[IDX_MIN_WAIT_TIME])
 	r.MaxWaitTime = int(buf[IDX_MAX_WAIT_TIME])
-	r.TrackData = parseTrackData(buf[IDX_TRACK_DATA:])
+
+	d := new(tracks.Data)
+	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
+	r.TrackData = *d
 
 	r.VehicleType = VehicleType(string(buf[IDX_VEHICLE_TYPE : IDX_VEHICLE_TYPE+LENGTH_VEHICLE_TYPE]))
 
