@@ -77,5 +77,9 @@ func (z *Reader) Read(ride []byte) (int, error) {
 }
 
 func (z *Writer) Write(ride []byte) (int, error) {
+	// XXX
+	// There is a checksum here that will have to be written as well. It seems
+	// cumbersome and I am not sure whether the checksum description at
+	// Technical Depot also works for RCT2. So I am leaving it alone.
 	return 5, nil
 }
