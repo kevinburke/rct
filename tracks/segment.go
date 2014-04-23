@@ -457,10 +457,20 @@ const (
 	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_UP     = 0x67
 	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_DOWN    = 0x68
 	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_DOWN   = 0x69
-	ELEM_WATERFALL                               = 0x70
-	ELEM_RAPIDS                                  = 0x71
-	ELEM_ON_RIDE_PHOTO                           = 0x72
+	ELEM_LEFT_QUARTER_HELIX_LARGE_UP             = 0x6a
+	ELEM_RIGHT_QUARTER_HELIX_LARGE_UP            = 0x6b
+	ELEM_LEFT_QUARTER_HELIX_LARGE_DOWN           = 0x6c
+	ELEM_RIGHT_QUARTER_HELIX_LARGE_DOWN          = 0x6d
 
+	ELEM_25_DEG_UP_LEFT_BANKED  = 0x6e
+	ELEM_25_DEG_UP_RIGHT_BANKED = 0x6f
+
+	ELEM_WATERFALL     = 0x70
+	ELEM_RAPIDS        = 0x71
+	ELEM_ON_RIDE_PHOTO = 0x72
+
+	// Not sure about this piece, the exe indicates that this is in the same
+	// category as a water feature/rapids/photo
 	ELEM_25_DEG_DOWN_LEFT_BANKED  = 0x73
 	ELEM_25_DEG_DOWN_RIGHT_BANKED = 0x74
 
