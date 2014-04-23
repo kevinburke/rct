@@ -252,9 +252,6 @@ var TS_MAP = map[SegmentType]*Segment{
 	ELEM_BRAKES: &Segment{
 		Type: 0x63,
 	},
-	ELEM_BOOSTER: &Segment{
-		Type: 0x64,
-	},
 	// This should only be used in RCT2, I think.
 	ELEM_INVERTED_90_DEG_UP_TO_FLAT_QUARTER_LOOP: &Segment{
 		Type: 0x65,
@@ -482,7 +479,7 @@ const (
 	ELEM_WHIRLPOOL = 0x78
 
 	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE = 0x79
-	ELEM_60_DEG_UP_TO_FLAT_LONG_BASE   = 0x7a
+	ELEM_60_DEG_DOWN_TO_FLAT_LONG_BASE = 0x7a
 
 	ELEM_CABLE_LIFT_HILL             = 0x7b
 	ELEM_REVERSE_WHOA_BELLY_SLOPE    = 0x7c
