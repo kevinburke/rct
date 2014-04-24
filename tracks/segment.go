@@ -3,13 +3,13 @@ package tracks
 type Degree int
 
 const (
-	DEGREE_FLAT    Degree = 0
-	DEGREE_25_UP          = 25
-	DEGREE_60_UP          = 60
-	DEGREE_25_DOWN        = -25
-	DEGREE_60_DOWN        = -60
-	DEGREE_90_UP          = 90
-	DEGREE_90_DOWN        = -90
+	TRACK_NONE    Degree = 0
+	TRACK_UP_25          = 25
+	TRACK_UP_60          = 60
+	TRACK_DOWN_25        = -25
+	TRACK_DOWN_60        = -60
+	TRACK_UP_90          = 90
+	TRACK_DOWN_90        = -90
 )
 
 type SegmentType int
@@ -17,10 +17,11 @@ type SegmentType int
 type Bank int
 
 const (
-	BANK_LEFT Bank = iota
-	BANK_RIGHT
-	BANK_FLAT
-	BANK_UPSIDE_DOWN
+	TRACK_BANK_NONE Bank = iota
+	TRACK_BANK_LEFT
+	TRACK_BANK_RIGHT
+	TRACK_BANK_FLAT
+	TRACK_BANK_UPSIDE_DOWN
 )
 
 type Segment struct {
@@ -891,14 +892,14 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank: TRACK_BANK_NONE,
 		EndingBank:   TRACK_BANK_NONE,
 	},
-	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE: &Segment{
+	ELEM_60_DEG_DOWN_TO_FLAT_LONG_BASE: &Segment{
 		Type:         0x79,
 		InputDegree:  TRACK_DOWN_60,
 		OutputDegree: TRACK_NONE,
 		StartingBank: TRACK_BANK_NONE,
 		EndingBank:   TRACK_BANK_NONE,
 	},
-	ELEM_60_DEG_UP_TO_FLAT_LONG_BASE: &Segment{
+	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE: &Segment{
 		Type:         0x7a,
 		InputDegree:  TRACK_NONE,
 		OutputDegree: TRACK_DOWN_60,
@@ -1502,8 +1503,8 @@ const (
 
 	ELEM_WHIRLPOOL = 0x78
 
-	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE = 0x79
-	ELEM_60_DEG_DOWN_TO_FLAT_LONG_BASE = 0x7a
+	ELEM_60_DEG_DOWN_TO_FLAT_LONG_BASE = 0x79
+	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE = 0x7a
 
 	ELEM_CABLE_LIFT_HILL             = 0x7b
 	ELEM_REVERSE_WHOA_BELLY_SLOPE    = 0x7c

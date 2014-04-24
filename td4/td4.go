@@ -1,12 +1,13 @@
 // td4 ride format parser
-
-package main
+package td4
 
 import (
 	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	rct "github.com/kevinburke/rct-rides"
+	"github.com/kevinburke/rct-rides/tracks"
 	"io/ioutil"
 	"math"
 )
@@ -53,7 +54,6 @@ type RideType int
 type VehicleType int
 type LoadType int
 type OperatingMode int
-type SegmentType int
 
 const (
 	WOODEN_RIDE    RideType = iota
@@ -114,7 +114,7 @@ type Ride struct {
 	CarsPerTrain  int
 	MinWaitTime   int
 	MaxWaitTime   int
-	TrackData     TrackData
+	TrackData     tracks.Data
 }
 
 type StationType int
@@ -127,7 +127,7 @@ const (
 )
 
 // computes sines in degrees
-func sindeg(deg DirectionDelta) int {
+func sindeg(deg tracks.DirectionDelta) int {
 	for ; deg >= 360; deg -= 360 {
 	}
 	if deg%180 == 0 {
@@ -142,7 +142,7 @@ func sindeg(deg DirectionDelta) int {
 }
 
 // computes sines in degrees
-func cosdeg(deg DirectionDelta) int {
+func cosdeg(deg tracks.DirectionDelta) int {
 	for ; deg >= 360; deg -= 360 {
 	}
 	if deg == 0 {
@@ -197,15 +197,15 @@ var EndOfRide = errors.New("End of ride")
 
 // Parse the serialized data into a TrackElement struct
 // When the end of ride is encountered a EndOfRide error is returned
-func parseElement(rawElement []byte) (te TrackElement, e error) {
+func parseElement(rawElement []byte) (te tracks.Element, e error) {
 	if len(rawElement) != 2 {
-		return TrackElement{}, errors.New("invalid length for element input")
+		return tracks.Element{}, errors.New("invalid length for element input")
 	}
-	te.Segment = &TrackSegment{
-		Type: SegmentType(rawElement[0]),
+	te.Segment = &tracks.Segment{
+		Type: tracks.SegmentType(rawElement[0]),
 	}
-	if te.Segment.Type == ELEM_END_OF_RIDE {
-		return TrackElement{}, EndOfRide
+	if te.Segment.Type == tracks.ELEM_END_OF_RIDE {
+		return tracks.Element{}, EndOfRide
 	}
 	q := int(rawElement[1])
 	te.ChainLift = q>>7 == 1
@@ -218,8 +218,8 @@ func parseElement(rawElement []byte) (te TrackElement, e error) {
 	return
 }
 
-func parseTrackData(trackData []byte) TrackData {
-	td := new(TrackData)
+func parseTrackData(trackData []byte) tracks.Data {
+	td := new(tracks.Data)
 	for i := 0; i < len(trackData); i += 2 {
 		elem, err := parseElement(trackData[i : i+2])
 		if err != nil {
@@ -233,14 +233,16 @@ func parseTrackData(trackData []byte) TrackData {
 
 	// XXX where is this data actually stored?
 	td.Clearance = 2
-	td.ClearanceDirection = CLEARANCE_ABOVE
+	td.ClearanceDirection = tracks.CLEARANCE_ABOVE
 	return *td
 }
 
 // Advance all of the values by one track segment.
-func advanceTrack(ts *TrackSegment, ΔE int, ΔForward int, ΔSideways int,
-	direction DirectionDelta) (int, int, int, DirectionDelta) {
-	ΔE += ts.ElevationGain
+func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
+	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
+
+	// XXX
+	ΔE += 0
 
 	ΔForward += cosdeg(direction) * ts.ForwardDelta
 	ΔForward += sindeg(direction) * ts.SidewaysDelta
@@ -257,11 +259,11 @@ func advanceTrack(ts *TrackSegment, ΔE int, ΔForward int, ΔSideways int,
 
 // Test whether the ride's track forms a continuous circuit. Does not test
 // whether the ride collides with itself.
-func IsCircuit(t *TrackData) bool {
+func IsCircuit(t *tracks.Data) bool {
 	// X and Y don't really make sense as variable names, easier to think about
 	// relative changes
 	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := DIRECTION_STRAIGHT
+	direction := tracks.DIRECTION_STRAIGHT
 	if len(t.Elements) == 0 {
 		return false
 	}
@@ -274,7 +276,7 @@ func IsCircuit(t *TrackData) bool {
 }
 
 // Detect whether the track collides with itself.
-func HasCollision(t *TrackData) bool {
+func HasCollision(t *tracks.Data) bool {
 	matrix := make([][][]bool, 100)
 	for i := range matrix {
 		matrix[i] = make([][]bool, 100)
@@ -283,7 +285,7 @@ func HasCollision(t *TrackData) bool {
 		}
 	}
 	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := DIRECTION_STRAIGHT
+	direction := tracks.DIRECTION_STRAIGHT
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
 		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(
@@ -306,7 +308,7 @@ func readRaptor() Ride {
 	if err != nil {
 		panic(err)
 	}
-	z := NewReader(bytes.NewReader(encodedBits))
+	z := rct.NewReader(bytes.NewReader(encodedBits))
 	if err != nil {
 		panic(err)
 	}
