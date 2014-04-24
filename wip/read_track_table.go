@@ -295,14 +295,25 @@ var foo = map[int]map[int]string{
 }
 
 func printValues(i int, b []byte) {
-	fmt.Printf("\t{ ")
+	fmt.Printf("%s: &Segment{\n", table1[i])
+	fmt.Printf("\tType: %#x,\n", i)
+	bitVal := int(b[i*8+2])
+	fmt.Printf("\tInputDegree: %s,\n", foo[2][bitVal])
+	bitVal = int(b[i*8+1])
+	fmt.Printf("\tOutputDegree: %s,\n", foo[1][bitVal])
+	bitVal = int(b[i*8+4])
+	fmt.Printf("\tStartingBank: %s,\n", foo[4][bitVal])
+	bitVal = int(b[i*8+3])
+	fmt.Printf("\tEndingBank: %s,\n", foo[3][bitVal])
+	fmt.Printf("},\n")
+	//fmt.Printf("\t{ ")
 
-	for j := 0; j < 6; j++ {
-		bitVal := int(b[i*8+j])
-		fmt.Printf("%s,\t\t", foo[j][bitVal])
-	}
+	//for j := 0; j < 6; j++ {
+	//bitVal := int(b[i*8+j])
+	//fmt.Printf("%s,\t\t", foo[j][bitVal])
+	//}
 
-	fmt.Printf(" },\t\t// %s\n", table1[i])
+	//fmt.Printf(" },\t\t// %s\n", table1[i])
 
 	//if b[i*8+2] == 2 {
 	//fmt.Println("- starts at 25 degrees up")
