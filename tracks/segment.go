@@ -4,12 +4,12 @@ type Degree int
 
 const (
 	TRACK_NONE    Degree = 0
-	TRACK_UP_25          = 25
-	TRACK_UP_60          = 60
-	TRACK_DOWN_25        = -25
-	TRACK_DOWN_60        = -60
-	TRACK_UP_90          = 90
-	TRACK_DOWN_90        = -90
+	TRACK_UP_25          = 1
+	TRACK_UP_60          = 4
+	TRACK_DOWN_25        = -1
+	TRACK_DOWN_60        = -4
+	TRACK_UP_90          = 10
+	TRACK_DOWN_90        = -10
 )
 
 type SegmentType int

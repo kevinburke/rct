@@ -68,9 +68,7 @@ func parseElement(rawElement []byte) (te Element, e error) {
 	if len(rawElement) != 2 {
 		return Element{}, errors.New("invalid length for element input")
 	}
-	te.Segment = &Segment{
-		Type: SegmentType(rawElement[0]),
-	}
+	te.Segment = TS_MAP[SegmentType(rawElement[0])]
 	if te.Segment.Type == ELEM_END_OF_RIDE {
 		return Element{}, EndOfRide
 	}
