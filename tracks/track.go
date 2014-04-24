@@ -20,16 +20,6 @@ const (
 	CLEARANCE_BELOW = iota
 )
 
-type Degree int
-
-const (
-	DEGREE_FLAT    = 0
-	DEGREE_25_UP   = 25
-	DEGREE_60_UP   = 60
-	DEGREE_25_DOWN = -25
-	DEGREE_60_DOWN = -60
-)
-
 type DirectionDelta int
 
 const (

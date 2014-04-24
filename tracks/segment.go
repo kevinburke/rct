@@ -25,7 +25,6 @@ const (
 
 type Segment struct {
 	Type           SegmentType
-	ElevationGain  int
 	DirectionDelta DirectionDelta
 
 	InputDegree  Degree
