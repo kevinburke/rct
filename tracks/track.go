@@ -97,7 +97,6 @@ func parseElement(rawElement []byte) (te Element, e error) {
 
 // Turn RCT encoded track data into a Data object.
 func Unmarshal(buf []byte, d *Data) error {
-	td := new(Data)
 	for i := 0; i < len(buf); i += 2 {
 		elem, err := parseElement(buf[i : i+2])
 		if err != nil {
@@ -106,11 +105,11 @@ func Unmarshal(buf []byte, d *Data) error {
 			}
 			return err
 		}
-		td.Elements = append(td.Elements, elem)
+		d.Elements = append(d.Elements, elem)
 	}
 
 	// XXX where is this data actually stored?
-	td.Clearance = 2
-	td.ClearanceDirection = CLEARANCE_ABOVE
+	d.Clearance = 2
+	d.ClearanceDirection = CLEARANCE_ABOVE
 	return nil
 }

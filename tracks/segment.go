@@ -1,6 +1,27 @@
 package tracks
 
+type Degree int
+
+const (
+	DEGREE_FLAT    Degree = 0
+	DEGREE_25_UP          = 25
+	DEGREE_60_UP          = 60
+	DEGREE_25_DOWN        = -25
+	DEGREE_60_DOWN        = -60
+	DEGREE_90_UP          = 90
+	DEGREE_90_DOWN        = -90
+)
+
 type SegmentType int
+
+type Bank int
+
+const (
+	BANK_LEFT Bank = iota
+	BANK_RIGHT
+	BANK_FLAT
+	BANK_UPSIDE_DOWN
+)
 
 type Segment struct {
 	Type           SegmentType
@@ -18,6 +39,9 @@ type Segment struct {
 	// How far we moved side to side. Negative numbers indicate the track
 	// turned left.
 	SidewaysDelta int
+
+	StartingBank Bank
+	EndingBank   Bank
 }
 
 var TS_MAP = map[SegmentType]*Segment{

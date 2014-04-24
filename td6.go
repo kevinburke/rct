@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 )
 
+const DEBUG = false
+
 func hasLoop(n int) bool {
 	return hasBit(n, BIT_VERTICAL_LOOP)
 }
@@ -158,6 +160,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	d := new(tracks.Data)
 	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
+	fmt.Println(d)
 	r.TrackData = *d
 
 	r.VehicleType = VehicleType(string(buf[IDX_VEHICLE_TYPE : IDX_VEHICLE_TYPE+LENGTH_VEHICLE_TYPE]))
@@ -170,7 +173,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	return nil
 }
-func readRide(filename string) Ride {
+func ReadRide(filename string) *Ride {
 	encodedBits, err := ioutil.ReadFile(filename)
 
 	if err != nil {
@@ -183,11 +186,14 @@ func readRide(filename string) Ride {
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	decrypted := bitbuffer.Bytes()
-	for i := 0; i < 200; i++ {
-		// encode the value of i as hex
-		ds := hex.EncodeToString([]byte{byte(i)})
-		bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
-		fmt.Printf("%s: %s\n", ds, bitValueInHex)
+
+	if DEBUG {
+		for i := 0; i < 200; i++ {
+			// encode the value of i as hex
+			ds := hex.EncodeToString([]byte{byte(i)})
+			bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
+			fmt.Printf("%s: %s\n", ds, bitValueInHex)
+		}
 	}
 
 	// r is a pointer
@@ -195,9 +201,9 @@ func readRide(filename string) Ride {
 	Unmarshal(decrypted, r)
 	//bits, err := Marshal(r)
 	//fmt.Println(bits)
-	return *r
+	return r
 }
 
 func main() {
-	fmt.Println(readRide("rides/mischief.td6"))
+	fmt.Println(ReadRide("rides/mischief.td6"))
 }
