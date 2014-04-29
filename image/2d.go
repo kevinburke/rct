@@ -13,6 +13,7 @@ import (
 
 	"code.google.com/p/draw2d/draw2d"
 	rct "github.com/kevinburke/rct-rides"
+	"github.com/kevinburke/rct-rides/tracks"
 )
 
 func saveToPngFile(filePath string, m image.Image) {
@@ -49,10 +50,10 @@ func Draw(r *rct.Ride) image.Image {
 	c := color.RGBA{0xff, 0xff, 0xff, 0xff}
 	draw.Draw(i, i.Bounds(), &image.Uniform{c}, image.ZP, draw.Src)
 	gc := draw2d.NewGraphicContext(i)
-	x := 8.0
+	x := float64(PIECE_WIDTH)
 	y := float64(IMG_HEIGHT) - 20.0
-	gc.MoveTo(x, y)
 	for j := 0; j < len(r.TrackData.Elements); j++ {
+		gc.MoveTo(x, y)
 		elem := r.TrackData.Elements[j]
 		seg := elem.Segment
 		if elem.ChainLift {
@@ -60,16 +61,42 @@ func Draw(r *rct.Ride) image.Image {
 		} else {
 			gc.SetStrokeColor(RED)
 		}
-		y -= 10.0 * float64(seg.InputDegree)
+		y -= 10.0 * computeElevationChange(seg)
 		gc.LineTo(float64(x+PIECE_WIDTH), y)
-		fmt.Println("==========")
-		fmt.Println(seg.InputDegree)
-		fmt.Println(seg.OutputDegree)
-		x += PIECE_WIDTH
 		gc.Stroke()
-		gc.MoveTo(x, y)
+		x += PIECE_WIDTH
 	}
 	return i
+}
+
+// 0 to -1 ==> -1 (diff -1)
+// -1 to 0 ==> 0 (diff 1)
+
+// 0 to 1 ==> 0 (diff 1)
+// 1 to 0 ==> 1 (diff -1)
+
+// 1 to 1 ==> 1
+// 4 to 4 ==> 4
+// 1 to 4 ==> 2
+// 4 to 1 ==> 2
+// 0-1, 1-4, 4-4, 4-1, 1-0
+
+func computeElevationChange(seg *tracks.Segment) float64 {
+	fmt.Println("==========")
+	fmt.Println(seg.InputDegree)
+	fmt.Println(seg.OutputDegree)
+	if seg.InputDegree == seg.OutputDegree {
+		return float64(seg.InputDegree)
+	}
+	if seg.InputDegree == tracks.TRACK_FLAT && seg.OutputDegree == tracks.TRACK_25_UP {
+		return 0.0
+	}
+	if seg.InputDegree == tracks.TRACK_FLAT && seg.OutputDegree == tracks.TRACK_25_DOWN {
+		return -1.0
+	}
+
+	diff := seg.OutputDegree - seg.InputDegree
+	return float64(diff)
 }
 
 func main() {
