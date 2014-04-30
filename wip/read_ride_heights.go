@@ -2,18 +2,20 @@ package main
 
 import (
 	//"encoding/hex"
+
+	"encoding/binary"
 	"fmt"
 	"os"
-
-	//"strings"
 )
+
+//"strings"
 
 func hasBit(n int, pos uint) bool {
 	val := n & (1 << pos)
 	return (val > 0)
 }
 
-var table1 = []string{
+var elementNames = []string{
 	"ELEM_FLAT",
 	"ELEM_END_STATION",
 	"ELEM_BEGIN_STATION",
@@ -196,7 +198,7 @@ var table1 = []string{
 	"ELEM_RIGHT_BANK_TO_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP",
 	"ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_LEFT_BANK",
 	"ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_RIGHT_BANK",
-	"ELEM_POWERED_LIFT", // b6
+	"ELEM_POWERED_LIFT",
 	"ELEM_LEFT_LARGE_HALF_LOOP_UP",
 	"ELEM_RIGHT_LARGE_HALF_LOOP_UP",
 	"ELEM_RIGHT_LARGE_HALF_LOOP_DOWN",
@@ -238,50 +240,25 @@ func main() {
 	defer f.Close()
 
 	b := make([]byte, 1800)
-	//f.ReadAt(b, 0x0057d218) // supplementary ride data ?
-	//f.ReadAt(b, 0x005acfa4) // all 0xff, maybe this gets writtento
-	f.ReadAt(b, 0x0059423C)
+	//f.ReadAt(b, 0x00594638) // ride height data ?
+	f.ReadAt(b, 0x00594A38) // ride height data ?
 
-	//rptrs := make([]byte, 30)
-	//for i := int64(0); i < 70; i++ {
-	//rptrs = append(rptrs, b[0])
-	//}
-	//for i := 0; i < len(rides)+70; i++ {
-	//if i < len(rides) {
-	//fmt.Printf("%50s ", rides[i])
-	//fmt.Println(rptrs[i])
-	//} else {
-	//fmt.Printf("%50s ", "unknown")
-	//fmt.Println(rptrs[i])
-	//}
-	//}
-
-	var WIDTH = 2
-	//for i := 0; i < len(rides)+30; i++ {
-	//if i < len(rides) {
-	//fmt.Printf("%50s ", rides[i])
-	//} else {
-	//fmt.Printf("%50s ", "unknown")
-	//}
-	for i := 0; i < len(table1)+30; i++ {
-		if i < len(table1) {
-			fmt.Printf("%50s ", table1[i])
+	fmt.Println(len(b))
+	fmt.Println(b[0*4 : 0*4+2])
+	for i := 0; i < 256; i++ {
+		if i < len(elementNames) {
+			fmt.Printf("%50s ", elementNames[i])
 		} else {
 			fmt.Printf("%50s ", "unknown")
 		}
-		//fmt.Printf("%4d", int(b[i*WIDTH]))
+		dataBit := binary.LittleEndian.Uint32(b[i*4 : i*4+4])
+		exeAddress := dataBit - 0x400000
+		var WIDTH = 11
+		c := make([]byte, WIDTH)
+		f.ReadAt(c, int64(exeAddress))
 		for j := 0; j < WIDTH; j++ {
-			bijint := int(b[i*WIDTH+j])
-			//fmt.Printf("%08b ", bijint)
+			bijint := int(c[j])
 			fmt.Printf("%4d", bijint)
-			//fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
-			//fmt.Println(table1[i])
-			//fmt.Println(strings.Repeat("=", len(table1[i])))
-			//fmt.Println(" 0 1 2 3 4 5 6 7 ")
-			//fmt.Println(b[i*8 : i*8+8])
-			//fmt.Println(c[i*8 : i*8+8])
-			//printValues(i, b)
-			//fmt.Println("")
 		}
 		fmt.Printf("\n")
 	}
@@ -354,129 +331,3 @@ var foo = map[int]map[int]string{
 		224: "TRACK_CORKSCREW_DOWN",
 	},
 }
-
-func printValues(i int, b []byte) {
-	fmt.Printf("%s: &Segment{\n", table1[i])
-	fmt.Printf("\tType: %#x,\n", i)
-	bitVal := int(b[i*8+2])
-	fmt.Printf("\tInputDegree: %s,\n", foo[2][bitVal])
-	bitVal = int(b[i*8+1])
-	fmt.Printf("\tOutputDegree: %s,\n", foo[1][bitVal])
-	bitVal = int(b[i*8+4])
-	fmt.Printf("\tStartingBank: %s,\n", foo[4][bitVal])
-	bitVal = int(b[i*8+3])
-	fmt.Printf("\tEndingBank: %s,\n", foo[3][bitVal])
-	fmt.Printf("},\n")
-	//fmt.Printf("\t{ ")
-
-	//for j := 0; j < 6; j++ {
-	//bitVal := int(b[i*8+j])
-	//fmt.Printf("%s,\t\t", foo[j][bitVal])
-	//}
-
-	//fmt.Printf(" },\t\t// %s\n", table1[i])
-
-	//if b[i*8+2] == 2 {
-	//fmt.Println("- starts at 25 degrees up")
-	//}
-	//if b[i*8+2] == 4 {
-	//fmt.Println("- starts at 60 degrees up")
-	//}
-	//if b[i*8+2] == 6 {
-	//fmt.Println("- starts at 25 degrees down")
-	//}
-	//if b[i*8+2] == 8 {
-	//fmt.Println("- starts at 60 degrees down")
-	//}
-	//if b[i*8+1] == 0 {
-	//fmt.Println("- ends flat")
-	//}
-	//if b[i*8+1] == 2 {
-	//fmt.Println("- ends at 25 degrees up")
-	//}
-	//if b[i*8+1] == 4 {
-	//fmt.Println("- ends at 60 degrees up")
-	//}
-	//if b[i*8+1] == 6 {
-	//fmt.Println("- ends at 25 degrees down")
-	//}
-	//if b[i*8+1] == 8 {
-	//fmt.Println("- ends at 60 degrees down")
-	//}
-	//if b[i*8+4] == 2 {
-	//fmt.Println("- starts with left bank")
-	//}
-	//if b[i*8+4] == 4 {
-	//fmt.Println("- starts with right bank")
-	//}
-	//if b[i*8+3] == 2 {
-	//fmt.Println("- ends with left bank")
-	//}
-	//if b[i*8+3] == 4 {
-	//fmt.Println("- ends with right bank")
-	//}
-}
-
-// keys
-// byte 0:
-// value 2: end station
-// value 7: vertical loop
-// value 13: s bend
-// 17: twist
-// 18: half loop
-// 19: corkscrew
-// 20: tower base
-// 21: small helix
-// 22: large helix
-// 23: unbanked large helix
-// 24: brakes
-// 26: on ride photo
-// 27: water splash
-// 29: barrel roll
-// 30: powered lift
-// 31: half loop
-// 33: log flume reverser
-// 36: whoa belly
-// 43: lift hill
-// 46: spinning tunnel
-// 47: rotation control toggle
-// 52: rapids (rct2 only)
-// 152: waterfall/whirlpool
-// 172: brake for drop
-
-// byte 1:
-// 2: ends at 25 degree up
-// 4: ends at 60 degree up
-// 6: ends at 25 degree down
-// 8: ends at 60 degree down
-// 10: 90 degree up (tower, whoa belly)
-// 18: 90 degree down
-
-// byte 2:
-// 2: starts at 25 degree up
-// 4: starts at 60 degree up
-// 6: starts at 25 degree down
-// 8: starts at 60 degree down
-// 10: 90 degree up (also tower, whoa belly)
-// 18: 90 degree down
-
-// byte 3:
-// 2: ends with left bank
-// 4: ends with right bank
-// 15: ends upside down
-
-// byte 4:
-// 2: starts with L bank
-// 4: starts with R bank
-// 15: starts upside down
-
-// byte 5:
-// 64: half loop up
-// 192: half loop down
-// 208: something relating to vertical loops. same for both L and R
-// 224: corkscrew down
-
-// odd things:
-// - no instruction for diagonal
-// - no instruction for direction change
-// - no instruction for diameter

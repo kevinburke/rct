@@ -1,11 +1,10 @@
 package main
 
 import (
-	//"encoding/hex"
+	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"os"
-
-	//"strings"
 )
 
 func hasBit(n int, pos uint) bool {
@@ -196,7 +195,7 @@ var table1 = []string{
 	"ELEM_RIGHT_BANK_TO_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP",
 	"ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_LEFT_BANK",
 	"ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_RIGHT_BANK",
-	"ELEM_POWERED_LIFT", // b6
+	"ELEM_POWERED_LIFT",
 	"ELEM_LEFT_LARGE_HALF_LOOP_UP",
 	"ELEM_RIGHT_LARGE_HALF_LOOP_UP",
 	"ELEM_RIGHT_LARGE_HALF_LOOP_DOWN",
@@ -217,17 +216,6 @@ var rides = []string{
 	"Steeplechase/Motorbike/Soap Box Derby",
 	"Car Ride",
 	"Launched Freefall",
-	"Bobsleigh Coaster",
-	"Flying Turns",
-	"Observation Tower",
-	"Looping Roller Coaster",
-	"Dinghy Slide",
-	"Mine Train Coaster",
-	"Chairlift",
-	"Corkscrew Roller Coaster",
-	"Maze",
-	"Spiral Slide",
-	"Go Karts",
 }
 
 func main() {
@@ -238,9 +226,18 @@ func main() {
 	defer f.Close()
 
 	b := make([]byte, 1800)
-	//f.ReadAt(b, 0x0057d218) // supplementary ride data ?
-	//f.ReadAt(b, 0x005acfa4) // all 0xff, maybe this gets writtento
-	f.ReadAt(b, 0x0059423C)
+	f.ReadAt(b, 0x00599492)
+	//bits := []byte{b[3], b[2]}
+	//buf := bytes.NewReader(bits)
+	for i := 0; i < 256; i++ {
+		fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
+		fmt.Println(binary.LittleEndian.Uint16(b[2*i : 2*i+2]))
+	}
+	//fmt.Println(binary.Uvarint(bits))
+	//fmt.Println(b[177])
+	//fmt.Println(b[1])
+	//fmt.Println(b[2]) // 223
+	//fmt.Println(b[3])
 
 	//rptrs := make([]byte, 30)
 	//for i := int64(0); i < 70; i++ {
@@ -256,35 +253,33 @@ func main() {
 	//}
 	//}
 
-	var WIDTH = 2
+	//var WIDTH = 4
 	//for i := 0; i < len(rides)+30; i++ {
 	//if i < len(rides) {
 	//fmt.Printf("%50s ", rides[i])
 	//} else {
 	//fmt.Printf("%50s ", "unknown")
 	//}
-	for i := 0; i < len(table1)+30; i++ {
-		if i < len(table1) {
-			fmt.Printf("%50s ", table1[i])
-		} else {
-			fmt.Printf("%50s ", "unknown")
-		}
-		//fmt.Printf("%4d", int(b[i*WIDTH]))
-		for j := 0; j < WIDTH; j++ {
-			bijint := int(b[i*WIDTH+j])
-			//fmt.Printf("%08b ", bijint)
-			fmt.Printf("%4d", bijint)
-			//fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
-			//fmt.Println(table1[i])
-			//fmt.Println(strings.Repeat("=", len(table1[i])))
-			//fmt.Println(" 0 1 2 3 4 5 6 7 ")
-			//fmt.Println(b[i*8 : i*8+8])
-			//fmt.Println(c[i*8 : i*8+8])
-			//printValues(i, b)
-			//fmt.Println("")
-		}
-		fmt.Printf("\n")
-	}
+	//for i := 0; i < len(table1)+30; i++ {
+	//if i < len(table1) {
+	//fmt.Printf("%50s ", table1[i])
+	//} else {
+	//fmt.Printf("%50s ", "unknown")
+	//}
+	////fmt.Printf("%4d", int(b[i*WIDTH]))
+	//for j := 0; j < WIDTH; j++ {
+	//fmt.Printf("%4d", int(b[i*WIDTH+j]))
+	////fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
+	////fmt.Println(table1[i])
+	////fmt.Println(strings.Repeat("=", len(table1[i])))
+	////fmt.Println(" 0 1 2 3 4 5 6 7 ")
+	////fmt.Println(b[i*8 : i*8+8])
+	////fmt.Println(c[i*8 : i*8+8])
+	////printValues(i, b)
+	////fmt.Println("")
+	//}
+	//fmt.Printf("\n")
+	//}
 }
 
 var foo = map[int]map[int]string{
