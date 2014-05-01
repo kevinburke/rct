@@ -236,13 +236,14 @@ func main() {
 
 	var WIDTH = 10
 	b := make([]byte, 256*WIDTH)
-	f.ReadAt(b, 0x005972bb) // direction change stored in 2nd bit.
+	addr := 0x005972bb
+	f.ReadAt(b, int64(addr))
 
 	var colHeaderFmt = "%55s "
 	// header row
 	fmt.Printf(colHeaderFmt, "Number")
 	for j := 0; j < WIDTH; j++ {
-		fmt.Printf("%4d", j)
+		fmt.Printf("%4x ", addr+j-0x590000)
 	}
 	fmt.Printf("\n")
 
@@ -254,7 +255,7 @@ func main() {
 		}
 		for j := 0; j < WIDTH; j++ {
 			bijint := int(b[i*WIDTH+j])
-			fmt.Printf("%4d", bijint)
+			fmt.Printf("%4d ", bijint)
 		}
 		fmt.Printf("\n")
 	}

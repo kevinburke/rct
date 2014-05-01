@@ -243,7 +243,7 @@ func main() {
 	// header row
 	fmt.Printf(colHeaderFmt, "Number")
 	for j := 0; j < WIDTH; j++ {
-		fmt.Printf("%6x ", addr+j)
+		fmt.Printf("%4x ", addr+j-0x590000)
 	}
 	fmt.Printf("\n")
 
@@ -255,7 +255,7 @@ func main() {
 		}
 		for j := 0; j < WIDTH; j++ {
 			bijint := int(b[i*WIDTH+j])
-			fmt.Printf("%6d ", bijint)
+			fmt.Printf("%4d ", bijint)
 		}
 		fmt.Printf("\n")
 	}
