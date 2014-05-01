@@ -7,6 +7,11 @@ import (
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
+func hasBit(n int, pos uint) bool {
+	val := n & (1 << pos)
+	return (val > 0)
+}
+
 var reverseMap = map[tracks.DirectionDelta]string{
 	tracks.DIR_STRAIGHT:       "DIR_STRAIGHT",
 	tracks.DIR_45_DEG_RIGHT:   "DIR_45_DEG_RIGHT",
@@ -19,30 +24,48 @@ var reverseMap = map[tracks.DirectionDelta]string{
 	tracks.DIR_DIAGONAL_RIGHT: "DIR_DIAGONAL_RIGHT",
 }
 
-// Print out the Go code to make up a track segment
-func printValues(i int, b []byte) {
-	startingDirectionInt := int(b[i*RCT_DIRECTION_WIDTH])
+func getDiagonalFromRCTStruct(b []byte) tracks.DirectionDelta {
+	startingDirectionInt := int(b[0])
 	startingDirection := tracks.RCTDirectionKeys[startingDirectionInt]
-	endingDirectionInt := int(b[i*RCT_DIRECTION_WIDTH+1])
+	endingDirectionInt := int(b[1])
 	endingDirection := tracks.RCTDirectionKeys[endingDirectionInt]
 
-	var dir tracks.DirectionDelta
 	if startingDirection == tracks.DIR_DIAGONAL {
 		if endingDirection == tracks.DIR_DIAGONAL {
-			dir = tracks.DIR_DIAGONAL
+			return tracks.DIR_DIAGONAL
 		} else if endingDirection == tracks.DIR_90_DEG_RIGHT {
-			dir = tracks.DIR_DIAGONAL_RIGHT
+			return tracks.DIR_DIAGONAL_RIGHT
 		} else {
-			dir = tracks.DIR_DIAGONAL_LEFT
+			return tracks.DIR_DIAGONAL_LEFT
 		}
 	} else if endingDirection == tracks.DIR_DIAGONAL {
-		dir = tracks.DIR_DIAGONAL_RIGHT
+		return tracks.DIR_DIAGONAL_RIGHT
 	} else {
-		dir = endingDirection
+		return endingDirection
 	}
+}
 
-	fmt.Printf("%s: &Segment{\n", tracks.ElementNames[i])
+// XXX, this doesn't correctly handle s-bends, which only move sideways by 1
+// piece, I think.
+func getSidewaysDelta(sidewaysDeltaByte int) int {
+	if hasBit(sidewaysDeltaByte, 7) {
+		return 1 + (256-sidewaysDeltaByte)>>5
+	}
+	if hasBit(sidewaysDeltaByte, 6) {
+		return 1 + sidewaysDeltaByte>>5
+	}
+	return 0
+}
+
+// Print out the Go code to make up a track segment
+func printValues(elementName string, b []byte) {
+
+	dir := getDiagonalFromRCTStruct(b)
+	sidewaysDelta := getSidewaysDelta(int(b[8]))
+
+	fmt.Printf("%s: &Segment{\n", elementName)
 	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
+	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
 	//bitVal := int(b[i*8+2])
 	//fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
 	//bitVal = int(b[i*8+1])
@@ -141,8 +164,9 @@ func main() {
 		//fmt.Printf("%55s ", tracks.ElementNames[i])
 		//fmt.Printf("%4d ", b[i*WIDTH])
 		//fmt.Printf("\n")
-
-		printValues(i, b)
+		idx := i * RCT_DIRECTION_WIDTH
+		bitSubset := b[idx : idx+RCT_DIRECTION_WIDTH]
+		printValues(tracks.ElementNames[i], bitSubset)
 	}
 
 	//fmt.Printf("%#v\n", tracks.TS_MAP)

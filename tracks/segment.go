@@ -61,6 +61,8 @@ type Segment struct {
 	// moved backwards
 	ForwardDelta int
 
+	ElevationDelta int
+
 	// How far we moved side to side. Negative numbers indicate the track
 	// turned left.
 	SidewaysDelta int
