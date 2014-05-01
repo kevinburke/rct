@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"os"
 )
@@ -235,11 +234,10 @@ func main() {
 	}
 	defer f.Close()
 
-	b := make([]byte, 1800)
-	//f.ReadAt(b, 0x00594638) // ride height data ?
-	f.ReadAt(b, 0x00594A38) // ride height data ?
+	var WIDTH = 10
+	b := make([]byte, 256*WIDTH)
+	f.ReadAt(b, 0x005972bb) // direction change stored in 2nd bit.
 
-	var WIDTH = 11
 	var colHeaderFmt = "%55s "
 	// header row
 	fmt.Printf(colHeaderFmt, "Number")
@@ -248,18 +246,14 @@ func main() {
 	}
 	fmt.Printf("\n")
 
-	for i := 0; i < 256; i++ {
+	for i := 0; i < len(elementNames)+30; i++ {
 		if i < len(elementNames) {
 			fmt.Printf(colHeaderFmt, elementNames[i])
 		} else {
 			fmt.Printf(colHeaderFmt, "unknown")
 		}
-		dataBit := binary.LittleEndian.Uint32(b[i*4 : i*4+4])
-		exeAddress := dataBit - 0x400000
-		c := make([]byte, WIDTH)
-		f.ReadAt(c, int64(exeAddress))
 		for j := 0; j < WIDTH; j++ {
-			bijint := int(c[j])
+			bijint := int(b[i*WIDTH+j])
 			fmt.Printf("%4d", bijint)
 		}
 		fmt.Printf("\n")
