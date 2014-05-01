@@ -13,7 +13,6 @@ import (
 
 	"code.google.com/p/draw2d/draw2d"
 	rct "github.com/kevinburke/rct-rides"
-	"github.com/kevinburke/rct-rides/tracks"
 )
 
 func saveToPngFile(filePath string, m image.Image) {
@@ -38,7 +37,7 @@ func saveToPngFile(filePath string, m image.Image) {
 }
 
 const PIECE_WIDTH = 8
-const IMG_HEIGHT = 200
+const IMG_HEIGHT = 400
 
 var RED = color.RGBA{0xff, 0x00, 0x00, 0xff}
 var BLUE = color.RGBA{0x00, 0x00, 0xff, 0xff}
@@ -61,7 +60,7 @@ func Draw(r *rct.Ride) image.Image {
 		} else {
 			gc.SetStrokeColor(RED)
 		}
-		y -= 10.0 * computeElevationChange(seg)
+		y -= 10.0 * float64(seg.ElevationDelta)
 		gc.LineTo(float64(x+PIECE_WIDTH), y)
 		gc.Stroke()
 		x += PIECE_WIDTH
@@ -80,18 +79,6 @@ func Draw(r *rct.Ride) image.Image {
 // 1 to 4 ==> 2
 // 4 to 1 ==> 2
 // 0-1, 1-4, 4-4, 4-1, 1-0
-
-func computeElevationChange(seg *tracks.Segment) float64 {
-	fmt.Println("==========")
-	fmt.Println(seg.InputDegree)
-	fmt.Println(seg.OutputDegree)
-	if seg.InputDegree == seg.OutputDegree {
-		return float64(seg.InputDegree)
-	}
-
-	diff := seg.OutputDegree - seg.InputDegree
-	return float64(diff)
-}
 
 func main() {
 	r := rct.ReadRide("../rides/mischief.td6")
