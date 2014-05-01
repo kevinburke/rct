@@ -2,8 +2,10 @@ package main
 
 import (
 	//"encoding/hex"
+	"encoding/hex"
 	"fmt"
 	"os"
+	"strings"
 	//"strings"
 )
 
@@ -215,13 +217,13 @@ func main() {
 	f.ReadAt(c, 0x0059849d)
 
 	for i := 0; i < len(table1); i++ {
-		//fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
-		//fmt.Println(table1[i])
-		//fmt.Println(strings.Repeat("=", len(table1[i])))
-		//fmt.Println(" 0 1 2 3 4 5 6 7 ")
-		//fmt.Println(b[i*8 : i*8+8])
+		fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))
+		fmt.Println(table1[i])
+		fmt.Println(strings.Repeat("=", len(table1[i])))
+		fmt.Println(" 0 1 2 3 4 5 6 7 ")
+		fmt.Println(b[i*8 : i*8+8])
 		//fmt.Println(c[i*8 : i*8+8])
-		printValues(i, b)
+		//printValues(i, b)
 		//fmt.Println("")
 	}
 }

@@ -68,31 +68,35 @@ func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 }
 
 // Print out the Go code to make up a track segment
-func printValues(elementName string, b []byte) {
+func printValues(elementName string, diagonalByte []byte, bankByte []byte) {
 
-	dir := getDiagonalFromRCTStruct(b)
-	sidewaysDelta := getSidewaysDelta(int(b[8]))
-	negativeHeightBit := int(b[2])
-	positiveHeightBit := int(b[4])
+	dir := getDiagonalFromRCTStruct(diagonalByte)
+	sidewaysDelta := getSidewaysDelta(int(diagonalByte[8]))
+	negativeHeightBit := int(diagonalByte[2])
+	positiveHeightBit := int(diagonalByte[4])
 	elevationDelta := getElevationDelta(positiveHeightBit, negativeHeightBit)
 
 	fmt.Printf("%s: &Segment{\n", elementName)
 	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
 	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
 	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
-	//bitVal := int(b[i*8+2])
-	//fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
-	//bitVal = int(b[i*8+1])
-	//fmt.Printf("\tOutputDegree: %s,\n", configTable1Map[1][bitVal])
-	//bitVal = int(b[i*8+4])
-	//fmt.Printf("\tStartingBank: %s,\n", configTable1Map[4][bitVal])
-	//bitVal = int(b[i*8+3])
-	//fmt.Printf("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
+
+	bitVal := int(bankByte[2])
+	fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
+	bitVal = int(bankByte[1])
+	fmt.Printf("\tOutputDegree: %s,\n", configTable1Map[1][bitVal])
+	bitVal = int(bankByte[4])
+	fmt.Printf("\tStartingBank: %s,\n", configTable1Map[4][bitVal])
+	bitVal = int(bankByte[3])
+	fmt.Printf("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
 	fmt.Printf("},\n")
 }
 
 const RCT_DIRECTION_ADDR = 0x005972bb
 const RCT_DIRECTION_WIDTH = 10
+
+const RCT_BANK_SLOPE_ADDR = 0x00597c9d
+const RCT_BANK_SLOPE_WIDTH = 8
 
 var configTable1Map = map[int]map[int]string{
 	0: map[int]string{
@@ -173,6 +177,9 @@ func main() {
 	b := make([]byte, 256*RCT_DIRECTION_WIDTH)
 	f.ReadAt(b, int64(RCT_DIRECTION_ADDR))
 
+	c := make([]byte, 256*RCT_BANK_SLOPE_WIDTH)
+	f.ReadAt(c, RCT_BANK_SLOPE_ADDR)
+
 	for i := 0; i < len(tracks.ElementNames); i++ {
 		//fmt.Println(i)
 		//fmt.Printf("%55s ", tracks.ElementNames[i])
@@ -180,7 +187,11 @@ func main() {
 		//fmt.Printf("\n")
 		idx := i * RCT_DIRECTION_WIDTH
 		bitSubset := b[idx : idx+RCT_DIRECTION_WIDTH]
-		printValues(tracks.ElementNames[i], bitSubset)
+
+		bankIdx := i * RCT_BANK_SLOPE_WIDTH
+		bankBitSubset := b[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
+
+		printValues(tracks.ElementNames[i], bitSubset, bankBitSubset)
 	}
 
 	//fmt.Printf("%#v\n", tracks.TS_MAP)
