@@ -240,7 +240,7 @@ func main() {
 	b := make([]byte, 1800)
 	//f.ReadAt(b, 0x0057d218) // supplementary ride data ?
 	//f.ReadAt(b, 0x005acfa4) // all 0xff, maybe this gets writtento
-	f.ReadAt(b, 0x0059423C)
+	f.ReadAt(b, 0x0057d4f2)
 
 	//rptrs := make([]byte, 30)
 	//for i := int64(0); i < 70; i++ {
@@ -256,19 +256,21 @@ func main() {
 	//}
 	//}
 
-	var WIDTH = 2
-	//for i := 0; i < len(rides)+30; i++ {
-	//if i < len(rides) {
-	//fmt.Printf("%50s ", rides[i])
-	//} else {
-	//fmt.Printf("%50s ", "unknown")
-	//}
-	for i := 0; i < len(table1)+30; i++ {
-		if i < len(table1) {
-			fmt.Printf("%50s ", table1[i])
+	var WIDTH = 8
+
+	for i := 0; i < len(rides)+30; i++ {
+		if i < len(rides) {
+			fmt.Printf("%50s ", rides[i])
 		} else {
 			fmt.Printf("%50s ", "unknown")
 		}
+		//for i := 0; i < len(table1)+30; i++ {
+		//if i < len(table1) {
+		//fmt.Printf("%50s ", table1[i])
+		//} else {
+		//fmt.Printf("%50s ", "unknown")
+		//}
+
 		//fmt.Printf("%4d", int(b[i*WIDTH]))
 		for j := 0; j < WIDTH; j++ {
 			bijint := int(b[i*WIDTH+j])

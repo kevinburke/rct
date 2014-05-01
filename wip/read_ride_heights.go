@@ -243,17 +243,23 @@ func main() {
 	//f.ReadAt(b, 0x00594638) // ride height data ?
 	f.ReadAt(b, 0x00594A38) // ride height data ?
 
-	fmt.Println(len(b))
-	fmt.Println(b[0*4 : 0*4+2])
+	var WIDTH = 11
+	var colHeaderFmt = "%55s "
+	// header row
+	fmt.Printf(colHeaderFmt, "Number")
+	for j := 0; j < WIDTH; j++ {
+		fmt.Printf("%4d", j)
+	}
+	fmt.Printf("\n")
+
 	for i := 0; i < 256; i++ {
 		if i < len(elementNames) {
-			fmt.Printf("%50s ", elementNames[i])
+			fmt.Printf(colHeaderFmt, elementNames[i])
 		} else {
-			fmt.Printf("%50s ", "unknown")
+			fmt.Printf(colHeaderFmt, "unknown")
 		}
 		dataBit := binary.LittleEndian.Uint32(b[i*4 : i*4+4])
 		exeAddress := dataBit - 0x400000
-		var WIDTH = 11
 		c := make([]byte, WIDTH)
 		f.ReadAt(c, int64(exeAddress))
 		for j := 0; j < WIDTH; j++ {
