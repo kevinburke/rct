@@ -24,6 +24,31 @@ const (
 	TRACK_BANK_UPSIDE_DOWN
 )
 
+type DirectionDelta int
+
+const (
+	// All of these expressed in positives to help with degree calculations
+	DIR_STRAIGHT       DirectionDelta = 0
+	DIR_45_DEG_RIGHT                  = 45
+	DIR_90_DEG_RIGHT                  = 90
+	DIR_180_DEG                       = 180
+	DIR_90_DEG_LEFT                   = 270
+	DIR_45_DEG_LEFT                   = 315
+	DIR_DIAGONAL                      = iota
+	DIR_DIAGONAL_LEFT                 = iota
+	DIR_DIAGONAL_RIGHT                = iota
+)
+
+var RCTDirectionKeys = map[int]DirectionDelta{
+	0: DIR_STRAIGHT,
+	1: DIR_90_DEG_RIGHT,
+	2: DIR_180_DEG,
+	3: DIR_90_DEG_LEFT,
+	// XXX
+	4: DIR_DIAGONAL,
+	7: DIR_DIAGONAL_LEFT,
+}
+
 type Segment struct {
 	Type           SegmentType
 	DirectionDelta DirectionDelta

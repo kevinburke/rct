@@ -37,18 +37,6 @@ const (
 	CLEARANCE_BELOW = iota
 )
 
-type DirectionDelta int
-
-const (
-	// All of these expressed in positives to help with degree calculations
-	DIRECTION_STRAIGHT     DirectionDelta = 0
-	DIRECTION_45_DEG_RIGHT                = 45
-	DIRECTION_90_DEG_RIGHT                = 90
-	DIRECTION_180_DEG                     = 180
-	DIRECTION_90_DEG_LEFT                 = 270
-	DIRECTION_45_DEG_LEFT                 = 315
-)
-
 type Element struct {
 	// XXX, add color schemes
 
