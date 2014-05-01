@@ -57,15 +57,29 @@ func getSidewaysDelta(sidewaysDeltaByte int) int {
 	return 0
 }
 
+func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
+	if positiveHeightBit > 0 {
+		return positiveHeightBit >> 3
+	}
+	if negativeHeightBit > 0 {
+		return negativeHeightBit >> 3
+	}
+	return 0
+}
+
 // Print out the Go code to make up a track segment
 func printValues(elementName string, b []byte) {
 
 	dir := getDiagonalFromRCTStruct(b)
 	sidewaysDelta := getSidewaysDelta(int(b[8]))
+	negativeHeightBit := int(b[2])
+	positiveHeightBit := int(b[4])
+	elevationDelta := getElevationDelta(positiveHeightBit, negativeHeightBit)
 
 	fmt.Printf("%s: &Segment{\n", elementName)
 	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
 	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
+	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
 	//bitVal := int(b[i*8+2])
 	//fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
 	//bitVal = int(b[i*8+1])
