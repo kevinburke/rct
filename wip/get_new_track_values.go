@@ -189,7 +189,7 @@ func main() {
 		bitSubset := b[idx : idx+RCT_DIRECTION_WIDTH]
 
 		bankIdx := i * RCT_BANK_SLOPE_WIDTH
-		bankBitSubset := b[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
+		bankBitSubset := c[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
 
 		printValues(tracks.ElementNames[i], bitSubset, bankBitSubset)
 	}
