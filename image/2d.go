@@ -88,12 +88,6 @@ func computeElevationChange(seg *tracks.Segment) float64 {
 	if seg.InputDegree == seg.OutputDegree {
 		return float64(seg.InputDegree)
 	}
-	if seg.InputDegree == tracks.TRACK_FLAT && seg.OutputDegree == tracks.TRACK_25_UP {
-		return 0.0
-	}
-	if seg.InputDegree == tracks.TRACK_FLAT && seg.OutputDegree == tracks.TRACK_25_DOWN {
-		return -1.0
-	}
 
 	diff := seg.OutputDegree - seg.InputDegree
 	return float64(diff)

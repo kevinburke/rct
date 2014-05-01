@@ -49,7 +49,7 @@ func getDiagonalFromRCTStruct(b []byte) tracks.DirectionDelta {
 // piece, I think.
 func getSidewaysDelta(sidewaysDeltaByte int) int {
 	if hasBit(sidewaysDeltaByte, 7) {
-		return 1 + (256-sidewaysDeltaByte)>>5
+		return -(1 + (256-sidewaysDeltaByte)>>5)
 	}
 	if hasBit(sidewaysDeltaByte, 6) {
 		return 1 + sidewaysDeltaByte>>5
@@ -62,13 +62,13 @@ func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 		return positiveHeightBit >> 3
 	}
 	if negativeHeightBit > 0 {
-		return negativeHeightBit >> 3
+		return -(negativeHeightBit >> 3)
 	}
 	return 0
 }
 
 // Print out the Go code to make up a track segment
-func printValues(elementName string, diagonalByte []byte, bankByte []byte) {
+func printValues(typ int, elementName string, diagonalByte []byte, bankByte []byte) {
 
 	dir := getDiagonalFromRCTStruct(diagonalByte)
 	sidewaysDelta := getSidewaysDelta(int(diagonalByte[8]))
@@ -77,10 +77,8 @@ func printValues(elementName string, diagonalByte []byte, bankByte []byte) {
 	elevationDelta := getElevationDelta(positiveHeightBit, negativeHeightBit)
 
 	fmt.Printf("%s: &Segment{\n", elementName)
-	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
-	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
-	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
 
+	fmt.Printf("\tType: %#x,\n", typ)
 	bitVal := int(bankByte[2])
 	fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
 	bitVal = int(bankByte[1])
@@ -89,7 +87,13 @@ func printValues(elementName string, diagonalByte []byte, bankByte []byte) {
 	fmt.Printf("\tStartingBank: %s,\n", configTable1Map[4][bitVal])
 	bitVal = int(bankByte[3])
 	fmt.Printf("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
+
+	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
+	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
+	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
+
 	fmt.Printf("},\n")
+
 }
 
 const RCT_DIRECTION_ADDR = 0x005972bb
@@ -191,7 +195,7 @@ func main() {
 		bankIdx := i * RCT_BANK_SLOPE_WIDTH
 		bankBitSubset := c[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
 
-		printValues(tracks.ElementNames[i], bitSubset, bankBitSubset)
+		printValues(i, tracks.ElementNames[i], bitSubset, bankBitSubset)
 	}
 
 	//fmt.Printf("%#v\n", tracks.TS_MAP)
