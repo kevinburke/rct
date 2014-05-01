@@ -234,9 +234,9 @@ func main() {
 	}
 	defer f.Close()
 
-	var WIDTH = 10
+	var WIDTH = 4
 	b := make([]byte, 256*WIDTH)
-	addr := 0x005972bb
+	addr := 0x00593ccc
 	f.ReadAt(b, int64(addr)) // direction change stored in 2nd bit.
 
 	var colHeaderFmt = "%55s "
