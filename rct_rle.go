@@ -77,8 +77,42 @@ func (z *Reader) Read(ride []byte) (int, error) {
 }
 
 func (z *Writer) Write(ride []byte) (int, error) {
+	if len(ride) == 0 {
+		return 0, nil
+	}
+	if len(ride) == 1 {
+		n, err := z.w.Write([]byte{byte(1), ride[0]})
+		if err != nil {
+			return n, err
+		}
+		return 1, nil
+	}
+	// if you find an immediate duplicate, read all of the duplicates to get
+	// the count. write the count, then write the duplicate byte.
+	if len(ride) > 1 && ride[0] == ride[1] {
+		count := 2
+		for {
+			if len(ride) > count && ride[count-1] == ride[count] {
+				count += 1
+			} else {
+				break
+			}
+		}
+
+		inv := -count + 1
+		n, err := z.w.Write([]byte{byte(inv), ride[0]})
+		if err != nil {
+			return n, err
+		}
+		return count, nil
+	}
+	// algo: read bytes until you find a duplicate, or reach 127
+
+	// if they are different, write one byte, return 1
+
 	// There is a checksum here that will have to be written as well. It seems
 	// cumbersome and I am not sure whether the checksum description at
-	// Technical Depot also works for RCT2. So I am leaving it alone.
+	// Technical Depot also works for RCT2. So I am leaving it alone for the
+	// moment.
 	return 5, nil
 }

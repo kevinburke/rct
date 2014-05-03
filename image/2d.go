@@ -60,7 +60,7 @@ func Draw(r *rct.Ride) image.Image {
 		} else {
 			gc.SetStrokeColor(RED)
 		}
-		y -= 10.0 * float64(seg.ElevationDelta)
+		y -= 8.0 * float64(seg.ElevationDelta)
 		gc.LineTo(float64(x+PIECE_WIDTH), y)
 		gc.Stroke()
 		x += PIECE_WIDTH
@@ -68,20 +68,8 @@ func Draw(r *rct.Ride) image.Image {
 	return i
 }
 
-// 0 to -1 ==> -1 (diff -1)
-// -1 to 0 ==> 0 (diff 1)
-
-// 0 to 1 ==> 0 (diff 1)
-// 1 to 0 ==> 1 (diff -1)
-
-// 1 to 1 ==> 1
-// 4 to 4 ==> 4
-// 1 to 4 ==> 2
-// 4 to 1 ==> 2
-// 0-1, 1-4, 4-4, 4-1, 1-0
-
 func main() {
-	r := rct.ReadRide("../rides/mischief.td6")
+	r := rct.ReadRide("/Users/kevin/code/go/src/github.com/kevinburke/rct-rides/rides/mischief.td6")
 	img := Draw(r)
 	saveToPngFile("test.png", img)
 }

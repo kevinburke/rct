@@ -6,8 +6,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/kevinburke/rct-rides/tracks"
 	"io/ioutil"
+
+	"github.com/kevinburke/rct-rides/tracks"
 )
 
 const DEBUG = false
@@ -160,7 +161,6 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	d := new(tracks.Data)
 	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
-	fmt.Println(d)
 	r.TrackData = *d
 
 	r.VehicleType = VehicleType(string(buf[IDX_VEHICLE_TYPE : IDX_VEHICLE_TYPE+LENGTH_VEHICLE_TYPE]))
