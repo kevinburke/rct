@@ -76,7 +76,8 @@ func (z *Reader) Read(ride []byte) (int, error) {
 	return n, nil
 }
 
-func (z *Writer) Write(ride []byte) (int, error) {
+// implement the writing algorithm
+func (z *Writer) write(ride []byte) (int, error) {
 	if len(ride) == 0 {
 		return 0, nil
 	}
@@ -92,7 +93,7 @@ func (z *Writer) Write(ride []byte) (int, error) {
 	if len(ride) > 1 && ride[0] == ride[1] {
 		count := 2
 		for {
-			if len(ride) > count && ride[count-1] == ride[count] {
+			if len(ride) > count && ride[count-1] == ride[count] && count <= 127 {
 				count += 1
 			} else {
 				break
@@ -101,6 +102,25 @@ func (z *Writer) Write(ride []byte) (int, error) {
 
 		inv := -count + 1
 		n, err := z.w.Write([]byte{byte(inv), ride[0]})
+		if err != nil {
+			return n, err
+		}
+		return count, nil
+	} else {
+		// read bytes until you find ones that are the same
+		count := 1
+		for {
+			if len(ride)-1 == count {
+				count += 1
+				break
+			}
+			if ride[count] != ride[count+1] && count <= 127 {
+				count += 1
+			} else {
+				break
+			}
+		}
+		n, err := z.w.Write(append([]byte{byte(len(ride[0:count]) - 1)}, ride[0:count]...))
 		if err != nil {
 			return n, err
 		}
@@ -114,5 +134,18 @@ func (z *Writer) Write(ride []byte) (int, error) {
 	// cumbersome and I am not sure whether the checksum description at
 	// Technical Depot also works for RCT2. So I am leaving it alone for the
 	// moment.
-	return 5, nil
+}
+
+func (z *Writer) Write(ride []byte) (int, error) {
+	count := 0
+	for {
+		n, err := z.write(ride[count:])
+		if err != nil {
+			return n, err
+		}
+		if count >= len(ride) {
+			return count, nil
+		}
+		count += n
+	}
 }

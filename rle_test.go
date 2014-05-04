@@ -14,14 +14,21 @@ func TestDecompress(t *testing.T) {
 	}
 	bitreader := bytes.NewReader(bits)
 	z := NewReader(bitreader)
-	if err != nil {
-		t.Fatalf(err.Error())
-	}
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	out := bitbuffer.Bytes()
 	if string(out) != "Good job!" {
 		t.Fatalf("expected \"Good job!\" but got %s", out)
+	}
+}
+
+func TestCompress(t *testing.T) {
+	var buf bytes.Buffer
+	z := NewWriter(&buf)
+	z.Write([]byte("Good job!"))
+	b := "0047ff6f0564206a6f6221"
+	if hex.EncodeToString(buf.Bytes()) != b {
+		t.Fatalf("expected %s but got %s", b, hex.EncodeToString(buf.Bytes()))
 	}
 }
 
