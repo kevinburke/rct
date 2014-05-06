@@ -201,12 +201,14 @@ func Unmarshal(buf []byte, r *Ride) error {
 	return nil
 }
 
+// Deserialize the ride to a string of bytes.
+//
 // This is a little bit tricky, and requires implementing the format
 // described in the tycoon technical depot, available here:
 // https://github.com/UnknownShadow200/RCTTechDepot-Archive/blob/master/td4.html
 func Marshal(r *Ride) ([]byte, error) {
 	// at a minimum, rides have this much data
-	bits := make([]byte, 0xc4)
+	bits := make([]byte, 0xa3+2*len(r.TrackData.Elements))
 
 	fmt.Println(r.RideType)
 	bits[IDX_RIDE_TYPE] = byte(r.RideType)
@@ -282,8 +284,16 @@ func Marshal(r *Ride) ([]byte, error) {
 	// XXX
 	copy(bits[0x70:0x80], r.DatData)
 
+	// Top 3 bytes are the number of circuits
 	bits[0xa2] = 1 << 5
+	// Low 5 bytes are the lift speed
 	bits[0xa2] |= 7
+
+	trackBits, err := tracks.Marshal(&r.TrackData)
+	if err != nil {
+		return []byte{}, err
+	}
+	copy(bits[0xa3:0xa3+len(trackBits)], trackBits)
 
 	return bits, nil
 }

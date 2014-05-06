@@ -21,20 +21,8 @@ package tracks
 import (
 	"encoding/hex"
 	"errors"
-)
 
-type Data struct {
-	Elements           []Element
-	Clearance          int
-	ClearanceDirection ClearanceDirection
-}
-
-type ClearanceDirection int
-
-const (
-	CLEARANCE_ABOVE = iota
-	// For suspended coasters
-	CLEARANCE_BELOW = iota
+	"github.com/kevinburke/rct-rides/bits"
 )
 
 type Element struct {
@@ -58,6 +46,20 @@ type Element struct {
 	Rotation int
 }
 
+type Data struct {
+	Elements           []Element
+	Clearance          int
+	ClearanceDirection ClearanceDirection
+}
+
+type ClearanceDirection int
+
+const (
+	CLEARANCE_ABOVE = iota
+	// For suspended coasters
+	CLEARANCE_BELOW = iota
+)
+
 func (te Element) String() string {
 	if te.Segment.Type > 0x17 {
 		return hex.EncodeToString([]byte{byte(te.Segment.Type)})
@@ -69,7 +71,9 @@ var EndOfRide = errors.New("End of ride")
 
 // Parse the serialized data into a Element struct
 // When the end of ride is encountered a EndOfRide error is returned
-func parseElement(rawElement []byte) (te Element, e error) {
+// Documentation from
+// http://freerct.github.io/RCTTechDepot-Archive/trackQualifier.html
+func unmarshalElement(rawElement []byte) (te Element, e error) {
 	if len(rawElement) != 2 {
 		return Element{}, errors.New("invalid length for element input")
 	}
@@ -88,10 +92,34 @@ func parseElement(rawElement []byte) (te Element, e error) {
 	return
 }
 
+// Turn track elements back into bytes (opposite of above function)
+//
+// Taken from http://freerct.github.io/RCTTechDepot-Archive/trackQualifier.html
+func marshalElement(e Element) ([]byte, error) {
+	buf := make([]byte, 2)
+	buf[0] = byte(e.Segment.Type)
+	featureBit := 0
+	bits.SetCond(featureBit, 7, e.ChainLift)
+	bits.SetCond(featureBit, 6, e.InvertedTrack)
+	bits.SetCond(featureBit, 3, e.Station)
+	if e.Segment.Type == ELEM_END_STATION || e.Segment.Type == ELEM_BEGIN_STATION || e.Segment.Type == ELEM_MIDDLE_STATION {
+		featureBit |= e.StationNumber
+	}
+
+	// XXX booster?
+	if e.Segment.Type == ELEM_BRAKES || e.Segment.Type == ELEM_BLOCK_BRAKES {
+		bm := e.BoostMagnitude / 7.6
+		featureBit |= int(bm)
+	}
+	// XXX, rotation for multi dimensional coasters
+	buf[1] = byte(featureBit)
+	return buf, nil
+}
+
 // Turn RCT encoded track data into a Data object.
 func Unmarshal(buf []byte, d *Data) error {
 	for i := 0; i < len(buf); i += 2 {
-		elem, err := parseElement(buf[i : i+2])
+		elem, err := unmarshalElement(buf[i : i+2])
 		if err != nil {
 			if err == EndOfRide {
 				break
@@ -105,4 +133,17 @@ func Unmarshal(buf []byte, d *Data) error {
 	d.Clearance = 2
 	d.ClearanceDirection = CLEARANCE_ABOVE
 	return nil
+}
+
+// Turn track data into a series of bytes
+func Marshal(d *Data) ([]byte, error) {
+	buf := make([]byte, 2*len(d.Elements))
+	for i := 0; i < len(d.Elements); i++ {
+		bts, err := marshalElement(d.Elements[i])
+		if err != nil {
+			return []byte{}, err
+		}
+		copy(buf[i*2:i*2+2], bts)
+	}
+	return buf, nil
 }
