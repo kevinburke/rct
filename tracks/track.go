@@ -5,17 +5,6 @@
 // order/arrangement. Some rides and shops use the same type as this is how
 // custom objects work.
 
-// I have attached the IDA database I have made so far.
-
-// Current_possible_ride_configurations appears to be 32 bytes which map to
-// ride_configuration_string_ids, those string ids map to the english text file
-// I have sent you. current_possible_ride_configurations is the order of track
-// configurations shown in the dropdown for the ride construction window when
-// currently constructing a ride. In order to find the tables used to see what
-// configurations are possible for a particular ride type, address 0x006C8681
-// is the code which sets the current_possible_ride_configurations array using
-// these other tables: track_config_table_1 and track_config_table_2. This is
-// all I have been able to figure out so far.
 package tracks
 
 import (

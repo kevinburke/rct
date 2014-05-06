@@ -29,10 +29,10 @@ func NewWriter(w io.Writer) *Writer {
 
 // Create a new reader that can read encoded files.
 func NewReader(r io.Reader) *Reader {
-	z := new(Reader)
-	z.r = bufio.NewReader(r)
-	z.off = 0
-	return z
+	return &Reader{
+		r:   bufio.NewReader(r),
+		off: 0,
+	}
 }
 
 func min(a int, b int) int {
