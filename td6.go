@@ -351,6 +351,16 @@ func ReadRide(filename string) *Ride {
 	return r
 }
 
+func _pad(bits []byte, n int) []byte {
+	return append(bits, bytes.Repeat([]byte{0}, n)...)
+}
+
+const RCT2_TD6_LENGTH = 24735
+
+func pad(bits []byte) []byte {
+	return _pad(bits, RCT2_TD6_LENGTH-len(bits))
+}
+
 func main() {
 	encodedBits, err := ioutil.ReadFile("rides/mischief.td6")
 	fmt.Println(hex.EncodeToString(encodedBits[len(encodedBits)-4 : len(encodedBits)]))
@@ -363,9 +373,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println("checksum:")
-	fmt.Println(checksum(bitsWithoutChecksum))
 
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
@@ -380,8 +387,6 @@ func main() {
 		panic(err)
 	}
 
-	//fmt.Println(bits)
-	//fmt.Println(decrypted)
 	for i := range bits {
 		if bits[i] != decrypted[i] {
 			fmt.Printf("%d: ", i)
@@ -389,7 +394,6 @@ func main() {
 		}
 	}
 
-	//fmt.Println(bits)
 	if DEBUG {
 		begin := 0xa2 + 2*len(r.TrackData.Elements) - 3
 		for i := begin; i < begin+DEBUG_LENGTH; i++ {
@@ -400,9 +404,14 @@ func main() {
 		}
 	}
 
+	paddedBits := pad(bits)
+
+	fmt.Println(paddedBits)
+	fmt.Println(decrypted)
+
 	var buf bytes.Buffer
 	w := NewWriter(&buf)
-	w.Write(bits)
+	w.Write(paddedBits)
 	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.TD6", buf.Bytes(), 0644)
 	fmt.Println("Wrote rides/mischief.td6.out.")
 }
