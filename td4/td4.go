@@ -263,7 +263,7 @@ func IsCircuit(t *tracks.Data) bool {
 	// X and Y don't really make sense as variable names, easier to think about
 	// relative changes
 	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := tracks.DIRECTION_STRAIGHT
+	direction := tracks.DIR_STRAIGHT
 	if len(t.Elements) == 0 {
 		return false
 	}
@@ -285,7 +285,7 @@ func HasCollision(t *tracks.Data) bool {
 		}
 	}
 	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := tracks.DIRECTION_STRAIGHT
+	direction := tracks.DIR_STRAIGHT
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
 		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(

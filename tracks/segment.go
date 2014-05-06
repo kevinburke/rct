@@ -2170,3 +2170,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		Type: 0xff,
 	},
 }
+
+func (s Segment) String() string {
+	return ElementNames[s.Type]
+}
