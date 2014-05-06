@@ -3,6 +3,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -11,7 +12,7 @@ import (
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
-const DEBUG = false
+const DEBUG = true
 
 func hasLoop(n int) bool {
 	return hasBit(n, BIT_VERTICAL_LOOP)
@@ -38,11 +39,11 @@ func unmarshalControlFlags(n int) *ControlFlags {
 }
 
 func marshalControlFlags(c ControlFlags) (n int) {
-	setConditionalBit(n, 7, c.UseMaximumTime)
-	setConditionalBit(n, 6, c.UseMinimumTime)
-	setConditionalBit(n, 5, c.SyncWithAdjacentStation)
-	setConditionalBit(n, 4, c.LeaveIfAnotherTrainArrives)
-	setConditionalBit(n, 3, c.WaitForLoad)
+	n = setConditionalBit(n, 7, c.UseMaximumTime)
+	n = setConditionalBit(n, 6, c.UseMinimumTime)
+	n = setConditionalBit(n, 5, c.SyncWithAdjacentStation)
+	n = setConditionalBit(n, 4, c.LeaveIfAnotherTrainArrives)
+	n = setConditionalBit(n, 3, c.WaitForLoad)
 	n |= int(c.Load)
 	return n
 }
@@ -228,6 +229,30 @@ func Marshal(r *Ride) ([]byte, error) {
 
 	bits[IDX_OPERATING_MODE] = byte(r.OperatingMode)
 	bits[IDX_CONTROL_FLAG] = byte(marshalControlFlags(*r.ControlFlags))
+	bits[IDX_NUM_TRAINS] = byte(r.NumTrains)
+	bits[IDX_CARS_PER_TRAIN] = byte(r.CarsPerTrain)
+	bits[IDX_MIN_WAIT_TIME] = byte(r.MinWaitTime)
+	bits[IDX_MAX_WAIT_TIME] = byte(r.MaxWaitTime)
+
+	// XXX The below information hasn't been parsed into ride data yet - this
+	// is just writing data to the file so it parses
+
+	// Color scheme, 3rd bit is RCT2 flag
+	bits[7] = 1 << 3
+	// Set a colorscheme (taken from Mischief)
+	bits[8] = 18
+	// air time
+	bits[0x4a] = 0x13
+	// max speed
+	bits[0x51] = 0x15
+	// average speed
+	bits[0x52] = 9
+
+	// also just copied from mischief
+	buf := new(bytes.Buffer)
+	binary.Write(buf, binary.LittleEndian, uint16(0x03b6))
+	copy(bits[0x53:0x53+2], buf.Bytes())
+
 	return bits, nil
 }
 
@@ -244,10 +269,9 @@ func ReadRide(filename string) *Ride {
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	decrypted := bitbuffer.Bytes()
-	fmt.Println(decrypted[:50])
 
 	if DEBUG {
-		for i := 0; i < 200; i++ {
+		for i := 0x4a; i < 0x4a+50; i++ {
 			// encode the value of i as hex
 			ds := hex.EncodeToString([]byte{byte(i)})
 			bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
@@ -270,7 +294,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(bits)
+	//fmt.Println(bits)
+	if DEBUG {
+		for i := 0x4a; i < 0x4a+50; i++ {
+			// encode the value of i as hex
+			ds := hex.EncodeToString([]byte{byte(i)})
+			bitValueInHex := hex.EncodeToString([]byte{bits[i]})
+			fmt.Printf("%s: %s\n", ds, bitValueInHex)
+		}
+	}
 	ioutil.WriteFile("rides/mischief.td6.out", bits, 0644)
 	fmt.Println("Wrote rides/mischief.td6.out.")
 }
