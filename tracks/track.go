@@ -82,9 +82,9 @@ func unmarshalElement(rawElement []byte) (te Element, e error) {
 		return Element{}, EndOfRide
 	}
 	q := int(rawElement[1])
-	te.ChainLift = q>>7 == 1
-	te.InvertedTrack = q>>6 == 1
-	te.Station = q>>3 == 1
+	te.ChainLift = bits.On(q, 7)
+	te.InvertedTrack = bits.On(q, 6)
+	te.Station = bits.On(q, 3)
 	te.StationNumber = q & 3
 
 	te.BoostMagnitude = float32(q&15) * 7.6
@@ -99,10 +99,11 @@ func marshalElement(e Element) ([]byte, error) {
 	buf := make([]byte, 2)
 	buf[0] = byte(e.Segment.Type)
 	featureBit := 0
-	bits.SetCond(featureBit, 7, e.ChainLift)
-	bits.SetCond(featureBit, 6, e.InvertedTrack)
-	bits.SetCond(featureBit, 3, e.Station)
+	featureBit = bits.SetCond(featureBit, 7, e.ChainLift)
+	featureBit = bits.SetCond(featureBit, 6, e.InvertedTrack)
+	featureBit = bits.SetCond(featureBit, 3, e.Station)
 	if e.Segment.Type == ELEM_END_STATION || e.Segment.Type == ELEM_BEGIN_STATION || e.Segment.Type == ELEM_MIDDLE_STATION {
+		// Set the station bit
 		featureBit |= e.StationNumber
 	}
 
@@ -110,6 +111,9 @@ func marshalElement(e Element) ([]byte, error) {
 	if e.Segment.Type == ELEM_BRAKES || e.Segment.Type == ELEM_BLOCK_BRAKES {
 		bm := e.BoostMagnitude / 7.6
 		featureBit |= int(bm)
+	} else {
+		// 2nd bit seems to be set in most cases.
+		featureBit |= 1 << 2
 	}
 	// XXX, rotation for multi dimensional coasters
 	buf[1] = byte(featureBit)
@@ -137,13 +141,14 @@ func Unmarshal(buf []byte, d *Data) error {
 
 // Turn track data into a series of bytes
 func Marshal(d *Data) ([]byte, error) {
-	buf := make([]byte, 2*len(d.Elements))
-	for i := 0; i < len(d.Elements); i++ {
+	buf := make([]byte, 2*len(d.Elements)+1)
+	for i := range d.Elements {
 		bts, err := marshalElement(d.Elements[i])
 		if err != nil {
 			return []byte{}, err
 		}
 		copy(buf[i*2:i*2+2], bts)
 	}
+	buf[len(buf)-1] = 0xff
 	return buf, nil
 }

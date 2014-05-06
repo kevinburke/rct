@@ -13,6 +13,7 @@ import (
 )
 
 const DEBUG = true
+const DEBUG_LENGTH = 20
 
 func hasLoop(n int) bool {
 	return hasBit(n, BIT_VERTICAL_LOOP)
@@ -112,6 +113,8 @@ type Ride struct {
 
 	// This is a little bit of a copout
 	DatData []byte
+
+	Egresses []*Egress
 }
 
 type RideType int
@@ -198,6 +201,13 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	r.DatData = buf[0x70:0x80]
 
+	// XXX, not sure if this fn should know about this, or the track data
+	entranceExitIdx := IDX_TRACK_DATA + 2*len(r.TrackData.Elements) + 1
+	r.Egresses = unmarshalEgress(buf[entranceExitIdx:])
+
+	// Ignore scenery data for now.
+	// sceneryIdx := entranceExitIdx + 6*len(r.Egresses) + 1
+
 	return nil
 }
 
@@ -208,7 +218,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 // https://github.com/UnknownShadow200/RCTTechDepot-Archive/blob/master/td4.html
 func Marshal(r *Ride) ([]byte, error) {
 	// at a minimum, rides have this much data
-	bits := make([]byte, 0xa3+2*len(r.TrackData.Elements))
+	bits := make([]byte, 0xa3)
 
 	fmt.Println(r.RideType)
 	bits[IDX_RIDE_TYPE] = byte(r.RideType)
@@ -293,8 +303,14 @@ func Marshal(r *Ride) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	copy(bits[0xa3:0xa3+len(trackBits)], trackBits)
+	bits = append(bits, trackBits...)
 
+	egresses, err := marshalEgresses(r.Egresses)
+	bits = append(bits, egresses...)
+
+	// append empty scenery data, XXX when we have scenery.
+	bits = append(bits, 0xff)
+	bits = append(bits, bytes.Repeat([]byte{0}, 21)...)
 	return bits, nil
 }
 
@@ -312,18 +328,23 @@ func ReadRide(filename string) *Ride {
 	bitbuffer.ReadFrom(z)
 	decrypted := bitbuffer.Bytes()
 
+	// r is a pointer
+	r := new(Ride)
+	Unmarshal(decrypted, r)
+
 	if DEBUG {
-		for i := 0xa2; i < 0xa2+20; i++ {
+		begin := 0xa2 + 2*len(r.TrackData.Elements) - 3
+		for i := begin; i < begin+DEBUG_LENGTH; i++ {
 			// encode the value of i as hex
+			if i > len(decrypted) {
+				continue
+			}
 			ds := hex.EncodeToString([]byte{byte(i)})
 			bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
 			fmt.Printf("%s: %s\n", ds, bitValueInHex)
 		}
 	}
 
-	// r is a pointer
-	r := new(Ride)
-	Unmarshal(decrypted, r)
 	//bits, err := Marshal(r)
 	//fmt.Println(bits)
 	return r
@@ -337,8 +358,11 @@ func main() {
 		panic(err)
 	}
 	//fmt.Println(bits)
+	fmt.Println(bits)
+	fmt.Println(len(bits))
 	if DEBUG {
-		for i := 0xa2; i < 0xa2+20; i++ {
+		begin := 0xa2 + 2*len(r.TrackData.Elements) - 3
+		for i := begin; i < begin+DEBUG_LENGTH; i++ {
 			// encode the value of i as hex
 			ds := hex.EncodeToString([]byte{byte(i)})
 			bitValueInHex := hex.EncodeToString([]byte{bits[i]})
