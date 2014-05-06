@@ -28,6 +28,7 @@ func NewWriter(w io.Writer) *Writer {
 	return z
 }
 
+// Create a new reader that can read encoded files.
 func NewReader(r io.Reader) *Reader {
 	z := new(Reader)
 	z.r = bufio.NewReader(r)
@@ -43,6 +44,23 @@ func min(a int, b int) int {
 	}
 }
 
+// Compute the checksum for a given series of bytes.
+func checksum(ride []byte) uint32 {
+	summation := uint32(0)
+	for i := range ride {
+		tmp := summation + uint32(ride[i])
+		summation = (summation & 0xffffff00) | (tmp & 0x000000ff)
+		highthree := summation & (7 << 29)
+		summation = summation << 3
+		summation |= highthree >> 29
+	}
+	summation -= 120001
+	return summation
+}
+
+// Read the encoded file into the byte array, decoding it in the process.
+// Note, a TD6 file will have a checksum appended on the end. This checksum is
+// not removed by the Read function.
 func (z *Reader) Read(ride []byte) (int, error) {
 	var n int
 	if len(ride) == 0 {
@@ -66,8 +84,8 @@ func (z *Reader) Read(ride []byte) (int, error) {
 		// if negative, read the next byte, repeat that byte (-c + 1) times
 		repeatByte, err := z.r.ReadByte()
 		repeatTimes := 0 - int8(c) + 1
-		repeatReader := bytes.NewReader(
-			bytes.Repeat([]byte{repeatByte}, int(repeatTimes)))
+		rpts := bytes.Repeat([]byte{repeatByte}, int(repeatTimes))
+		repeatReader := bytes.NewReader(rpts)
 		n, err = repeatReader.Read(ride[:int(repeatTimes)])
 		if err != nil {
 			return 0, err
@@ -126,14 +144,6 @@ func (z *Writer) write(ride []byte) (int, error) {
 		}
 		return count, nil
 	}
-	// algo: read bytes until you find a duplicate, or reach 127
-
-	// if they are different, write one byte, return 1
-
-	// There is a checksum here that will have to be written as well. It seems
-	// cumbersome and I am not sure whether the checksum description at
-	// Technical Depot also works for RCT2. So I am leaving it alone for the
-	// moment.
 }
 
 func (z *Writer) Write(ride []byte) (int, error) {

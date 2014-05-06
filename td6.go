@@ -316,11 +316,12 @@ func Marshal(r *Ride) ([]byte, error) {
 
 func ReadRide(filename string) *Ride {
 	encodedBits, err := ioutil.ReadFile(filename)
+	bitsWithoutChecksum := encodedBits[:len(encodedBits)-4]
 
 	if err != nil {
 		panic(err)
 	}
-	z := NewReader(bytes.NewReader(encodedBits))
+	z := NewReader(bytes.NewReader(bitsWithoutChecksum))
 	if err != nil {
 		panic(err)
 	}
@@ -352,14 +353,19 @@ func ReadRide(filename string) *Ride {
 
 func main() {
 	encodedBits, err := ioutil.ReadFile("rides/mischief.td6")
+	fmt.Println(hex.EncodeToString(encodedBits[len(encodedBits)-4 : len(encodedBits)]))
+	bitsWithoutChecksum := encodedBits[:len(encodedBits)-4]
 
 	if err != nil {
 		panic(err)
 	}
-	z := NewReader(bytes.NewReader(encodedBits))
+	z := NewReader(bytes.NewReader(bitsWithoutChecksum))
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("checksum:")
+	fmt.Println(checksum(bitsWithoutChecksum))
 
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
@@ -374,6 +380,8 @@ func main() {
 		panic(err)
 	}
 
+	//fmt.Println(bits)
+	//fmt.Println(decrypted)
 	for i := range bits {
 		if bits[i] != decrypted[i] {
 			fmt.Printf("%d: ", i)
@@ -395,6 +403,6 @@ func main() {
 	var buf bytes.Buffer
 	w := NewWriter(&buf)
 	w.Write(bits)
-	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.td6", buf.Bytes(), 0644)
+	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.TD6", buf.Bytes(), 0644)
 	fmt.Println("Wrote rides/mischief.td6.out.")
 }
