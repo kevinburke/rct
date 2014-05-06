@@ -52,19 +52,30 @@ func marshalControlFlags(c ControlFlags) (n int) {
 const (
 	IDX_RIDE_TYPE = 0x0
 	// Indications this isn't stored here in td6
-	IDX_FEATURES_0     = 0x2
-	IDX_FEATURES_1     = 0x3
-	IDX_OPERATING_MODE = 0x06
-	IDX_COLOR_SCHEME   = 0x07
-	IDX_CONTROL_FLAG   = 0x4b
-	IDX_NUM_TRAINS     = 0x4c
-	IDX_CARS_PER_TRAIN = 0x4d
-	IDX_MIN_WAIT_TIME  = 0x4e
-	IDX_MAX_WAIT_TIME  = 0x4f
-	IDX_VEHICLE_TYPE   = 0x74
-	IDX_TRACK_DATA     = 0xa3
-	IDX_X_SPACE        = 0x80
-	IDX_Y_SPACE        = 0x81
+	IDX_FEATURES_0       = 0x2
+	IDX_FEATURES_1       = 0x3
+	IDX_OPERATING_MODE   = 0x06
+	IDX_COLOR_SCHEME     = 0x07
+	IDX_CONTROL_FLAG     = 0x4b
+	IDX_NUM_TRAINS       = 0x4c
+	IDX_CARS_PER_TRAIN   = 0x4d
+	IDX_MIN_WAIT_TIME    = 0x4e
+	IDX_MAX_WAIT_TIME    = 0x4f
+	IDX_POSITIVE_G_FORCE = 0x55
+	IDX_NEGATIVE_G_FORCE = 0x56
+	IDX_LATERAL_G_FORCE  = 0x57
+	IDX_NUM_INVERSIONS   = 0x58
+	IDX_NUM_DROPS        = 0x59
+	IDX_HIGHEST_DROP     = 0x5a
+	IDX_EXCITEMENT       = 0x5b
+	IDX_INTENSITY        = 0x5c
+	IDX_NAUSEA           = 0x5d
+
+	IDX_VEHICLE_TYPE = 0x74
+
+	IDX_TRACK_DATA = 0xa3
+	IDX_X_SPACE    = 0x80
+	IDX_Y_SPACE    = 0x81
 )
 
 type Ride struct {
@@ -96,6 +107,11 @@ type Ride struct {
 	SBends            bool
 	SmallRadiusCurves bool
 	SmallRadiusBanked bool
+
+	NumInversions int
+
+	// This is a little bit of a copout
+	DatData []byte
 }
 
 type RideType int
@@ -169,6 +185,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.CarsPerTrain = int(buf[IDX_CARS_PER_TRAIN])
 	r.MinWaitTime = int(buf[IDX_MIN_WAIT_TIME])
 	r.MaxWaitTime = int(buf[IDX_MAX_WAIT_TIME])
+	r.NumInversions = int(buf[IDX_NUM_INVERSIONS])
 
 	d := new(tracks.Data)
 	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
@@ -179,8 +196,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.XSpaceRequired = int(buf[IDX_X_SPACE])
 	r.YSpaceRequired = int(buf[IDX_Y_SPACE])
 
-	// Not sure where the source of truth for this is yet
-	// r.VehicleType = VehicleType(buf[IDX_VEHICLE_TYPE])
+	r.DatData = buf[0x70:0x80]
 
 	return nil
 }
@@ -233,6 +249,9 @@ func Marshal(r *Ride) ([]byte, error) {
 	bits[IDX_CARS_PER_TRAIN] = byte(r.CarsPerTrain)
 	bits[IDX_MIN_WAIT_TIME] = byte(r.MinWaitTime)
 	bits[IDX_MAX_WAIT_TIME] = byte(r.MaxWaitTime)
+	bits[IDX_NUM_INVERSIONS] = byte(r.NumInversions)
+	bits[IDX_X_SPACE] = byte(r.XSpaceRequired)
+	bits[IDX_Y_SPACE] = byte(r.YSpaceRequired)
 
 	// XXX The below information hasn't been parsed into ride data yet - this
 	// is just writing data to the file so it parses
@@ -248,10 +267,23 @@ func Marshal(r *Ride) ([]byte, error) {
 	// average speed
 	bits[0x52] = 9
 
-	// also just copied from mischief
+	// ride length. also just copied from mischief
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, uint16(0x03b6))
 	copy(bits[0x53:0x53+2], buf.Bytes())
+
+	// positive G force
+	bits[0x55] = 0x0a
+	// negative g force
+	bits[0x56] = 0xfb
+	// lateral G force
+	bits[0x57] = 0x07
+
+	// XXX
+	copy(bits[0x70:0x80], r.DatData)
+
+	bits[0xa2] = 1 << 5
+	bits[0xa2] |= 7
 
 	return bits, nil
 }
@@ -271,7 +303,7 @@ func ReadRide(filename string) *Ride {
 	decrypted := bitbuffer.Bytes()
 
 	if DEBUG {
-		for i := 0x4a; i < 0x4a+50; i++ {
+		for i := 0xa2; i < 0xa2+20; i++ {
 			// encode the value of i as hex
 			ds := hex.EncodeToString([]byte{byte(i)})
 			bitValueInHex := hex.EncodeToString([]byte{decrypted[i]})
@@ -296,13 +328,13 @@ func main() {
 	}
 	//fmt.Println(bits)
 	if DEBUG {
-		for i := 0x4a; i < 0x4a+50; i++ {
+		for i := 0xa2; i < 0xa2+20; i++ {
 			// encode the value of i as hex
 			ds := hex.EncodeToString([]byte{byte(i)})
 			bitValueInHex := hex.EncodeToString([]byte{bits[i]})
 			fmt.Printf("%s: %s\n", ds, bitValueInHex)
 		}
 	}
-	ioutil.WriteFile("rides/mischief.td6.out", bits, 0644)
+	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.td6", bits, 0644)
 	fmt.Println("Wrote rides/mischief.td6.out.")
 }
