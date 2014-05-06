@@ -12,6 +12,14 @@ func setBit(n int, pos uint) int {
 	return n
 }
 
+// Only set the bit if the conditional is true.
+func setConditionalBit(n int, pos uint, question bool) int {
+	if question {
+		n |= (1 << pos)
+	}
+	return n
+}
+
 // Clears the bit at pos in n.
 func clearBit(n int, pos uint) int {
 	mask := ^(1 << pos)

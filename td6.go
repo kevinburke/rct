@@ -26,7 +26,7 @@ type ControlFlags struct {
 	Load                       LoadType
 }
 
-func parseControlFlags(n int) *ControlFlags {
+func unmarshalControlFlags(n int) *ControlFlags {
 	return &ControlFlags{
 		UseMaximumTime:             n>>7 == 1,
 		UseMinimumTime:             n>>6 == 1,
@@ -37,9 +37,19 @@ func parseControlFlags(n int) *ControlFlags {
 	}
 }
 
+func marshalControlFlags(c ControlFlags) (n int) {
+	setConditionalBit(n, 7, c.UseMaximumTime)
+	setConditionalBit(n, 6, c.UseMinimumTime)
+	setConditionalBit(n, 5, c.SyncWithAdjacentStation)
+	setConditionalBit(n, 4, c.LeaveIfAnotherTrainArrives)
+	setConditionalBit(n, 3, c.WaitForLoad)
+	n |= int(c.Load)
+	return n
+}
+
 // Where to find various pieces of information in the decoded ride.
 const (
-	IDX_RIDE_TYPE = 0x1
+	IDX_RIDE_TYPE = 0x0
 	// Indications this isn't stored here in td6
 	IDX_FEATURES_0     = 0x2
 	IDX_FEATURES_1     = 0x3
@@ -153,7 +163,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.SmallRadiusBanked = hasBit(featuresBit1, BIT_SMALL_RADIUS_BANKED)
 
 	r.OperatingMode = OperatingMode(buf[IDX_OPERATING_MODE])
-	r.ControlFlags = parseControlFlags(int(buf[IDX_CONTROL_FLAG]))
+	r.ControlFlags = unmarshalControlFlags(int(buf[IDX_CONTROL_FLAG]))
 	r.NumTrains = int(buf[IDX_NUM_TRAINS])
 	r.CarsPerTrain = int(buf[IDX_CARS_PER_TRAIN])
 	r.MinWaitTime = int(buf[IDX_MIN_WAIT_TIME])
@@ -173,6 +183,54 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	return nil
 }
+
+// This is a little bit tricky, and requires implementing the format
+// described in the tycoon technical depot, available here:
+// https://github.com/UnknownShadow200/RCTTechDepot-Archive/blob/master/td4.html
+func Marshal(r *Ride) ([]byte, error) {
+	// at a minimum, rides have this much data
+	bits := make([]byte, 0xc4)
+
+	fmt.Println(r.RideType)
+	bits[IDX_RIDE_TYPE] = byte(r.RideType)
+
+	copy(bits[IDX_VEHICLE_TYPE:IDX_VEHICLE_TYPE+8], r.VehicleType)
+	featureBit0 := 0
+	if r.SteepLiftChain {
+		setBit(featureBit0, BIT_STEEP_LIFT_CHAIN)
+	}
+	if r.CurvedLiftChain {
+		setBit(featureBit0, BIT_CURVED_LIFT_CHAIN)
+	}
+	if r.Banking {
+		setBit(featureBit0, BIT_BANKING)
+	}
+	if r.HasLoop {
+		setBit(featureBit0, BIT_VERTICAL_LOOP)
+	}
+	bits[IDX_FEATURES_0] = byte(featureBit0)
+
+	// Features bit 1
+	featureBit1 := 0
+	if r.SteepSlope {
+		setBit(featureBit1, BIT_STEEP_SLOPE)
+	}
+	if r.FlatToSteep {
+		setBit(featureBit1, BIT_FLAT_TO_STEEP)
+	}
+	if r.SlopedCurves {
+		setBit(featureBit1, BIT_SLOPED_CURVES)
+	}
+	if r.SteepTwist {
+		setBit(featureBit1, BIT_STEEP_TWIST)
+	}
+	bits[IDX_FEATURES_1] = byte(featureBit1)
+
+	bits[IDX_OPERATING_MODE] = byte(r.OperatingMode)
+	bits[IDX_CONTROL_FLAG] = byte(marshalControlFlags(*r.ControlFlags))
+	return bits, nil
+}
+
 func ReadRide(filename string) *Ride {
 	encodedBits, err := ioutil.ReadFile(filename)
 
@@ -186,6 +244,7 @@ func ReadRide(filename string) *Ride {
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(z)
 	decrypted := bitbuffer.Bytes()
+	fmt.Println(decrypted[:50])
 
 	if DEBUG {
 		for i := 0; i < 200; i++ {
@@ -205,5 +264,13 @@ func ReadRide(filename string) *Ride {
 }
 
 func main() {
-	fmt.Println(ReadRide("rides/mischief.td6"))
+	r := ReadRide("rides/mischief.td6")
+
+	bits, err := Marshal(r)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(bits)
+	ioutil.WriteFile("rides/mischief.td6.out", bits, 0644)
+	fmt.Println("Wrote rides/mischief.td6.out.")
 }

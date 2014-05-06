@@ -6,10 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	rct "github.com/kevinburke/rct-rides"
-	"github.com/kevinburke/rct-rides/tracks"
 	"io/ioutil"
 	"math"
+
+	rct "github.com/kevinburke/rct-rides"
+	"github.com/kevinburke/rct-rides/tracks"
 )
 
 func hasBit(n int, pos uint) bool {
@@ -188,7 +189,6 @@ func Marshal(r *Ride) ([]byte, error) {
 	// https://github.com/UnknownShadow200/RCTTechDepot-Archive/blob/master/td4.html
 	bits[IDX_RIDE_TYPE] = byte(r.RideType)
 	bits[IDX_VEHICLE_TYPE] = byte(r.VehicleType)
-	//bits[IDX_HAS_LOOP] = byte(r.HasLoop)
 
 	return bits, nil
 }
