@@ -26,7 +26,7 @@ func TestCompress(t *testing.T) {
 	var buf bytes.Buffer
 	z := NewWriter(&buf)
 	z.Write([]byte("Goood job!"))
-	b := "0047fe6f0564206a6f6221"
+	b := "0047fe6f0564206a6f6221d882451d"
 	if hex.EncodeToString(buf.Bytes()) != b {
 		t.Fatalf("expected %s but got %s", b, hex.EncodeToString(buf.Bytes()))
 	}

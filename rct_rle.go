@@ -8,6 +8,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/binary"
 	"io"
 )
 
@@ -23,9 +24,7 @@ type Writer struct {
 }
 
 func NewWriter(w io.Writer) *Writer {
-	z := new(Writer)
-	z.w = w
-	return z
+	return &Writer{w: w}
 }
 
 // Create a new reader that can read encoded files.
@@ -94,17 +93,19 @@ func (z *Reader) Read(ride []byte) (int, error) {
 	return n, nil
 }
 
-// implement the writing algorithm
-func (z *Writer) write(ride []byte) (int, error) {
+// implement the writing algorithm. Need to return the byte array so that we
+// can compute checksums.
+func (z *Writer) write(ride []byte) ([]byte, int, error) {
 	if len(ride) == 0 {
-		return 0, nil
+		return []byte{}, 0, nil
 	}
 	if len(ride) == 1 {
-		n, err := z.w.Write([]byte{byte(1), ride[0]})
+		towrite := []byte{byte(1), ride[0]}
+		n, err := z.w.Write(towrite)
 		if err != nil {
-			return n, err
+			return []byte{}, n, err
 		}
-		return 1, nil
+		return towrite, 1, nil
 	}
 	// if you find an immediate duplicate, read all of the duplicates to get
 	// the count. write the count, then write the duplicate byte.
@@ -119,11 +120,12 @@ func (z *Writer) write(ride []byte) (int, error) {
 		}
 
 		inv := -count + 1
-		n, err := z.w.Write([]byte{byte(inv), ride[0]})
+		towrite := []byte{byte(inv), ride[0]}
+		n, err := z.w.Write(towrite)
 		if err != nil {
-			return n, err
+			return []byte{}, n, err
 		}
-		return count, nil
+		return towrite, count, nil
 	} else {
 		// read bytes until you find ones that are the same
 		count := 1
@@ -138,23 +140,37 @@ func (z *Writer) write(ride []byte) (int, error) {
 				break
 			}
 		}
-		n, err := z.w.Write(append([]byte{byte(len(ride[0:count]) - 1)}, ride[0:count]...))
+		towrite := append([]byte{byte(len(ride[0:count]) - 1)}, ride[0:count]...)
+		n, err := z.w.Write(towrite)
 		if err != nil {
-			return n, err
+			return []byte{}, n, err
 		}
-		return count, nil
+		return towrite, count, nil
 	}
 }
 
 func (z *Writer) Write(ride []byte) (int, error) {
 	count := 0
+	var b bytes.Buffer
 	for {
-		n, err := z.write(ride[count:])
+		encoded, n, err := z.write(ride[count:])
 		if err != nil {
 			return n, err
 		}
+		b.Write(encoded)
 		if count >= len(ride) {
-			return count, nil
+			// all done. write checksum and continue
+			cks := checksum(b.Bytes())
+			buf := new(bytes.Buffer)
+			err := binary.Write(buf, binary.LittleEndian, cks)
+			if err != nil {
+				return n, err
+			}
+			n, err := z.w.Write(buf.Bytes())
+			if err != nil {
+				return n, err
+			}
+			return count + n, nil
 		}
 		count += n
 	}
