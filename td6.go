@@ -12,7 +12,7 @@ import (
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
-const DEBUG = true
+const DEBUG = false
 const DEBUG_LENGTH = 20
 
 func hasLoop(n int) bool {
@@ -351,15 +351,37 @@ func ReadRide(filename string) *Ride {
 }
 
 func main() {
-	r := ReadRide("rides/mischief.td6")
+	encodedBits, err := ioutil.ReadFile("rides/mischief.td6")
+
+	if err != nil {
+		panic(err)
+	}
+	z := NewReader(bytes.NewReader(encodedBits))
+	if err != nil {
+		panic(err)
+	}
+
+	var bitbuffer bytes.Buffer
+	bitbuffer.ReadFrom(z)
+	decrypted := bitbuffer.Bytes()
+
+	// r is a pointer
+	r := new(Ride)
+	Unmarshal(decrypted, r)
 
 	bits, err := Marshal(r)
 	if err != nil {
 		panic(err)
 	}
+
+	for i := range bits {
+		if bits[i] != decrypted[i] {
+			fmt.Printf("%d: ", i)
+			fmt.Printf("byte %x differs, in my mischief it is %d, in orig it is %d\n", i, bits[i], decrypted[i])
+		}
+	}
+
 	//fmt.Println(bits)
-	fmt.Println(bits)
-	fmt.Println(len(bits))
 	if DEBUG {
 		begin := 0xa2 + 2*len(r.TrackData.Elements) - 3
 		for i := begin; i < begin+DEBUG_LENGTH; i++ {
@@ -369,6 +391,10 @@ func main() {
 			fmt.Printf("%s: %s\n", ds, bitValueInHex)
 		}
 	}
-	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.td6", bits, 0644)
+
+	var buf bytes.Buffer
+	w := NewWriter(&buf)
+	w.Write(bits)
+	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.td6", buf.Bytes(), 0644)
 	fmt.Println("Wrote rides/mischief.td6.out.")
 }
