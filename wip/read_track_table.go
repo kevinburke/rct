@@ -211,10 +211,10 @@ func main() {
 	}
 	defer f.Close()
 	b := make([]byte, 1800)
-	f.ReadAt(b, 0x00597c9d)
+	//f.ReadAt(b, 0x00597c9d)
 
-	c := make([]byte, 1800)
-	f.ReadAt(c, 0x0059849d)
+	//c := make([]byte, 1800)
+	f.ReadAt(b, 0x0059849d)
 
 	for i := 0; i < len(table1); i++ {
 		fmt.Printf("%s ", hex.EncodeToString([]byte{byte(i)}))

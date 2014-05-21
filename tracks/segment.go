@@ -1,5 +1,7 @@
 package tracks
 
+import "strings"
+
 type Degree int
 
 const (
@@ -26,15 +28,17 @@ type DirectionDelta int
 
 const (
 	// All of these expressed in positives to help with degree calculations
-	DIR_STRAIGHT       DirectionDelta = 0
-	DIR_45_DEG_RIGHT                  = 45
-	DIR_90_DEG_RIGHT                  = 90
-	DIR_180_DEG                       = 180
-	DIR_90_DEG_LEFT                   = 270
-	DIR_45_DEG_LEFT                   = 315
-	DIR_DIAGONAL                      = iota
-	DIR_DIAGONAL_LEFT                 = iota
-	DIR_DIAGONAL_RIGHT                = iota
+	DIR_STRAIGHT     DirectionDelta = 0
+	DIR_45_DEG_RIGHT                = 45
+	DIR_90_DEG_RIGHT                = 90
+	DIR_180_DEG                     = 180
+	DIR_90_DEG_LEFT                 = 270
+	DIR_45_DEG_LEFT                 = 315
+	DIR_DIAGONAL                    = iota
+	// 1/8th direction change left (?)
+	DIR_DIAGONAL_LEFT = iota
+	// 1/8th direction change (?)
+	DIR_DIAGONAL_RIGHT = iota
 )
 
 var RCTDirectionKeys = map[int]DirectionDelta{
@@ -48,10 +52,16 @@ var RCTDirectionKeys = map[int]DirectionDelta{
 }
 
 type Segment struct {
-	Type           SegmentType
+	// Corresponds to the hex number of this element's order, eg 1 is flat,
+	// 2 is 25 deg up, etc.
+	Type SegmentType
+
+	// Computes the change in direction
 	DirectionDelta DirectionDelta
 
-	InputDegree  Degree
+	// The starting slope
+	InputDegree Degree
+	// The ending slope
 	OutputDegree Degree
 
 	// Change in tile position. A positive number indicates after the track
@@ -59,14 +69,17 @@ type Segment struct {
 	// moved backwards
 	ForwardDelta int
 
+	// The total change in elevation
 	ElevationDelta int
 
 	// How far we moved side to side. Negative numbers indicate the track
 	// turned left.
 	SidewaysDelta int
 
+	// Starting bank
 	StartingBank Bank
-	EndingBank   Bank
+	// the ending bank
+	EndingBank Bank
 }
 
 type SegmentType int
@@ -2172,5 +2185,5 @@ var TS_MAP = map[SegmentType]*Segment{
 }
 
 func (s Segment) String() string {
-	return ElementNames[s.Type]
+	return strings.Replace(ElementNames[s.Type], "ELEM_", "", 1)
 }
