@@ -16,9 +16,8 @@ func main() {
 
 	var WIDTH = 0x12
 	b := make([]byte, 100*WIDTH)
-	// all 4 bytes here have significance on their own, somehow
-	addr := 0x0057E3A8
-	f.ReadAt(b, int64(addr)) // direction change stored in 2nd bit.
+	addr := 0x0057E3AA
+	f.ReadAt(b, int64(addr))
 
 	for i := 0; i < len(rct.RIDENAMES); i++ {
 		fmt.Printf("\t%d,\t", b[i*WIDTH])
