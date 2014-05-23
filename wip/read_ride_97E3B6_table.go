@@ -20,7 +20,11 @@ func main() {
 	f.ReadAt(b, int64(addr))
 
 	for i := 0; i < len(rct.RIDENAMES); i++ {
-		fmt.Printf("\t%d,\t", b[i*WIDTH])
+		if b[i*WIDTH] == 3 {
+			fmt.Printf("\ttrue,\t")
+		} else {
+			fmt.Printf("\tfalse,\t")
+		}
 		fmt.Printf("// %02x ", i)
 		fmt.Printf("%s\n", rct.RIDENAMES[i])
 	}
