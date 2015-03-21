@@ -1,4 +1,4 @@
-package main
+package rct
 
 // Rides in the order they're used in the game
 var RIDENAMES = []string{

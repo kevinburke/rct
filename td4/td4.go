@@ -10,12 +10,12 @@ import (
 	"math"
 
 	rct "github.com/kevinburke/rct-rides"
+	"github.com/kevinburke/rct-rides/bits"
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
 func hasBit(n int, pos uint) bool {
-	val := n & (1 << pos)
-	return (val > 0)
+	return bits.On(n, pos)
 }
 
 func hasLoop(n int) bool {
