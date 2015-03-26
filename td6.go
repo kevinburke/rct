@@ -1,5 +1,5 @@
 // Parses TD6 files
-package main
+package rct
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/kevinburke/rct-rides/bits"
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
@@ -16,7 +17,7 @@ const DEBUG = false
 const DEBUG_LENGTH = 20
 
 func hasLoop(n int) bool {
-	return hasBit(n, BIT_VERTICAL_LOOP)
+	return bits.On(n, BIT_VERTICAL_LOOP)
 }
 
 type ControlFlags struct {
@@ -40,11 +41,11 @@ func unmarshalControlFlags(n int) *ControlFlags {
 }
 
 func marshalControlFlags(c ControlFlags) (n int) {
-	n = setConditionalBit(n, 7, c.UseMaximumTime)
-	n = setConditionalBit(n, 6, c.UseMinimumTime)
-	n = setConditionalBit(n, 5, c.SyncWithAdjacentStation)
-	n = setConditionalBit(n, 4, c.LeaveIfAnotherTrainArrives)
-	n = setConditionalBit(n, 3, c.WaitForLoad)
+	n = bits.SetCond(n, 7, c.UseMaximumTime)
+	n = bits.SetCond(n, 6, c.UseMinimumTime)
+	n = bits.SetCond(n, 5, c.SyncWithAdjacentStation)
+	n = bits.SetCond(n, 4, c.LeaveIfAnotherTrainArrives)
+	n = bits.SetCond(n, 3, c.WaitForLoad)
 	n |= int(c.Load)
 	return n
 }
@@ -168,19 +169,19 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.RideType = RideType(buf[IDX_RIDE_TYPE])
 
 	featuresBit0 := int(buf[IDX_FEATURES_0])
-	r.SteepLiftChain = hasBit(featuresBit0, BIT_STEEP_LIFT_CHAIN)
-	r.CurvedLiftChain = hasBit(featuresBit0, BIT_CURVED_LIFT_CHAIN)
-	r.Banking = hasBit(featuresBit0, BIT_BANKING)
-	r.HasLoop = hasBit(featuresBit0, BIT_VERTICAL_LOOP)
+	r.SteepLiftChain = bits.On(featuresBit0, BIT_STEEP_LIFT_CHAIN)
+	r.CurvedLiftChain = bits.On(featuresBit0, BIT_CURVED_LIFT_CHAIN)
+	r.Banking = bits.On(featuresBit0, BIT_BANKING)
+	r.HasLoop = bits.On(featuresBit0, BIT_VERTICAL_LOOP)
 
 	featuresBit1 := int(buf[IDX_FEATURES_1])
-	r.SteepSlope = hasBit(featuresBit1, BIT_STEEP_SLOPE)
-	r.FlatToSteep = hasBit(featuresBit1, BIT_FLAT_TO_STEEP)
-	r.SlopedCurves = hasBit(featuresBit1, BIT_SLOPED_CURVES)
-	r.SteepTwist = hasBit(featuresBit1, BIT_STEEP_TWIST)
-	r.SBends = hasBit(featuresBit1, BIT_S_BENDS)
-	r.SmallRadiusCurves = hasBit(featuresBit1, BIT_SMALL_RADIUS_CURVES)
-	r.SmallRadiusBanked = hasBit(featuresBit1, BIT_SMALL_RADIUS_BANKED)
+	r.SteepSlope = bits.On(featuresBit1, BIT_STEEP_SLOPE)
+	r.FlatToSteep = bits.On(featuresBit1, BIT_FLAT_TO_STEEP)
+	r.SlopedCurves = bits.On(featuresBit1, BIT_SLOPED_CURVES)
+	r.SteepTwist = bits.On(featuresBit1, BIT_STEEP_TWIST)
+	r.SBends = bits.On(featuresBit1, BIT_S_BENDS)
+	r.SmallRadiusCurves = bits.On(featuresBit1, BIT_SMALL_RADIUS_CURVES)
+	r.SmallRadiusBanked = bits.On(featuresBit1, BIT_SMALL_RADIUS_BANKED)
 
 	r.OperatingMode = OperatingMode(buf[IDX_OPERATING_MODE])
 	r.ControlFlags = unmarshalControlFlags(int(buf[IDX_CONTROL_FLAG]))
@@ -218,100 +219,100 @@ func Unmarshal(buf []byte, r *Ride) error {
 // https://github.com/UnknownShadow200/RCTTechDepot-Archive/blob/master/td4.html
 func Marshal(r *Ride) ([]byte, error) {
 	// at a minimum, rides have this much data
-	bits := make([]byte, 0xa3)
+	rideb := make([]byte, 0xa3)
 
 	fmt.Println(r.RideType)
-	bits[IDX_RIDE_TYPE] = byte(r.RideType)
+	rideb[IDX_RIDE_TYPE] = byte(r.RideType)
 
-	copy(bits[IDX_VEHICLE_TYPE:IDX_VEHICLE_TYPE+8], r.VehicleType)
+	copy(rideb[IDX_VEHICLE_TYPE:IDX_VEHICLE_TYPE+8], r.VehicleType)
 	featureBit0 := 0
 	if r.SteepLiftChain {
-		setBit(featureBit0, BIT_STEEP_LIFT_CHAIN)
+		bits.Set(featureBit0, BIT_STEEP_LIFT_CHAIN)
 	}
 	if r.CurvedLiftChain {
-		setBit(featureBit0, BIT_CURVED_LIFT_CHAIN)
+		bits.Set(featureBit0, BIT_CURVED_LIFT_CHAIN)
 	}
 	if r.Banking {
-		setBit(featureBit0, BIT_BANKING)
+		bits.Set(featureBit0, BIT_BANKING)
 	}
 	if r.HasLoop {
-		setBit(featureBit0, BIT_VERTICAL_LOOP)
+		bits.Set(featureBit0, BIT_VERTICAL_LOOP)
 	}
-	bits[IDX_FEATURES_0] = byte(featureBit0)
+	rideb[IDX_FEATURES_0] = byte(featureBit0)
 
 	// Features bit 1
 	featureBit1 := 0
 	if r.SteepSlope {
-		setBit(featureBit1, BIT_STEEP_SLOPE)
+		bits.Set(featureBit1, BIT_STEEP_SLOPE)
 	}
 	if r.FlatToSteep {
-		setBit(featureBit1, BIT_FLAT_TO_STEEP)
+		bits.Set(featureBit1, BIT_FLAT_TO_STEEP)
 	}
 	if r.SlopedCurves {
-		setBit(featureBit1, BIT_SLOPED_CURVES)
+		bits.Set(featureBit1, BIT_SLOPED_CURVES)
 	}
 	if r.SteepTwist {
-		setBit(featureBit1, BIT_STEEP_TWIST)
+		bits.Set(featureBit1, BIT_STEEP_TWIST)
 	}
-	bits[IDX_FEATURES_1] = byte(featureBit1)
+	rideb[IDX_FEATURES_1] = byte(featureBit1)
 
-	bits[IDX_OPERATING_MODE] = byte(r.OperatingMode)
-	bits[IDX_CONTROL_FLAG] = byte(marshalControlFlags(*r.ControlFlags))
-	bits[IDX_NUM_TRAINS] = byte(r.NumTrains)
-	bits[IDX_CARS_PER_TRAIN] = byte(r.CarsPerTrain)
-	bits[IDX_MIN_WAIT_TIME] = byte(r.MinWaitTime)
-	bits[IDX_MAX_WAIT_TIME] = byte(r.MaxWaitTime)
-	bits[IDX_NUM_INVERSIONS] = byte(r.NumInversions)
-	bits[IDX_X_SPACE] = byte(r.XSpaceRequired)
-	bits[IDX_Y_SPACE] = byte(r.YSpaceRequired)
+	rideb[IDX_OPERATING_MODE] = byte(r.OperatingMode)
+	rideb[IDX_CONTROL_FLAG] = byte(marshalControlFlags(*r.ControlFlags))
+	rideb[IDX_NUM_TRAINS] = byte(r.NumTrains)
+	rideb[IDX_CARS_PER_TRAIN] = byte(r.CarsPerTrain)
+	rideb[IDX_MIN_WAIT_TIME] = byte(r.MinWaitTime)
+	rideb[IDX_MAX_WAIT_TIME] = byte(r.MaxWaitTime)
+	rideb[IDX_NUM_INVERSIONS] = byte(r.NumInversions)
+	rideb[IDX_X_SPACE] = byte(r.XSpaceRequired)
+	rideb[IDX_Y_SPACE] = byte(r.YSpaceRequired)
 
 	// XXX The below information hasn't been parsed into ride data yet - this
 	// is just writing data to the file so it parses
 
 	// Color scheme, 3rd bit is RCT2 flag
-	bits[7] = 1 << 3
+	rideb[7] = 1 << 3
 	// Set a colorscheme (taken from Mischief)
-	bits[8] = 18
+	rideb[8] = 18
 	// air time
-	bits[0x4a] = 0x13
+	rideb[0x4a] = 0x13
 	// max speed
-	bits[0x51] = 0x15
+	rideb[0x51] = 0x15
 	// average speed
-	bits[0x52] = 9
+	rideb[0x52] = 9
 
 	// ride length. also just copied from mischief
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.LittleEndian, uint16(0x03b6))
-	copy(bits[0x53:0x53+2], buf.Bytes())
+	copy(rideb[0x53:0x53+2], buf.Bytes())
 
 	// positive G force
-	bits[0x55] = 0x0a
+	rideb[0x55] = 0x0a
 	// negative g force
-	bits[0x56] = 0xfb
+	rideb[0x56] = 0xfb
 	// lateral G force
-	bits[0x57] = 0x07
+	rideb[0x57] = 0x07
 
 	// XXX
-	copy(bits[0x70:0x80], r.DatData)
+	copy(rideb[0x70:0x80], r.DatData)
 
 	// Top 3 bytes are the number of circuits
-	bits[0xa2] = 1 << 5
+	rideb[0xa2] = 1 << 5
 	// Low 5 bytes are the lift speed
-	bits[0xa2] |= 7
+	rideb[0xa2] |= 7
 
 	trackBits, err := tracks.Marshal(&r.TrackData)
 	if err != nil {
 		return []byte{}, err
 	}
-	bits = append(bits, trackBits...)
+	rideb = append(rideb, trackBits...)
 
 	egresses, err := marshalEgresses(r.Egresses)
-	bits = append(bits, egresses...)
+	rideb = append(rideb, egresses...)
 
 	// append empty scenery data, XXX when we have scenery.
-	bits = append(bits, 0xff)
-	bits = append(bits, bytes.Repeat([]byte{0}, 21)...)
-	return bits, nil
+	rideb = append(rideb, 0xff)
+	rideb = append(rideb, bytes.Repeat([]byte{0}, 21)...)
+	return rideb, nil
 }
 
 func ReadRide(filename string) *Ride {

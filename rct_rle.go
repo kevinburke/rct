@@ -2,8 +2,7 @@
 
 // This should follow the API laid out by the gzip package.
 // Author: Kevin Burke
-
-package main
+package rct
 
 import (
 	"bufio"

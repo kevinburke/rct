@@ -1,7 +1,9 @@
-package main
+package rct
 
 import (
 	"testing"
+
+	"github.com/kevinburke/rct-rides/bits"
 )
 
 func testMarshalControlFlags(t *testing.T) {
@@ -11,7 +13,7 @@ func testMarshalControlFlags(t *testing.T) {
 		UseMaximumTime: true,
 	}
 	n := marshalControlFlags(cFlags)
-	if !hasBit(n, 7) {
+	if !bits.On(n, 7) {
 		t.Errorf("Maximum time bit should have been set, but wasn't, n is %d", n)
 	}
 }

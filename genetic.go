@@ -1,5 +1,5 @@
 // Code for genetic algorithms
-package main
+package rct
 
 // constants which may be altered to affect the ride runtime
 const PARENTS = 3
