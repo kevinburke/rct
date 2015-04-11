@@ -66,6 +66,10 @@ func unmarshalElement(rawElement []byte) (te Element, e error) {
 	if len(rawElement) != 2 {
 		return Element{}, errors.New("invalid length for element input")
 	}
+	// XXX hack for brakes
+	if rawElement[0] == 0xd8 {
+		rawElement[0] = ELEM_BRAKES
+	}
 	te.Segment = TS_MAP[SegmentType(rawElement[0])]
 	if te.Segment.Type == ELEM_END_OF_RIDE {
 		return Element{}, EndOfRide

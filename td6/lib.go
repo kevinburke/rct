@@ -53,10 +53,11 @@ func marshalControlFlags(c ControlFlags) (n int) {
 
 // Where to find various pieces of information in the decoded ride.
 const (
-	IDX_RIDE_TYPE = 0x0
-	// Indications this isn't stored here in td6
-	IDX_FEATURES_0       = 0x2
-	IDX_FEATURES_1       = 0x3
+	IDX_RIDE_TYPE        = 0x0
+	IDX_VEHICLE_TYPE     = 0x1
+	IDX_FEATURES_0       = 0x1
+	IDX_FEATURES_1       = 0x1
+	IDX_COST             = 0x2
 	IDX_OPERATING_MODE   = 0x06
 	IDX_COLOR_SCHEME     = 0x07
 	IDX_CONTROL_FLAG     = 0x4b
@@ -71,17 +72,19 @@ const (
 	IDX_NUM_DROPS        = 0x59
 	IDX_HIGHEST_DROP     = 0x5a
 
-	IDX_EXCITEMENT = 0x140
-	IDX_INTENSITY  = 0x142
-	IDX_NAUSEA     = 0x144
+	IDX_EXCITEMENT = 0x5b
+	IDX_INTENSITY  = 0x5c
+	IDX_NAUSEA     = 0x5d
 
-	IDX_VEHICLE_TYPE = 0x74
+	IDX_VEHICLE_TYPE_STRING = 0x74
 
 	IDX_TRACK_DATA = 0xa3
 	IDX_X_SPACE    = 0x80
 	IDX_Y_SPACE    = 0x81
 )
 
+// Technically this is track data that gets serialized to disk. A RCT2 Ride
+// structure in memory has a different format.
 type Ride struct {
 	RideType    RideType
 	VehicleType VehicleType
@@ -201,7 +204,7 @@ func Unmarshal(buf []byte, r *Ride) error {
 	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
 	r.TrackData = *d
 
-	r.VehicleType = VehicleType(string(buf[IDX_VEHICLE_TYPE : IDX_VEHICLE_TYPE+LENGTH_VEHICLE_TYPE]))
+	r.VehicleType = VehicleType(string(buf[IDX_VEHICLE_TYPE_STRING : IDX_VEHICLE_TYPE_STRING+LENGTH_VEHICLE_TYPE]))
 
 	r.XSpaceRequired = int(buf[IDX_X_SPACE])
 	r.YSpaceRequired = int(buf[IDX_Y_SPACE])

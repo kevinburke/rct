@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	encodedBits, err := ioutil.ReadFile("rides/blackwidow.td6")
+	encodedBits, err := ioutil.ReadFile("rides/woodchip.td6")
 	//fmt.Println(hex.EncodeToString(encodedBits[len(encodedBits)-4 : len(encodedBits)]))
 	bitsWithoutChecksum := encodedBits[:len(encodedBits)-4]
 
@@ -31,7 +31,7 @@ func main() {
 	r := new(td6.Ride)
 	td6.Unmarshal(decrypted, r)
 
-	fmt.Println(decrypted[0x13e:0x146])
+	fmt.Println(decrypted[0x58:0x5f])
 	fmt.Println(r.Excitement)
 	fmt.Println(r.Intensity)
 

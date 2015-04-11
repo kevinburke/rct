@@ -2179,6 +2179,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		ElevationDelta: 29,
 	},
 
+	// XXX missing some?? Blackwidow has a 0xee track segment.
+	// 0xd8: Block brakes
+
 	ELEM_END_OF_RIDE: &Segment{
 		Type: 0xff,
 	},
