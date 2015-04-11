@@ -1,5 +1,5 @@
 // Parses TD6 files
-package rct
+package td6
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 
 	"github.com/kevinburke/rct-rides/bits"
+	"github.com/kevinburke/rct-rides/rle"
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
@@ -69,9 +70,10 @@ const (
 	IDX_NUM_INVERSIONS   = 0x58
 	IDX_NUM_DROPS        = 0x59
 	IDX_HIGHEST_DROP     = 0x5a
-	IDX_EXCITEMENT       = 0x5b
-	IDX_INTENSITY        = 0x5c
-	IDX_NAUSEA           = 0x5d
+
+	IDX_EXCITEMENT = 0x140
+	IDX_INTENSITY  = 0x142
+	IDX_NAUSEA     = 0x144
 
 	IDX_VEHICLE_TYPE = 0x74
 
@@ -89,10 +91,10 @@ type Ride struct {
 
 	OperatingMode OperatingMode
 	ControlFlags  *ControlFlags
-	NumTrains     int
-	CarsPerTrain  int
-	MinWaitTime   int
-	MaxWaitTime   int
+	NumTrains     uint8
+	CarsPerTrain  uint8
+	MinWaitTime   uint8
+	MaxWaitTime   uint8
 	TrackData     tracks.Data
 
 	// set in bit 0 of the ride features list
@@ -116,6 +118,10 @@ type Ride struct {
 	DatData []byte
 
 	Egresses []*Egress
+
+	Excitement int16
+	Intensity  int16
+	Nausea     int16
 }
 
 type RideType int
@@ -185,10 +191,10 @@ func Unmarshal(buf []byte, r *Ride) error {
 
 	r.OperatingMode = OperatingMode(buf[IDX_OPERATING_MODE])
 	r.ControlFlags = unmarshalControlFlags(int(buf[IDX_CONTROL_FLAG]))
-	r.NumTrains = int(buf[IDX_NUM_TRAINS])
-	r.CarsPerTrain = int(buf[IDX_CARS_PER_TRAIN])
-	r.MinWaitTime = int(buf[IDX_MIN_WAIT_TIME])
-	r.MaxWaitTime = int(buf[IDX_MAX_WAIT_TIME])
+	r.NumTrains = uint8(buf[IDX_NUM_TRAINS])
+	r.CarsPerTrain = uint8(buf[IDX_CARS_PER_TRAIN])
+	r.MinWaitTime = uint8(buf[IDX_MIN_WAIT_TIME])
+	r.MaxWaitTime = uint8(buf[IDX_MAX_WAIT_TIME])
 	r.NumInversions = int(buf[IDX_NUM_INVERSIONS])
 
 	d := new(tracks.Data)
@@ -206,6 +212,10 @@ func Unmarshal(buf []byte, r *Ride) error {
 	entranceExitIdx := IDX_TRACK_DATA + 2*len(r.TrackData.Elements) + 1
 	r.Egresses = unmarshalEgress(buf[entranceExitIdx:])
 
+	r.Excitement = int16(buf[IDX_EXCITEMENT])
+	r.Intensity = int16(buf[IDX_INTENSITY])
+	r.Nausea = int16(buf[IDX_NAUSEA])
+
 	// Ignore scenery data for now.
 	// sceneryIdx := entranceExitIdx + 6*len(r.Egresses) + 1
 
@@ -221,7 +231,6 @@ func Marshal(r *Ride) ([]byte, error) {
 	// at a minimum, rides have this much data
 	rideb := make([]byte, 0xa3)
 
-	fmt.Println(r.RideType)
 	rideb[IDX_RIDE_TYPE] = byte(r.RideType)
 
 	copy(rideb[IDX_VEHICLE_TYPE:IDX_VEHICLE_TYPE+8], r.VehicleType)
@@ -322,7 +331,7 @@ func ReadRide(filename string) *Ride {
 	if err != nil {
 		panic(err)
 	}
-	z := NewReader(bytes.NewReader(bitsWithoutChecksum))
+	z := rle.NewReader(bytes.NewReader(bitsWithoutChecksum))
 	if err != nil {
 		panic(err)
 	}
@@ -360,59 +369,4 @@ const RCT2_TD6_LENGTH = 24735
 
 func pad(bits []byte) []byte {
 	return _pad(bits, RCT2_TD6_LENGTH-len(bits))
-}
-
-func main() {
-	encodedBits, err := ioutil.ReadFile("rides/mischief.td6")
-	fmt.Println(hex.EncodeToString(encodedBits[len(encodedBits)-4 : len(encodedBits)]))
-	bitsWithoutChecksum := encodedBits[:len(encodedBits)-4]
-
-	if err != nil {
-		panic(err)
-	}
-	z := NewReader(bytes.NewReader(bitsWithoutChecksum))
-	if err != nil {
-		panic(err)
-	}
-
-	var bitbuffer bytes.Buffer
-	bitbuffer.ReadFrom(z)
-	decrypted := bitbuffer.Bytes()
-
-	// r is a pointer
-	r := new(Ride)
-	Unmarshal(decrypted, r)
-
-	bits, err := Marshal(r)
-	if err != nil {
-		panic(err)
-	}
-
-	for i := range bits {
-		if bits[i] != decrypted[i] {
-			fmt.Printf("%d: ", i)
-			fmt.Printf("byte %x differs, in my mischief it is %d, in orig it is %d\n", i, bits[i], decrypted[i])
-		}
-	}
-
-	if DEBUG {
-		begin := 0xa2 + 2*len(r.TrackData.Elements) - 3
-		for i := begin; i < begin+DEBUG_LENGTH; i++ {
-			// encode the value of i as hex
-			ds := hex.EncodeToString([]byte{byte(i)})
-			bitValueInHex := hex.EncodeToString([]byte{bits[i]})
-			fmt.Printf("%s: %s\n", ds, bitValueInHex)
-		}
-	}
-
-	paddedBits := pad(bits)
-
-	fmt.Println(paddedBits)
-	fmt.Println(decrypted)
-
-	var buf bytes.Buffer
-	w := NewWriter(&buf)
-	w.Write(paddedBits)
-	ioutil.WriteFile("/Users/kevin/Applications/Wineskin/rct2.app/Contents/Resources/drive_c/GOG Games/RollerCoaster Tycoon 2 Triple Thrill Pack/Tracks/mymischief.TD6", buf.Bytes(), 0644)
-	fmt.Println("Wrote rides/mischief.td6.out.")
 }

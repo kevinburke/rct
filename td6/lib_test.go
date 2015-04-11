@@ -1,4 +1,4 @@
-package rct
+package td6
 
 import (
 	"testing"

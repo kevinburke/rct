@@ -1,5 +1,5 @@
 // Dealing with entrances/exits from a ride
-package rct
+package td6
 
 import (
 	"bytes"
