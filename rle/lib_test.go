@@ -1,4 +1,4 @@
-package rct
+package rle
 
 import (
 	"bytes"
@@ -18,7 +18,7 @@ func TestDecompress(t *testing.T) {
 	bitbuffer.ReadFrom(z)
 	out := bitbuffer.Bytes()
 	if string(out) != "Good job!" {
-		t.Fatalf("expected \"Good job!\" but got %s", out)
+		t.Fatalf("expected \"Good job!\" but got \"%s\"", out)
 	}
 }
 
@@ -31,15 +31,3 @@ func TestCompress(t *testing.T) {
 		t.Fatalf("expected %s but got %s", b, hex.EncodeToString(buf.Bytes()))
 	}
 }
-
-//func TestMSB(t *testing.T) {
-//thirtytwo := getmsb(32)
-//if thirtytwo != 5 {
-//t.Errorf("expected msb(32) = 5, was %d", thirtytwo)
-//}
-
-//thirtyone := getmsb(31)
-//if thirtyone != 4 {
-//t.Errorf("expected msb(31) = 4, was %d", thirtyone)
-//}
-//}

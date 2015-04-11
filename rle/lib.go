@@ -2,7 +2,7 @@
 
 // This should follow the API laid out by the gzip package.
 // Author: Kevin Burke
-package rct
+package rle
 
 import (
 	"bufio"
