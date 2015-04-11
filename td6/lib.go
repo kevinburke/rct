@@ -212,6 +212,8 @@ func Unmarshal(buf []byte, r *Ride) error {
 	entranceExitIdx := IDX_TRACK_DATA + 2*len(r.TrackData.Elements) + 1
 	r.Egresses = unmarshalEgress(buf[entranceExitIdx:])
 
+	fmt.Printf("%x\n", buf[IDX_INTENSITY])
+	fmt.Printf("%x\n", buf[IDX_INTENSITY+1])
 	r.Excitement = int16(buf[IDX_EXCITEMENT])
 	r.Intensity = int16(buf[IDX_INTENSITY])
 	r.Nausea = int16(buf[IDX_NAUSEA])
@@ -367,6 +369,6 @@ func _pad(bits []byte, n int) []byte {
 
 const RCT2_TD6_LENGTH = 24735
 
-func pad(bits []byte) []byte {
+func Pad(bits []byte) []byte {
 	return _pad(bits, RCT2_TD6_LENGTH-len(bits))
 }
