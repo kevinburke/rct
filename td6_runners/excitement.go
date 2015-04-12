@@ -11,29 +11,13 @@ import (
 )
 
 func main() {
-	encodedBits, err := ioutil.ReadFile("rides/woodchip.td6")
-	//fmt.Println(hex.EncodeToString(encodedBits[len(encodedBits)-4 : len(encodedBits)]))
-	bitsWithoutChecksum := encodedBits[:len(encodedBits)-4]
+	r := td6.ReadRide("rides/woodchip.td6")
 
-	if err != nil {
-		panic(err)
-	}
-	z := rle.NewReader(bytes.NewReader(bitsWithoutChecksum))
-	if err != nil {
-		panic(err)
-	}
-
-	var bitbuffer bytes.Buffer
-	bitbuffer.ReadFrom(z)
-	decrypted := bitbuffer.Bytes()
-
-	// r is a pointer
-	r := new(td6.Ride)
-	td6.Unmarshal(decrypted, r)
-
-	fmt.Println(decrypted[0x58:0x5f])
 	fmt.Println(r.Excitement)
 	fmt.Println(r.Intensity)
+	fmt.Println(r.Nausea)
+	fmt.Println(r.MaxSpeed)
+	fmt.Println(r.AverageSpeed)
 
 	bits, err := td6.Marshal(r)
 	if err != nil {

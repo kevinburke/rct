@@ -65,6 +65,8 @@ const (
 	IDX_CARS_PER_TRAIN   = 0x4d
 	IDX_MIN_WAIT_TIME    = 0x4e
 	IDX_MAX_WAIT_TIME    = 0x4f
+	IDX_MAX_SPEED        = 0x51
+	IDX_AVERAGE_SPEED    = 0x52
 	IDX_POSITIVE_G_FORCE = 0x55
 	IDX_NEGATIVE_G_FORCE = 0x56
 	IDX_LATERAL_G_FORCE  = 0x57
@@ -115,7 +117,9 @@ type Ride struct {
 	SmallRadiusCurves bool
 	SmallRadiusBanked bool
 
-	NumInversions int
+	NumInversions uint8
+	MaxSpeed      uint8
+	AverageSpeed  uint8
 
 	// This is a little bit of a copout
 	DatData []byte
@@ -198,7 +202,9 @@ func Unmarshal(buf []byte, r *Ride) error {
 	r.CarsPerTrain = uint8(buf[IDX_CARS_PER_TRAIN])
 	r.MinWaitTime = uint8(buf[IDX_MIN_WAIT_TIME])
 	r.MaxWaitTime = uint8(buf[IDX_MAX_WAIT_TIME])
-	r.NumInversions = int(buf[IDX_NUM_INVERSIONS])
+	r.NumInversions = uint8(buf[IDX_NUM_INVERSIONS])
+	r.MaxSpeed = uint8(buf[IDX_MAX_SPEED])
+	r.AverageSpeed = uint8(buf[IDX_AVERAGE_SPEED])
 
 	d := new(tracks.Data)
 	tracks.Unmarshal(buf[IDX_TRACK_DATA:], d)
@@ -215,8 +221,6 @@ func Unmarshal(buf []byte, r *Ride) error {
 	entranceExitIdx := IDX_TRACK_DATA + 2*len(r.TrackData.Elements) + 1
 	r.Egresses = unmarshalEgress(buf[entranceExitIdx:])
 
-	fmt.Printf("%x\n", buf[IDX_INTENSITY])
-	fmt.Printf("%x\n", buf[IDX_INTENSITY+1])
 	r.Excitement = int16(buf[IDX_EXCITEMENT])
 	r.Intensity = int16(buf[IDX_INTENSITY])
 	r.Nausea = int16(buf[IDX_NAUSEA])
@@ -279,6 +283,8 @@ func Marshal(r *Ride) ([]byte, error) {
 	rideb[IDX_NUM_INVERSIONS] = byte(r.NumInversions)
 	rideb[IDX_X_SPACE] = byte(r.XSpaceRequired)
 	rideb[IDX_Y_SPACE] = byte(r.YSpaceRequired)
+	rideb[IDX_MAX_SPEED] = byte(r.MaxSpeed)
+	rideb[IDX_AVERAGE_SPEED] = byte(r.AverageSpeed)
 
 	// XXX The below information hasn't been parsed into ride data yet - this
 	// is just writing data to the file so it parses
