@@ -1,7 +1,11 @@
 // Code for genetic algorithms
 package genetic
 
-import "github.com/kevinburke/rct-rides/tracks"
+import (
+	"math/rand"
+
+	"github.com/kevinburke/rct-rides/tracks"
+)
 
 // constants which may be altered to affect the ride runtime
 const PARENTS = 3
@@ -21,7 +25,12 @@ func Run() {
 }
 
 type Pool struct {
-	Tracks [][]tracks.Element
+	Members []Member
+}
+
+type Member struct {
+	Track []tracks.Element
+	Score int64
 }
 
 // Create an initial pool
@@ -30,18 +39,32 @@ func CreatePool(size int) *Pool {
 	// 2. For the start station piece, generate a list of possible pieces.
 	// 3. Choose one at random. Advance a pointer one forward.
 	// 4. Repeat for 50 pieces (Woodchip is length 108. Mischief is 123)
+	members := make([]Member, POOL_SIZE)
 	for i := 0; i < POOL_SIZE; i++ {
 		track := CreateStation()
+		idx := STATION_LENGTH - 1
+		for j := 0; j < INITIAL_TRACK_LENGTH-STATION_LENGTH; j++ {
+			poss := track[idx].Possibilities()
+			track = append(track, poss[rand.Intn(len(poss))])
+		}
+		members[i] = Member{Track: track, Score: 0}
 	}
-	return nil
+	return &Pool{Members: members}
 }
 
 func (p *Pool) Mutate(rate float64) {
 
 }
 
-func (p *Pool) Crossover() {
+// Assign scores for every member of the pool
+func (p *Pool) Evaluate() {
+	for i := 0; i < POOL_SIZE; i++ {
+		member := p.Members[i]
+		member.Score = GetScore(member.Track)
+	}
+}
 
+func (p *Pool) Crossover() {
 }
 
 func (p *Pool) Fittest(fitPercentage float64) *Pool {

@@ -4,6 +4,7 @@ package genetic
 import "github.com/kevinburke/rct-rides/tracks"
 
 const STATION_LENGTH = 10
+const INITIAL_TRACK_LENGTH = 60
 
 // Create a station of length 10
 func CreateStation() []tracks.Element {
@@ -17,4 +18,9 @@ func CreateStation() []tracks.Element {
 	}
 	station[STATION_LENGTH-1] = tracks.Element{Segment: end}
 	return station
+}
+
+func GetScore(t []tracks.Element) int64 {
+	// Incredibly sophisticated scoring algorithm.
+	return int64(len(t))
 }
