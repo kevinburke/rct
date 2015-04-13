@@ -1,5 +1,5 @@
 // Draw a RCT roller coaster in 2d.
-package main
+package image
 
 import (
 	"bufio"
@@ -12,10 +12,10 @@ import (
 	"os"
 
 	"code.google.com/p/draw2d/draw2d"
-	rct "github.com/kevinburke/rct-rides"
+	"github.com/kevinburke/rct-rides/td6"
 )
 
-func saveToPngFile(filePath string, m image.Image) {
+func SaveToPngFile(filePath string, m image.Image) {
 	f, err := os.Create(filePath)
 	if err != nil {
 		log.Println(err)
@@ -42,7 +42,7 @@ const IMG_HEIGHT = 400
 var RED = color.RGBA{0xff, 0x00, 0x00, 0xff}
 var BLUE = color.RGBA{0x00, 0x00, 0xff, 0xff}
 
-func Draw(r *rct.Ride) image.Image {
+func Draw(r *td6.Ride) image.Image {
 	width := PIECE_WIDTH * (len(r.TrackData.Elements) + 2)
 	rect := image.Rect(0, 0, width, IMG_HEIGHT)
 	i := image.NewRGBA(rect)
@@ -69,7 +69,7 @@ func Draw(r *rct.Ride) image.Image {
 }
 
 func main() {
-	r := rct.ReadRide("/Users/kevin/code/go/src/github.com/kevinburke/rct-rides/rides/mischief.td6")
+	r := td6.ReadRide("/Users/kevin/code/go/src/github.com/kevinburke/rct-rides/rides/mischief.td6")
 	img := Draw(r)
-	saveToPngFile("test.png", img)
+	SaveToPngFile("test.png", img)
 }

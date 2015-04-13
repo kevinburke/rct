@@ -9,8 +9,8 @@ import (
 	"io/ioutil"
 	"math"
 
-	rct "github.com/kevinburke/rct-rides"
 	"github.com/kevinburke/rct-rides/bits"
+	"github.com/kevinburke/rct-rides/rle"
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
@@ -308,7 +308,7 @@ func readRaptor() Ride {
 	if err != nil {
 		panic(err)
 	}
-	z := rct.NewReader(bytes.NewReader(encodedBits))
+	z := rle.NewReader(bytes.NewReader(encodedBits))
 	if err != nil {
 		panic(err)
 	}
