@@ -1,0 +1,20 @@
+// RCT2 specific track stuff goes in here
+package genetic
+
+import "github.com/kevinburke/rct-rides/tracks"
+
+const STATION_LENGTH = 10
+
+// Create a station of length 10
+func CreateStation() []tracks.Element {
+	station := make([]tracks.Element, 10)
+	beginning := tracks.TS_MAP[tracks.ELEM_BEGIN_STATION]
+	middle := tracks.TS_MAP[tracks.ELEM_MIDDLE_STATION]
+	end := tracks.TS_MAP[tracks.ELEM_END_STATION]
+	station[0] = tracks.Element{Segment: beginning}
+	for i := 1; i < STATION_LENGTH; i++ {
+		station[i] = tracks.Element{Segment: middle}
+	}
+	station[STATION_LENGTH-1] = tracks.Element{Segment: end}
+	return station
+}

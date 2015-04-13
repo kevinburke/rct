@@ -1,5 +1,7 @@
 // Code for genetic algorithms
-package rct
+package genetic
+
+import "github.com/kevinburke/rct-rides/tracks"
 
 // constants which may be altered to affect the ride runtime
 const PARENTS = 3
@@ -18,10 +20,19 @@ func Run() {
 	}
 }
 
-type Pool struct{}
+type Pool struct {
+	Tracks [][]tracks.Element
+}
 
 // Create an initial pool
 func CreatePool(size int) *Pool {
+	// 1. Create a station of length 10
+	// 2. For the start station piece, generate a list of possible pieces.
+	// 3. Choose one at random. Advance a pointer one forward.
+	// 4. Repeat for 50 pieces (Woodchip is length 108. Mischief is 123)
+	for i := 0; i < POOL_SIZE; i++ {
+		track := CreateStation()
+	}
 	return nil
 }
 
