@@ -10,6 +10,7 @@ package tracks
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 
 	"github.com/kevinburke/rct-rides/bits"
 )
@@ -41,6 +42,8 @@ type Data struct {
 	ClearanceDirection ClearanceDirection
 }
 
+// The amount of space each track piece needs above or below. XXX should this
+// go on the ride object?
 type ClearanceDirection int
 
 const (
@@ -78,6 +81,10 @@ func unmarshalElement(rawElement []byte) (te Element, e error) {
 	te.ChainLift = bits.On(q, 7)
 	te.InvertedTrack = bits.On(q, 6)
 	te.Station = bits.On(q, 3)
+	if te.Station {
+		fmt.Println("found station piece")
+		fmt.Println(te.Segment)
+	}
 	te.StationNumber = q & 3
 
 	te.BoostMagnitude = float32(q&15) * 7.6
@@ -123,6 +130,7 @@ func Unmarshal(buf []byte, d *Data) error {
 			}
 			return err
 		}
+		fmt.Println(elem.Segment)
 		d.Elements = append(d.Elements, elem)
 	}
 

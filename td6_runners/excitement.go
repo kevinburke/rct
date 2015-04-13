@@ -11,13 +11,15 @@ import (
 )
 
 func main() {
-	r := td6.ReadRide("rides/woodchip.td6")
+	r := td6.ReadRide("rides/mischief.td6")
 
 	fmt.Println(r.Excitement)
 	fmt.Println(r.Intensity)
 	fmt.Println(r.Nausea)
 	fmt.Println(r.MaxSpeed)
 	fmt.Println(r.AverageSpeed)
+
+	fmt.Printf("Track length: %d\n", len(r.TrackData.Elements))
 
 	bits, err := td6.Marshal(r)
 	if err != nil {

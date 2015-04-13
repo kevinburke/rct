@@ -307,6 +307,8 @@ const (
 	ELEM_END_OF_RIDE = 0xff
 )
 
+// Map of track pieces. Key is the track piece name, value is a Segment with
+// various pieces of information about the track piece.
 var TS_MAP = map[SegmentType]*Segment{
 	ELEM_FLAT: &Segment{
 		Type:           0x0,
