@@ -2,25 +2,27 @@
 package genetic
 
 import (
+	"fmt"
 	"math/rand"
 
 	"github.com/kevinburke/rct-rides/tracks"
 )
 
 // constants which may be altered to affect the ride runtime
-const PARENTS = 3
+const PARENTS = 2
 const FIT_PERCENTAGE = 0.2
 const MUTATION_RATE = 0.05
 const POOL_SIZE = 500
 const ITERATIONS = 500
+const PRINT_RESULTS_EVERY = 1
 
 func Run() {
 	pool := CreatePool(POOL_SIZE)
 	for i := 0; i < ITERATIONS; i++ {
+		pool = pool.Crossover()
 		pool.Mutate(MUTATION_RATE)
-		pool.Crossover()
-		fittest := pool.Fittest(FIT_PERCENTAGE)
-		pool = fittest.Spawn(PARENTS)
+		pool.Evaluate()
+		pool.Statistics(i)
 	}
 }
 
@@ -33,6 +35,21 @@ type Member struct {
 	Score int64
 	// Advantage or disadvantage in reproducing
 	Fitness float64
+}
+
+func (p *Pool) Statistics(iteration int) {
+	if iteration%PRINT_RESULTS_EVERY == 0 {
+		var highestScore int64 = -1
+		bestMember := Member{}
+		for i := 0; i < len(p.Members); i++ {
+			if p.Members[i].Score > highestScore {
+				highestScore = p.Members[i].Score
+				bestMember = p.Members[i]
+			}
+		}
+		fmt.Printf("Iteration %d: Best member has score %d\n", iteration, bestMember.Score)
+		// XXX dump the winning ride to disk
+	}
 }
 
 // Create an initial pool
@@ -67,11 +84,15 @@ func (p *Pool) Mutate(rate float64) {
 // Assign scores for every member of the pool
 func (p *Pool) Evaluate() {
 	for i := 0; i < POOL_SIZE; i++ {
-		member := p.Members[i]
-		member.Score = GetScore(member.Track)
+		p.Members[i].Score = GetScore(p.Members[i].Track)
 	}
 
-	// Assign fitness for every member.
+	// Assign fitness for every member. For now, every member gets a fitness of
+	// 1. In the future, consider sorting/giving higher score members a better
+	// chance of reproducing.
+	for i := 0; i < POOL_SIZE; i++ {
+		p.Members[i].Fitness = 1
+	}
 }
 
 // Select chooses a member of the population at random
@@ -95,7 +116,7 @@ func (p *Pool) Select() Member {
 }
 
 // for starters, we will use one point crossover.
-func (p *Pool) Crossover() {
+func (p *Pool) Crossover() *Pool {
 	// select 2 parents at random
 	// parent1 := p.Select()
 	// parent2 := p.Select()
@@ -109,10 +130,7 @@ func (p *Pool) Crossover() {
 	//	swap the track pieces at the chosen point on track A and track B
 	// return both children
 	// (repeat how many times?)
-}
-
-func (p *Pool) Fittest(fitPercentage float64) *Pool {
-	return nil
+	return p
 }
 
 func (p *Pool) Spawn(numParents int) *Pool {
