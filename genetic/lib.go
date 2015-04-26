@@ -31,6 +31,8 @@ type Pool struct {
 type Member struct {
 	Track []tracks.Element
 	Score int64
+	// Advantage or disadvantage in reproducing
+	Fitness float64
 }
 
 // Create an initial pool
@@ -53,7 +55,13 @@ func CreatePool(size int) *Pool {
 }
 
 func (p *Pool) Mutate(rate float64) {
-
+	// for each ride:
+	// for each position in the ride:
+	// add in a possibility of mutation - addition
+	// if addition:
+	//	find a piece that is compatible with both ends.
+	//  if no piece:
+	//	  advance to the next track piece and try again
 }
 
 // Assign scores for every member of the pool
@@ -62,9 +70,45 @@ func (p *Pool) Evaluate() {
 		member := p.Members[i]
 		member.Score = GetScore(member.Track)
 	}
+
+	// Assign fitness for every member.
 }
 
+// Select chooses a member of the population at random
+func (p *Pool) Select() Member {
+	// Stupid dumb version of this taken from here:
+	// http://eli.thegreenplace.net/2010/01/22/weighted-random-generation-in-python
+	// If it's a bottleneck, rewrite it.
+	var weightedTotal float64 = 0
+	totals := make([]float64, len(p.Members))
+	for i := 0; i < len(p.Members); i++ {
+		weightedTotal += p.Members[i].Fitness
+		totals[i] = weightedTotal
+	}
+	rnd := rand.Float64() * weightedTotal
+	for index, element := range totals {
+		if rnd < element {
+			return p.Members[index]
+		}
+	}
+	return Member{}
+}
+
+// for starters, we will use one point crossover.
 func (p *Pool) Crossover() {
+	// select 2 parents at random
+	// parent1 := p.Select()
+	// parent2 := p.Select()
+	// crossover with a probability of 0.6 (taken from the book & De Jong 1975)
+	// if crossover:
+	//	choose a random point between the beginning and the end
+	//  while not compatible:
+	//		increment one space on track A
+	//		check compatibility
+	//		increment one space on track B
+	//	swap the track pieces at the chosen point on track A and track B
+	// return both children
+	// (repeat how many times?)
 }
 
 func (p *Pool) Fittest(fitPercentage float64) *Pool {
