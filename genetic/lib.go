@@ -118,28 +118,41 @@ func (p *Pool) Select() Member {
 	return Member{}
 }
 
-// for starters, we will use one point crossover.
+func min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// Crossover chooses two members of a pool and joins them at random.
 func (p *Pool) Crossover() *Pool {
 	// select 2 parents at random
 	parent1 := p.Select()
 	parent2 := p.Select()
 	if rand.Float64() < CROSSOVER_PROBABILITY {
 		//	choose a random point between the beginning and the end
-		crossPoint1 := rand.Intn(len(parent1.Track))
+		crossPoint1 := rand.Intn(min(len(parent1.Track), len(parent2.Track)))
 		crossPoint2 := crossPoint1
 		// XXX bounds check
 		foundMatch := false
 		for {
-			if crossPoint2 >= len(parent2.Track) {
+			if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+				foundMatch = true
+				break
+			}
+			crossPoint1++
+			if crossPoint1 >= len(parent1.Track) {
 				break
 			}
 			if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
 				foundMatch = true
 				break
 			}
-			//		increment one space on track A
-			//		check compatibility
-			//		increment one space on track B
+			crossPoint2++
+			if crossPoint2 >= len(parent2.Track) {
+				break
+			}
 		}
 		if foundMatch {
 			Swap(parent1, parent2, crossPoint1, crossPoint2)
