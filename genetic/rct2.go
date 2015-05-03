@@ -20,6 +20,10 @@ func CreateStation() []tracks.Element {
 	return station
 }
 
+func Compatible(a tracks.Element, b tracks.Element) {
+
+}
+
 func GetScore(t []tracks.Element) int64 {
 	// Incredibly sophisticated scoring algorithm.
 	return int64(len(t))

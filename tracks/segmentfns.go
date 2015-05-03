@@ -10,7 +10,7 @@ func isPossibleChainLift(val *Segment) bool {
 		val.EndingBank == TRACK_BANK_NONE
 }
 
-// Compute all of the possible track pieces that can be built
+// Possibilities computes all of the possible track pieces that can be built
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
 		// XXX, need to check diagonal
@@ -24,4 +24,11 @@ func (s *Element) Possibilities() (o []Element) {
 		}
 	}
 	return o
+}
+
+// Compatible returns true if the end of the first element is compatible with
+// the beginning of the second element.
+func Compatible(first Element, second Element) bool {
+	return first.Segment.OutputDegree == second.Segment.InputDegree &&
+		first.Segment.EndingBank == second.Segment.StartingBank
 }

@@ -12,6 +12,9 @@ import (
 const PARENTS = 2
 const FIT_PERCENTAGE = 0.2
 const MUTATION_RATE = 0.05
+
+// crossover with a probability of 0.6 (taken from the book & De Jong 1975)
+const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
 const ITERATIONS = 500
 const PRINT_RESULTS_EVERY = 1
@@ -118,19 +121,41 @@ func (p *Pool) Select() Member {
 // for starters, we will use one point crossover.
 func (p *Pool) Crossover() *Pool {
 	// select 2 parents at random
-	// parent1 := p.Select()
-	// parent2 := p.Select()
-	// crossover with a probability of 0.6 (taken from the book & De Jong 1975)
-	// if crossover:
-	//	choose a random point between the beginning and the end
-	//  while not compatible:
-	//		increment one space on track A
-	//		check compatibility
-	//		increment one space on track B
-	//	swap the track pieces at the chosen point on track A and track B
-	// return both children
-	// (repeat how many times?)
+	parent1 := p.Select()
+	parent2 := p.Select()
+	if rand.Float64() < CROSSOVER_PROBABILITY {
+		//	choose a random point between the beginning and the end
+		crossPoint1 := rand.Intn(len(parent1.Track))
+		crossPoint2 := crossPoint1
+		// XXX bounds check
+		foundMatch := false
+		for {
+			if crossPoint2 >= len(parent2.Track) {
+				break
+			}
+			if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+				foundMatch = true
+				break
+			}
+			//		increment one space on track A
+			//		check compatibility
+			//		increment one space on track B
+		}
+		if foundMatch {
+			Swap(parent1, parent2, crossPoint1, crossPoint2)
+		}
+		//	swap the track pieces at the chosen point on track A and track B
+		// return both children
+		// (repeat how many times?)
+	}
 	return p
+}
+
+// Swap creates two children out of the parents, by crossing over the tracks at
+// the given cross points. The sum of the two track lengths may be the same,
+// but the tracks themselves will change.
+func Swap(parent1 Member, parent2 Member, crossPoint1 int, crossPoint2 int) {
+
 }
 
 func (p *Pool) Spawn(numParents int) *Pool {
