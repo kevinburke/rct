@@ -2189,6 +2189,6 @@ var TS_MAP = map[SegmentType]*Segment{
 	},
 }
 
-func (s Segment) String() string {
+func (s *Segment) String() string {
 	return strings.Replace(ElementNames[s.Type], "ELEM_", "", 1)
 }

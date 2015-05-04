@@ -127,39 +127,41 @@ func min(a int, b int) int {
 
 // Crossover chooses two members of a pool and joins them at random.
 func (p *Pool) Crossover() *Pool {
-	// select 2 parents at random
-	parent1 := p.Select()
-	parent2 := p.Select()
-	if rand.Float64() < CROSSOVER_PROBABILITY {
-		//	choose a random point between the beginning and the end
-		crossPoint1 := rand.Intn(min(len(parent1.Track), len(parent2.Track)))
-		crossPoint2 := crossPoint1
-		// XXX bounds check
-		foundMatch := false
-		for {
-			if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
-				foundMatch = true
-				break
+	for i := 0; i < len(p.Members)/2; i++ {
+		// select 2 parents at random
+		parent1 := p.Select()
+		parent2 := p.Select()
+		if rand.Float64() < CROSSOVER_PROBABILITY {
+			//	choose a random point between the beginning and the end
+			minval := min(len(parent1.Track), len(parent2.Track))
+			crossPoint1 := rand.Intn(minval)
+			crossPoint2 := crossPoint1
+			foundMatch := false
+			for {
+				if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+					foundMatch = true
+					break
+				}
+				crossPoint1++
+				if crossPoint1 >= len(parent1.Track) {
+					break
+				}
+				if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+					foundMatch = true
+					break
+				}
+				crossPoint2++
+				if crossPoint2 >= len(parent2.Track) {
+					break
+				}
 			}
-			crossPoint1++
-			if crossPoint1 >= len(parent1.Track) {
-				break
-			}
-			if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
-				foundMatch = true
-				break
-			}
-			crossPoint2++
-			if crossPoint2 >= len(parent2.Track) {
-				break
+			//	swap the track pieces at the chosen point on track A and track B
+			if foundMatch {
+				child1, child2 := Swap(parent1, parent2, crossPoint1, crossPoint2)
+				// XXX delete parents
+				p.Members = append(p.Members, *child1, *child2)
 			}
 		}
-		if foundMatch {
-			Swap(parent1, parent2, crossPoint1, crossPoint2)
-		}
-		//	swap the track pieces at the chosen point on track A and track B
-		// return both children
-		// (repeat how many times?)
 	}
 	return p
 }
@@ -167,8 +169,19 @@ func (p *Pool) Crossover() *Pool {
 // Swap creates two children out of the parents, by crossing over the tracks at
 // the given cross points. The sum of the two track lengths may be the same,
 // but the tracks themselves will change.
-func Swap(parent1 Member, parent2 Member, crossPoint1 int, crossPoint2 int) {
-
+func Swap(parent1 Member, parent2 Member, crossPoint1 int, crossPoint2 int) (*Member, *Member) {
+	child1len := crossPoint1 + (len(parent2.Track) - crossPoint1)
+	child2len := crossPoint2 + (len(parent1.Track) - crossPoint1)
+	// XXX, probably something fancy you can do with xor, or a temporary array.
+	child1track := make([]tracks.Element, child1len)
+	child2track := make([]tracks.Element, child2len)
+	copy(child1track[:crossPoint1], parent1.Track[:crossPoint1])
+	copy(child1track[crossPoint1:], parent2.Track[crossPoint1:])
+	copy(child2track[:crossPoint2], parent2.Track[:crossPoint2])
+	copy(child2track[crossPoint2:], parent1.Track[crossPoint2:])
+	child1 := &Member{Track: child1track}
+	child2 := &Member{Track: child2track}
+	return child1, child2
 }
 
 func (p *Pool) Spawn(numParents int) *Pool {

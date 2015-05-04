@@ -15,6 +15,8 @@ import (
 	"github.com/kevinburke/rct-rides/bits"
 )
 
+// An Element containts a single track segment and some metadata about the
+// track segment - whether it is a station piece, or has a chain lift.
 type Element struct {
 	// XXX, add color schemes
 
@@ -53,10 +55,7 @@ const (
 )
 
 func (te Element) String() string {
-	if te.Segment.Type > 0x17 {
-		return hex.EncodeToString([]byte{byte(te.Segment.Type)})
-	}
-	return ""
+	return hex.EncodeToString([]byte{byte(te.Segment.Type)})
 }
 
 var EndOfRide = errors.New("End of ride")
