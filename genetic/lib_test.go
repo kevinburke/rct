@@ -7,13 +7,13 @@ import (
 )
 
 func TestSwap(t *testing.T) {
-	a := Member{
+	a := &Member{
 		Track: []tracks.Element{
 			{Segment: tracks.TS_MAP[tracks.ELEM_FLAT]},
 			{Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_UP]},
 		},
 	}
-	b := Member{
+	b := &Member{
 		Track: []tracks.Element{
 			{Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN]},
 			{Segment: tracks.TS_MAP[tracks.ELEM_60_DEG_DOWN]},

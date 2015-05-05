@@ -16,7 +16,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 500
+const ITERATIONS = 200
 const PRINT_RESULTS_EVERY = 1
 
 func Run() {
@@ -30,7 +30,7 @@ func Run() {
 }
 
 type Pool struct {
-	Members []Member
+	Members []*Member
 }
 
 type Member struct {
@@ -43,15 +43,18 @@ type Member struct {
 func (p *Pool) Statistics(iteration int) {
 	if iteration%PRINT_RESULTS_EVERY == 0 {
 		var highestScore int64 = -1
-		bestMember := Member{}
+		var worstScore int64 = 7000
+		bestMember := new(Member)
 		for i := 0; i < len(p.Members); i++ {
 			if p.Members[i].Score > highestScore {
 				highestScore = p.Members[i].Score
 				bestMember = p.Members[i]
 			}
+			if p.Members[i].Score < worstScore {
+				worstScore = p.Members[i].Score
+			}
 		}
-		fmt.Printf("Iteration %d: Best member has score %d\n", iteration, bestMember.Score)
-		// XXX dump the winning ride to disk
+		fmt.Printf("Iteration %d: %d members, best member has score %d, worst has score %d\n", iteration, len(p.Members), bestMember.Score, worstScore)
 	}
 }
 
@@ -61,7 +64,7 @@ func CreatePool(size int) *Pool {
 	// 2. For the start station piece, generate a list of possible pieces.
 	// 3. Choose one at random. Advance a pointer one forward.
 	// 4. Repeat for 50 pieces (Woodchip is length 108. Mischief is 123)
-	members := make([]Member, POOL_SIZE)
+	members := make([]*Member, POOL_SIZE)
 	for i := 0; i < POOL_SIZE; i++ {
 		track := CreateStation()
 		idx := STATION_LENGTH - 1
@@ -69,7 +72,8 @@ func CreatePool(size int) *Pool {
 			poss := track[idx].Possibilities()
 			track = append(track, poss[rand.Intn(len(poss))])
 		}
-		members[i] = Member{Track: track, Score: 0}
+		score := GetScore(track)
+		members[i] = &Member{Track: track, Score: score}
 	}
 	return &Pool{Members: members}
 }
@@ -94,12 +98,12 @@ func (p *Pool) Evaluate() {
 	// 1. In the future, consider sorting/giving higher score members a better
 	// chance of reproducing.
 	for i := 0; i < POOL_SIZE; i++ {
-		p.Members[i].Fitness = 1
+		p.Members[i].Fitness = float64(p.Members[i].Score)
 	}
 }
 
 // Select chooses a member of the population at random
-func (p *Pool) Select() Member {
+func (p *Pool) Select() (int, *Member) {
 	// Stupid dumb version of this taken from here:
 	// http://eli.thegreenplace.net/2010/01/22/weighted-random-generation-in-python
 	// If it's a bottleneck, rewrite it.
@@ -112,10 +116,10 @@ func (p *Pool) Select() Member {
 	rnd := rand.Float64() * weightedTotal
 	for index, element := range totals {
 		if rnd < element {
-			return p.Members[index]
+			return index, p.Members[index]
 		}
 	}
-	return Member{}
+	return -1, &Member{}
 }
 
 func min(a int, b int) int {
@@ -125,42 +129,52 @@ func min(a int, b int) int {
 	return b
 }
 
+func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
+	//	choose a random point between the beginning and the end
+	minval := min(len(parent1.Track), len(parent2.Track))
+	crossPoint1 := rand.Intn(minval)
+	crossPoint2 := crossPoint1
+	foundMatch := false
+	for {
+		if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+			foundMatch = true
+			break
+		}
+		crossPoint1++
+		if crossPoint1 >= len(parent1.Track) {
+			break
+		}
+		if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+			foundMatch = true
+			break
+		}
+		crossPoint2++
+		if crossPoint2 >= len(parent2.Track) {
+			break
+		}
+	}
+	//	swap the track pieces at the chosen point on track A and track B
+	if foundMatch {
+		return Swap(parent1, parent2, crossPoint1, crossPoint2)
+	}
+	return parent1, parent2
+}
+
 // Crossover chooses two members of a pool and joins them at random.
 func (p *Pool) Crossover() *Pool {
-	for i := 0; i < len(p.Members)/2; i++ {
+	halfLen := len(p.Members) / 2
+	for i := 0; i < halfLen; i++ {
 		// select 2 parents at random
-		parent1 := p.Select()
-		parent2 := p.Select()
+		idx1, parent1 := p.Select()
+		idx2, parent2 := p.Select()
+		if idx1 == -1 || idx2 == -1 {
+			continue
+		}
 		if rand.Float64() < CROSSOVER_PROBABILITY {
-			//	choose a random point between the beginning and the end
-			minval := min(len(parent1.Track), len(parent2.Track))
-			crossPoint1 := rand.Intn(minval)
-			crossPoint2 := crossPoint1
-			foundMatch := false
-			for {
-				if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
-					foundMatch = true
-					break
-				}
-				crossPoint1++
-				if crossPoint1 >= len(parent1.Track) {
-					break
-				}
-				if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
-					foundMatch = true
-					break
-				}
-				crossPoint2++
-				if crossPoint2 >= len(parent2.Track) {
-					break
-				}
-			}
-			//	swap the track pieces at the chosen point on track A and track B
-			if foundMatch {
-				child1, child2 := Swap(parent1, parent2, crossPoint1, crossPoint2)
-				// XXX delete parents
-				p.Members = append(p.Members, *child1, *child2)
-			}
+			// XXX delete parents
+			child1, child2 := crossoverOne(parent1, parent2)
+			p.Members[idx1] = child1
+			p.Members[idx2] = child2
 		}
 	}
 	return p
@@ -169,7 +183,7 @@ func (p *Pool) Crossover() *Pool {
 // Swap creates two children out of the parents, by crossing over the tracks at
 // the given cross points. The sum of the two track lengths may be the same,
 // but the tracks themselves will change.
-func Swap(parent1 Member, parent2 Member, crossPoint1 int, crossPoint2 int) (*Member, *Member) {
+func Swap(parent1 *Member, parent2 *Member, crossPoint1 int, crossPoint2 int) (*Member, *Member) {
 	child1len := crossPoint1 + (len(parent2.Track) - crossPoint1)
 	child2len := crossPoint2 + (len(parent1.Track) - crossPoint1)
 	// XXX, probably something fancy you can do with xor, or a temporary array.
