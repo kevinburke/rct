@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	"github.com/kevinburke/rct-rides/bits"
+	"github.com/kevinburke/rct/bits"
 )
 
 type Egress struct {

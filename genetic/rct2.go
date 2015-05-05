@@ -1,7 +1,7 @@
 // RCT2 specific track stuff goes in here
 package genetic
 
-import "github.com/kevinburke/rct-rides/tracks"
+import "github.com/kevinburke/rct/tracks"
 
 const STATION_LENGTH = 10
 const INITIAL_TRACK_LENGTH = 60

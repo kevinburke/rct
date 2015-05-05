@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/kevinburke/rct-rides/rle"
-	"github.com/kevinburke/rct-rides/td6"
+	"github.com/kevinburke/rct/rle"
+	"github.com/kevinburke/rct/td6"
 )
 
 func main() {

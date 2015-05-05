@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/kevinburke/rct-rides/tracks"
+	"github.com/kevinburke/rct/tracks"
 )
 
 // constants which may be altered to affect the ride runtime

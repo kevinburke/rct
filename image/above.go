@@ -7,7 +7,7 @@ import (
 	"image/color"
 	"image/draw"
 
-	"github.com/kevinburke/rct-rides/td6"
+	"github.com/kevinburke/rct/td6"
 )
 
 func getWhiteRectangle(width int, height int) *image.RGBA {

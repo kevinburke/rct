@@ -3,7 +3,7 @@ package td4
 import (
 	"testing"
 
-	"github.com/kevinburke/rct-rides/tracks"
+	"github.com/kevinburke/rct/tracks"
 )
 
 var stationTrack = &tracks.Data{

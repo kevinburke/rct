@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"code.google.com/p/draw2d/draw2d"
-	"github.com/kevinburke/rct-rides/td6"
+	"github.com/kevinburke/rct/td6"
 )
 
 func SaveToPngFile(filePath string, m image.Image) {
@@ -69,7 +69,7 @@ func Draw(r *td6.Ride) image.Image {
 }
 
 func main() {
-	r := td6.ReadRide("/Users/kevin/code/go/src/github.com/kevinburke/rct-rides/rides/mischief.td6")
+	r := td6.ReadRide("/Users/kevin/code/go/src/github.com/kevinburke/rct/rides/mischief.td6")
 	img := Draw(r)
 	SaveToPngFile("test.png", img)
 }

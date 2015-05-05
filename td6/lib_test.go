@@ -3,7 +3,7 @@ package td6
 import (
 	"testing"
 
-	"github.com/kevinburke/rct-rides/bits"
+	"github.com/kevinburke/rct/bits"
 )
 
 func testMarshalControlFlags(t *testing.T) {

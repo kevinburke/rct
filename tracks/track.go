@@ -12,7 +12,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kevinburke/rct-rides/bits"
+	"github.com/kevinburke/rct/bits"
 )
 
 // An Element containts a single track segment and some metadata about the

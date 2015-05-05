@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/kevinburke/rct-rides/bits"
-	"github.com/kevinburke/rct-rides/rle"
-	"github.com/kevinburke/rct-rides/tracks"
+	"github.com/kevinburke/rct/bits"
+	"github.com/kevinburke/rct/rle"
+	"github.com/kevinburke/rct/tracks"
 )
 
 const DEBUG = false

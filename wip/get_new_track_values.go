@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kevinburke/rct-rides/tracks"
+	"github.com/kevinburke/rct/tracks"
 )
 
 func hasBit(n int, pos uint) bool {

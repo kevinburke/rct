@@ -9,9 +9,9 @@ import (
 	"io/ioutil"
 	"math"
 
-	"github.com/kevinburke/rct-rides/bits"
-	"github.com/kevinburke/rct-rides/rle"
-	"github.com/kevinburke/rct-rides/tracks"
+	"github.com/kevinburke/rct/bits"
+	"github.com/kevinburke/rct/rle"
+	"github.com/kevinburke/rct/tracks"
 )
 
 func hasBit(n int, pos uint) bool {
