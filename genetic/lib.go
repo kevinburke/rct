@@ -4,6 +4,8 @@ package genetic
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"path"
 
 	"github.com/kevinburke/rct/tracks"
 )
@@ -19,14 +21,21 @@ const POOL_SIZE = 500
 const ITERATIONS = 200
 const PRINT_RESULTS_EVERY = 1
 
-func Run() {
+func Run(outputDirectory string) error {
 	pool := CreatePool(POOL_SIZE)
+	expDir := path.Join(outputDirectory, "experiments")
+	err := os.Mkdir(expDir, 0755)
+	// ugh
+	if err != nil && err.(*os.PathError).Err.Error() != "file exists" {
+		return err
+	}
 	for i := 0; i < ITERATIONS; i++ {
 		pool = pool.Crossover()
 		pool.Mutate(MUTATION_RATE)
 		pool.Evaluate()
 		pool.Statistics(i)
 	}
+	return nil
 }
 
 type Pool struct {
