@@ -136,7 +136,7 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 	// XXX, move offline to a goroutine
 	for i := 0; i < len(p.Members); i++ {
 		pth := path.Join(outputDirectory, "experiments", p.Id,
-			"iterations", strconv.Itoa(iteration), p.Members[i].Id, ".json")
+			"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", p.Members[i].Id))
 		err := encode(pth, p.Members[i])
 		if err != nil {
 			log.Print(err)
