@@ -2,10 +2,16 @@
 package genetic
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
+	"os/exec"
 	"path"
+	"strings"
+	"time"
+
+	"code.google.com/p/go-uuid/uuid"
 
 	"github.com/kevinburke/rct/tracks"
 )
@@ -21,12 +27,51 @@ const POOL_SIZE = 500
 const ITERATIONS = 200
 const PRINT_RESULTS_EVERY = 1
 
-func Run(outputDirectory string) error {
-	pool := CreatePool(POOL_SIZE)
-	expDir := path.Join(outputDirectory, "experiments")
-	err := os.Mkdir(expDir, 0755)
+// create a directory and ignore "directory exists" errors
+func mkdir(name string) error {
+	err := os.Mkdir(name, 0755)
 	// ugh
 	if err != nil && err.(*os.PathError).Err.Error() != "file exists" {
+		return err
+	}
+	return nil
+}
+
+type ExperimentMetadata struct {
+	Hash  string
+	Date  time.Time
+	Notes string
+}
+
+func Run(outputDirectory string, packageRoot string) error {
+	pool := CreatePool(POOL_SIZE)
+	expDir := path.Join(outputDirectory, "experiments")
+	err := mkdir(expDir)
+	if err != nil {
+		return err
+	}
+	id := fmt.Sprintf("exp_%s", uuid.New())
+	expIdDir := path.Join(expDir, id)
+	err = mkdir(expIdDir)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = packageRoot
+	hashb, err := cmd.Output()
+	mtd := ExperimentMetadata{
+		Hash:  strings.TrimSpace(string(hashb)),
+		Date:  time.Now().UTC(),
+		Notes: "(none)",
+	}
+	metadataPath := path.Join(expIdDir, "meta.json")
+	f, err := os.OpenFile(metadataPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	enc := json.NewEncoder(f)
+	err = enc.Encode(mtd)
+	if err != nil {
 		return err
 	}
 	for i := 0; i < ITERATIONS; i++ {
