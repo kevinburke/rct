@@ -50,10 +50,14 @@ func encode(name string, v interface{}) error {
 }
 
 type ExperimentMetadata struct {
-	Hash    string
-	Date    time.Time
-	Notes   string
-	Runtime time.Duration
+	Hash                 string
+	Date                 time.Time
+	Notes                string
+	Runtime              time.Duration
+	PoolSize             int16
+	Iterations           int32
+	CrossoverProbability float32
+	MutationRate         float32
 }
 
 func Run(outputDirectory string, packageRoot string) error {
@@ -77,9 +81,13 @@ func Run(outputDirectory string, packageRoot string) error {
 	cmd.Dir = packageRoot
 	hashb, err := cmd.Output()
 	mtd := ExperimentMetadata{
-		Hash:  strings.TrimSpace(string(hashb)),
-		Date:  time.Now().UTC(),
-		Notes: "(none)", // XXX
+		Hash:                 strings.TrimSpace(string(hashb)),
+		Date:                 time.Now().UTC(),
+		Notes:                "(none)", // XXX
+		CrossoverProbability: CROSSOVER_PROBABILITY,
+		PoolSize:             POOL_SIZE,
+		MutationRate:         MUTATION_RATE,
+		Iterations:           ITERATIONS,
 	}
 	metadataPath := path.Join(expIdDir, "meta.json")
 	err = encode(metadataPath, mtd)

@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+	<head>
+		<title>RCT2 Iteration Viewer</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	</head>
+	<body>
+		<h1>{{ .Id | truncate 17 }}</h1>
+
+		Score: {{ .Score }}<br>
+		Fitness: {{ .Fitness }}
+
+		<div id="coaster-target"></div>
+
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script>
+			var currentUrl
+		</script>
+	</body>
+</html>
