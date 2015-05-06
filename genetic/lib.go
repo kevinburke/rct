@@ -4,10 +4,12 @@ package genetic
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,7 +26,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 200
+const ITERATIONS = 10
 const PRINT_RESULTS_EVERY = 1
 
 // create a directory and ignore "directory exists" errors
@@ -37,6 +39,16 @@ func mkdir(name string) error {
 	return nil
 }
 
+func encode(name string, v interface{}) error {
+	f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	enc := json.NewEncoder(f)
+	return enc.Encode(v)
+}
+
 type ExperimentMetadata struct {
 	Hash  string
 	Date  time.Time
@@ -44,7 +56,6 @@ type ExperimentMetadata struct {
 }
 
 func Run(outputDirectory string, packageRoot string) error {
-	pool := CreatePool(POOL_SIZE)
 	expDir := path.Join(outputDirectory, "experiments")
 	err := mkdir(expDir)
 	if err != nil {
@@ -56,45 +67,55 @@ func Run(outputDirectory string, packageRoot string) error {
 	if err != nil {
 		return err
 	}
+	iterationsDir := path.Join(expIdDir, "iterations")
+	err = mkdir(iterationsDir)
+	if err != nil {
+		return err
+	}
 	cmd := exec.Command("git", "rev-parse", "HEAD")
 	cmd.Dir = packageRoot
 	hashb, err := cmd.Output()
 	mtd := ExperimentMetadata{
 		Hash:  strings.TrimSpace(string(hashb)),
 		Date:  time.Now().UTC(),
-		Notes: "(none)",
+		Notes: "(none)", // XXX
 	}
 	metadataPath := path.Join(expIdDir, "meta.json")
-	f, err := os.OpenFile(metadataPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	err = encode(metadataPath, mtd)
 	if err != nil {
 		return err
 	}
-	enc := json.NewEncoder(f)
-	err = enc.Encode(mtd)
-	if err != nil {
-		return err
-	}
+	fmt.Printf("Experiment %s\n======================================\n", id)
+	pool := SeedPool(POOL_SIZE)
+	pool.Id = id
 	for i := 0; i < ITERATIONS; i++ {
 		pool = pool.Crossover()
 		pool.Mutate(MUTATION_RATE)
 		pool.Evaluate()
-		pool.Statistics(i)
+		iterationDir := path.Join(iterationsDir, strconv.Itoa(i))
+		err = mkdir(iterationDir)
+		if err != nil {
+			return err
+		}
+		pool.Statistics(i, outputDirectory)
 	}
 	return nil
 }
 
 type Pool struct {
+	Id      string
 	Members []*Member
 }
 
 type Member struct {
+	Id    string
 	Track []tracks.Element
 	Score int64
 	// Advantage or disadvantage in reproducing
 	Fitness float64
 }
 
-func (p *Pool) Statistics(iteration int) {
+func (p *Pool) Statistics(iteration int, outputDirectory string) {
 	if iteration%PRINT_RESULTS_EVERY == 0 {
 		var highestScore int64 = -1
 		var worstScore int64 = 7000
@@ -110,10 +131,18 @@ func (p *Pool) Statistics(iteration int) {
 		}
 		fmt.Printf("Iteration %d: %d members, best member has score %d, worst has score %d\n", iteration, len(p.Members), bestMember.Score, worstScore)
 	}
+	// XXX, move offline to a goroutine
+	for i := 0; i < len(p.Members); i++ {
+		pth := path.Join(outputDirectory, "experiments", p.Id, "iterations", strconv.Itoa(iteration), p.Members[i].Id)
+		err := encode(pth, p.Members[i])
+		if err != nil {
+			log.Print(err)
+		}
+	}
 }
 
 // Create an initial pool
-func CreatePool(size int) *Pool {
+func SeedPool(size int) *Pool {
 	// 1. Create a station of length 10
 	// 2. For the start station piece, generate a list of possible pieces.
 	// 3. Choose one at random. Advance a pointer one forward.
@@ -127,7 +156,11 @@ func CreatePool(size int) *Pool {
 			track = append(track, poss[rand.Intn(len(poss))])
 		}
 		score := GetScore(track)
-		members[i] = &Member{Track: track, Score: score}
+		members[i] = &Member{
+			Id:    fmt.Sprintf("iter_%s", uuid.New()),
+			Track: track,
+			Score: score,
+		}
 	}
 	return &Pool{Members: members}
 }
@@ -239,7 +272,7 @@ func (p *Pool) Crossover() *Pool {
 // but the tracks themselves will change.
 func Swap(parent1 *Member, parent2 *Member, crossPoint1 int, crossPoint2 int) (*Member, *Member) {
 	child1len := crossPoint1 + (len(parent2.Track) - crossPoint1)
-	child2len := crossPoint2 + (len(parent1.Track) - crossPoint1)
+	child2len := crossPoint2 + (len(parent1.Track) - crossPoint2)
 	// XXX, probably something fancy you can do with xor, or a temporary array.
 	child1track := make([]tracks.Element, child1len)
 	child2track := make([]tracks.Element, child2len)
@@ -247,8 +280,14 @@ func Swap(parent1 *Member, parent2 *Member, crossPoint1 int, crossPoint2 int) (*
 	copy(child1track[crossPoint1:], parent2.Track[crossPoint1:])
 	copy(child2track[:crossPoint2], parent2.Track[:crossPoint2])
 	copy(child2track[crossPoint2:], parent1.Track[crossPoint2:])
-	child1 := &Member{Track: child1track}
-	child2 := &Member{Track: child2track}
+	child1 := &Member{
+		Id:    fmt.Sprintf("iter_%s", uuid.New()),
+		Track: child1track,
+	}
+	child2 := &Member{
+		Id:    fmt.Sprintf("iter_%s", uuid.New()),
+		Track: child2track,
+	}
 	return child1, child2
 }
 
