@@ -16,7 +16,10 @@
 
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script>
-			var currentUrl
+			var currentUrl = window.location.pathname;
+			$.getJSON(currentUrl+'/render', function(data) {
+				console.log(data);
+			});
 		</script>
 	</body>
 </html>

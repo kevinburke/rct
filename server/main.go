@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,9 +15,14 @@ import (
 	"github.com/kevinburke/rct/genetic"
 )
 
+func renderHandler(directory string, templateDirectory string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
 func newRctHandler(directory string, templateDirectory string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := path.Join(directory, r.URL.Path)
+		p := path.Join(directory, fmt.Sprintf("%s.json", r.URL.Path))
 		f, err := os.Open(p)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -94,7 +100,7 @@ func main() {
 		log.Fatalf("Usage: server [-directory DIRECTORY] ")
 	}
 	h := new(RegexpHandler)
-	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*\\.json")
+	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*")
 	if err != nil {
 		log.Fatal(err)
 	}
