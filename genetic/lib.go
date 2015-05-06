@@ -50,9 +50,10 @@ func encode(name string, v interface{}) error {
 }
 
 type ExperimentMetadata struct {
-	Hash  string
-	Date  time.Time
-	Notes string
+	Hash    string
+	Date    time.Time
+	Notes   string
+	Runtime time.Duration
 }
 
 func Run(outputDirectory string, packageRoot string) error {
@@ -109,10 +110,11 @@ type Pool struct {
 
 type Member struct {
 	Id    string
-	Track []tracks.Element
 	Score int64
 	// Advantage or disadvantage in reproducing
 	Fitness float64
+	Runtime time.Duration
+	Track   []tracks.Element
 }
 
 func (p *Pool) Statistics(iteration int, outputDirectory string) {
@@ -133,7 +135,8 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 	}
 	// XXX, move offline to a goroutine
 	for i := 0; i < len(p.Members); i++ {
-		pth := path.Join(outputDirectory, "experiments", p.Id, "iterations", strconv.Itoa(iteration), p.Members[i].Id)
+		pth := path.Join(outputDirectory, "experiments", p.Id,
+			"iterations", strconv.Itoa(iteration), p.Members[i].Id, ".json")
 		err := encode(pth, p.Members[i])
 		if err != nil {
 			log.Print(err)
