@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -11,33 +13,55 @@ import (
 	"path"
 	"pkg/text/template"
 	"regexp"
+	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/kevinburke/rct"
 	"github.com/kevinburke/rct/genetic"
+	"github.com/kevinburke/rct/geo"
 )
 
 const VERSION = "0.1"
 
-func renderHandler(directory string, templateDirectory string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("{status:\"ok\"}"))
+func loadMember(directory string, pth string) (*genetic.Member, error) {
+	p := path.Join(directory, fmt.Sprintf("%s.json", pth))
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
 	}
+	dec := json.NewDecoder(f)
+	m := new(genetic.Member)
+	err = dec.Decode(m)
+	return m, err
 }
 
-func newRctHandler(directory string, templateDirectory string) http.HandlerFunc {
+func renderHandler(directory string, templateDirectory string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		p := path.Join(directory, fmt.Sprintf("%s.json", r.URL.Path))
-		f, err := os.Open(p)
+		iterPath := strings.Replace(r.URL.Path, "/render", "", 1)
+		m, err := loadMember(directory, iterPath)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
 		}
-		dec := json.NewDecoder(f)
-		m := new(genetic.Member)
-		err = dec.Decode(m)
+		left, _ := geo.Render(m.Track)
+		b := new(bytes.Buffer)
+		enc := json.NewEncoder(b)
+		err = enc.Encode(left)
+		if err == nil {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			w.WriteHeader(http.StatusOK)
+			io.Copy(w, b)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+	}
+}
+
+func newRctHandler(directory string, templateDirectory string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m, err := loadMember(directory, r.URL.Path)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
@@ -63,10 +87,14 @@ func newRctHandler(directory string, templateDirectory string) http.HandlerFunc 
 			w.Write([]byte(err.Error()))
 			return
 		}
-		w.WriteHeader(http.StatusCreated)
-		err = tmpl.Execute(w, m)
-		if err != nil {
-			w.Write([]byte("\n" + err.Error()))
+		b := new(bytes.Buffer)
+		err = tmpl.Execute(b, m)
+		if err == nil {
+			w.WriteHeader(http.StatusOK)
+			io.Copy(w, b)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
 		}
 	}
 }

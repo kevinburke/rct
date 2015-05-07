@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math"
 
 	"github.com/kevinburke/rct/bits"
 	"github.com/kevinburke/rct/rle"
@@ -127,38 +126,6 @@ const (
 	STATION_FOUR              = 3
 )
 
-// computes sines in degrees
-func sindeg(deg tracks.DirectionDelta) int {
-	for ; deg >= 360; deg -= 360 {
-	}
-	if deg%180 == 0 {
-		return 0
-	} else if deg == 90 {
-		return 1
-	} else if deg == 270 {
-		return -1
-	} else {
-		return int(math.Sin(float64(deg) * math.Pi / 180))
-	}
-}
-
-// computes sines in degrees
-func cosdeg(deg tracks.DirectionDelta) int {
-	for ; deg >= 360; deg -= 360 {
-	}
-	if deg == 0 {
-		return 1
-	} else if deg == 90 || deg == 270 {
-		return 0
-	} else if deg == 180 {
-		return -1
-	} else {
-		return int(math.Sin(float64(deg) * math.Pi / 180))
-	}
-}
-
-//func Decrypt() {
-
 // Take a compressed byte stream representing a ride and turn it into a Ride
 // struct. Returns an error if the byte array is too short.
 func Unmarshal(buf []byte, r *Ride) error {
@@ -235,68 +202,6 @@ func parseTrackData(trackData []byte) tracks.Data {
 	td.Clearance = 2
 	td.ClearanceDirection = tracks.CLEARANCE_ABOVE
 	return *td
-}
-
-// Advance all of the values by one track segment.
-func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
-	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
-
-	// XXX
-	ΔE += 0
-
-	ΔForward += cosdeg(direction) * ts.ForwardDelta
-	ΔForward += sindeg(direction) * ts.SidewaysDelta
-
-	ΔSideways += sindeg(direction) * ts.ForwardDelta
-	ΔSideways += cosdeg(direction) * ts.SidewaysDelta
-
-	direction += ts.DirectionDelta
-	for ; direction >= 360; direction -= 360 {
-	}
-
-	return ΔE, ΔForward, ΔSideways, direction
-}
-
-// Test whether the ride's track forms a continuous circuit. Does not test
-// whether the ride collides with itself.
-func IsCircuit(t *tracks.Data) bool {
-	// X and Y don't really make sense as variable names, easier to think about
-	// relative changes
-	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := tracks.DIR_STRAIGHT
-	if len(t.Elements) == 0 {
-		return false
-	}
-	for i := range t.Elements {
-		ts := t.Elements[i].Segment
-		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(
-			ts, eΔ, forwardΔ, sidewaysΔ, direction)
-	}
-	return forwardΔ == 0 && sidewaysΔ == 0 && eΔ == 0
-}
-
-// Detect whether the track collides with itself.
-func HasCollision(t *tracks.Data) bool {
-	matrix := make([][][]bool, 100)
-	for i := range matrix {
-		matrix[i] = make([][]bool, 100)
-		for j := range matrix[i] {
-			matrix[i][j] = make([]bool, 100)
-		}
-	}
-	eΔ, forwardΔ, sidewaysΔ := 0, 0, 0
-	direction := tracks.DIR_STRAIGHT
-	for i := range t.Elements {
-		ts := t.Elements[i].Segment
-		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(
-			ts, eΔ, forwardΔ, sidewaysΔ, direction)
-		// if there already exists a piece there, we can't build.
-		if matrix[forwardΔ][sidewaysΔ][eΔ] {
-			return true
-		}
-		matrix[forwardΔ][sidewaysΔ][eΔ] = true
-	}
-	return false
 }
 
 func main() {

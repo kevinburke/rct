@@ -1,4 +1,4 @@
-package td4
+package td6
 
 import (
 	"testing"
