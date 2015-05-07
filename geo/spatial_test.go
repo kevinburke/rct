@@ -1,4 +1,4 @@
-package td6
+package geo
 
 import (
 	"testing"
