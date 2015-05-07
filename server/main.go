@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -12,11 +13,16 @@ import (
 	"regexp"
 
 	"github.com/gorilla/handlers"
+	"github.com/kevinburke/rct"
 	"github.com/kevinburke/rct/genetic"
 )
 
+const VERSION = "0.1"
+
 func renderHandler(directory string, templateDirectory string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("{status:\"ok\"}"))
 	}
 }
 
@@ -92,6 +98,21 @@ func (h *RegexpHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
+func serverHeaderHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Server", fmt.Sprintf("rct/%s", VERSION))
+		for {
+			rint := rand.Intn(len(rct.RIDENAMES))
+			if rct.RIDENAMES[rint] == "(none)" {
+				continue
+			}
+			w.Header().Set("X-Powered-By", rct.RIDENAMES[rint])
+			break
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	directory := flag.String("directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
 	templateDirectory := flag.String("template-directory", "/usr/local/rct/server/templates", "Path to the folder storing RCT server templates (this file -> server/templates)")
@@ -100,6 +121,10 @@ func main() {
 		log.Fatalf("Usage: server [-directory DIRECTORY] ")
 	}
 	h := new(RegexpHandler)
+	renderRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*/render")
+	if err != nil {
+		log.Fatal(err)
+	}
 	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*")
 	if err != nil {
 		log.Fatal(err)
@@ -108,7 +133,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	h.HandleFunc(renderRoute, renderHandler(*directory, *templateDirectory))
 	h.HandleFunc(iterationRoute, newRctHandler(*directory, *templateDirectory))
 	h.Handler(defaultRoute, http.FileServer(http.Dir(*directory)))
-	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, h)))
+	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, serverHeaderHandler(h))))
 }
