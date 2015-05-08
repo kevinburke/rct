@@ -24,7 +24,7 @@ const (
 	TRACK_BANK_UPSIDE_DOWN
 )
 
-type DirectionDelta int
+type DirectionDelta float32
 
 const (
 	// All of these expressed in positives to help with degree calculations
@@ -34,11 +34,11 @@ const (
 	DIR_180_DEG                     = 180
 	DIR_90_DEG_LEFT                 = 270
 	DIR_45_DEG_LEFT                 = 315
-	DIR_DIAGONAL                    = iota
+	DIR_DIAGONAL                    = 0
 	// 1/8th direction change left (?)
-	DIR_DIAGONAL_LEFT = iota
+	DIR_DIAGONAL_LEFT = 22.5
 	// 1/8th direction change (?)
-	DIR_DIAGONAL_RIGHT = iota
+	DIR_DIAGONAL_RIGHT = 337.5
 )
 
 var RCTDirectionKeys = map[int]DirectionDelta{

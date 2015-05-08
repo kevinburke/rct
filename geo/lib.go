@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/kevinburke/rct/tracks"
@@ -16,6 +17,7 @@ func Render(elems []tracks.Element) ([]*Point, []*Point) {
 		p := Diff(elem.Segment, direction)
 		left = append(left, p)
 		direction += int(elem.Segment.DirectionDelta)
+		fmt.Println(direction)
 	}
 	return left, []*Point{}
 }
