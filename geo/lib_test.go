@@ -23,3 +23,24 @@ func TestDiffCurve(t *testing.T) {
 		t.Errorf("expected curved 5-diameter track to be %#v, was %#v", expected, out)
 	}
 }
+
+func TestDiffFlatRotated(t *testing.T) {
+	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
+	out := Diff(seg, 90)
+	expected := Point{0, 1, 0}
+	if *out != expected {
+		t.Errorf("expected flat track to be %#v, was %#v", expected, out)
+	}
+
+	out = Diff(seg, 180)
+	expected = Point{-1, 0, 0}
+	if *out != expected {
+		t.Errorf("expected flat track to be %#v, was %#v", expected, out)
+	}
+
+	out = Diff(seg, 270)
+	expected = Point{0, -1, 0}
+	if *out != expected {
+		t.Errorf("expected flat track to be %#v, was %#v", expected, out)
+	}
+}
