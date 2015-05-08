@@ -211,4 +211,14 @@ var ElementNames = []string{
 	"ELEM_INVERTED_FLAT_TO_90_DEG_DOWN_QUARTER_LOOP",            // CE
 	"ELEM_90_DEG_UP_QUARTER_LOOP_TO_INVERTED",                   // CF
 	"ELEM_QUARTER_LOOP_INVERT_TO_90_DEG_DOWN",                   // D0
+	"ELEM_LEFT_CURVED_LIFT_HILL",                                // D1
+	"ELEM_RIGHT_CURVED_LIFT_HILL",                               // D2
+	"ELEM_LEFT_REVERSER",                                        // D3
+	"ELEM_RIGHT_REVERSER",                                       // D4
+	"ELEM_AIR_THRUST_TOP_CAP",                                   // D5
+	"ELEM_AIR_THRUST_VERTICAL_DOWN",                             // D6
+	"ELEM_AIR_THRUST_VERTICAL_DOWN_TO_LEVEL",                    // D7
+	"ELEM_BLOCK_BRAKES",                                         // D8
+	"ELEM_BANKED_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP",           // D9
+	"ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP",          // DA
 }
