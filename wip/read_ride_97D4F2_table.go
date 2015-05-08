@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	rct "github.com/kevinburke/rct"
+	"github.com/kevinburke/rct"
 )
 
 func main() {

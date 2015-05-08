@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"os"
 
@@ -68,7 +70,9 @@ func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 }
 
 // Print out the Go code to make up a track segment
-func printValues(typ int, elementName string, diagonalByte []byte, bankByte []byte) {
+// XXX actually build the Go datatypes instead of printing/needing to copy
+// paste
+func printValues(typ int, elementName string, diagonalByte []byte, bankByte []byte, forwardByte []byte) {
 
 	dir := getDiagonalFromRCTStruct(diagonalByte)
 	sidewaysDelta := getSidewaysDelta(int(diagonalByte[8]))
@@ -88,12 +92,19 @@ func printValues(typ int, elementName string, diagonalByte []byte, bankByte []by
 	bitVal = int(bankByte[3])
 	fmt.Printf("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
 
+	var forward int16
+	buf := bytes.NewReader(forwardByte[6:8])
+	err := binary.Read(buf, binary.LittleEndian, &forward)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("\tForwardDelta: %d,\n", forward/-32+1)
+
 	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
 	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
 	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
-
 	fmt.Printf("},\n")
-
 }
 
 const RCT_DIRECTION_ADDR = 0x005972bb
@@ -101,6 +112,18 @@ const RCT_DIRECTION_WIDTH = 10
 
 const RCT_BANK_SLOPE_ADDR = 0x00597c9d
 const RCT_BANK_SLOPE_WIDTH = 8
+
+// Follows the format in TrackCoordinates
+/*
+	sint8 rotation_negative;	// 0x00
+	sint8 rotation_positive;	// 0x01
+	sint16 z_negative;			// 0x02
+	sint16 z_positive;			// 0x04
+	sint16 x;					// 0x06
+	sint16 y;					// 0x08
+*/
+const RCT_FORWARD_ADDR = 0x005968bb
+const RCT_FORWARD_WIDTH = 0x0A
 
 var configTable1Map = map[int]map[int]string{
 	0: map[int]string{
@@ -184,6 +207,9 @@ func main() {
 	c := make([]byte, 256*RCT_BANK_SLOPE_WIDTH)
 	f.ReadAt(c, RCT_BANK_SLOPE_ADDR)
 
+	d := make([]byte, 256*RCT_FORWARD_WIDTH)
+	f.ReadAt(d, RCT_FORWARD_ADDR)
+
 	for i := 0; i < len(tracks.ElementNames); i++ {
 		//fmt.Println(i)
 		//fmt.Printf("%55s ", tracks.ElementNames[i])
@@ -195,7 +221,10 @@ func main() {
 		bankIdx := i * RCT_BANK_SLOPE_WIDTH
 		bankBitSubset := c[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
 
-		printValues(i, tracks.ElementNames[i], bitSubset, bankBitSubset)
+		forwardIdx := i * RCT_FORWARD_WIDTH
+		forwardBitSubset := d[forwardIdx : forwardIdx+RCT_FORWARD_WIDTH]
+
+		printValues(i, tracks.ElementNames[i], bitSubset, bankBitSubset, forwardBitSubset)
 	}
 
 	//fmt.Printf("%#v\n", tracks.TS_MAP)
