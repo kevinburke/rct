@@ -15,13 +15,14 @@ func hasBit(n int, pos uint) bool {
 }
 
 var reverseMap = map[tracks.DirectionDelta]string{
-	tracks.DIR_STRAIGHT:       "DIR_STRAIGHT",
-	tracks.DIR_45_DEG_RIGHT:   "DIR_45_DEG_RIGHT",
-	tracks.DIR_90_DEG_RIGHT:   "DIR_90_DEG_RIGHT",
-	tracks.DIR_180_DEG:        "DIR_180_DEG",
-	tracks.DIR_90_DEG_LEFT:    "DIR_90_DEG_LEFT",
-	tracks.DIR_45_DEG_LEFT:    "DIR_45_DEG_LEFT",
-	tracks.DIR_DIAGONAL:       "DIR_DIAGONAL",
+	tracks.DIR_STRAIGHT:     "DIR_STRAIGHT",
+	tracks.DIR_45_DEG_RIGHT: "DIR_45_DEG_RIGHT",
+	tracks.DIR_90_DEG_RIGHT: "DIR_90_DEG_RIGHT",
+	tracks.DIR_180_DEG:      "DIR_180_DEG",
+	tracks.DIR_90_DEG_LEFT:  "DIR_90_DEG_LEFT",
+	tracks.DIR_45_DEG_LEFT:  "DIR_45_DEG_LEFT",
+	// XXX - fix when we allow diagonals.
+	//tracks.DIR_DIAGONAL:       "DIR_DIAGONAL",
 	tracks.DIR_DIAGONAL_LEFT:  "DIR_DIAGONAL_LEFT",
 	tracks.DIR_DIAGONAL_RIGHT: "DIR_DIAGONAL_RIGHT",
 }

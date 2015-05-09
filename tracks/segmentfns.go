@@ -10,11 +10,19 @@ func isPossibleChainLift(val *Segment) bool {
 		val.EndingBank == TRACK_BANK_NONE
 }
 
+func (e *Element) diagonal() bool {
+	// 8d to ab are straight diagonal pieces, probably a better way to do that
+	// check
+	return e.Segment.DirectionDelta == DIR_DIAGONAL_RIGHT ||
+		e.Segment.DirectionDelta == DIR_DIAGONAL_LEFT ||
+		(e.Segment.Type < 0xAC && e.Segment.Type > 0x8C)
+}
+
 // Possibilities computes all of the possible track pieces that can be built
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
 		// XXX, need to check diagonal
-		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank {
+		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() {
 			o = append(o, Element{Segment: val, ChainLift: false})
 			if isPossibleChainLift(val) {
 				o = append(o, Element{Segment: val, ChainLift: true})

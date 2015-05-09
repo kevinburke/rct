@@ -1,7 +1,6 @@
 package geo
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/kevinburke/rct/tracks"
@@ -10,16 +9,24 @@ import (
 // A Point is a representation of (x, y, z) coordinates
 type Point [3]float64
 
-func Render(elems []tracks.Element) ([]*Point, []*Point) {
-	left := []*Point{&Point{0, 0, 0}}
-	direction := 0
+func Render(elems []tracks.Element) ([]Point, []Point) {
+	current := Point{0, 0, 0}
+	left := []Point{current}
+	var direction tracks.DirectionDelta
+	direction = 0
 	for _, elem := range elems {
-		p := Diff(elem.Segment, direction)
-		left = append(left, p)
-		direction += int(elem.Segment.DirectionDelta)
-		fmt.Println(direction)
+		segm := tracks.TS_MAP[elem.Segment.Type]
+		p := Diff(segm, direction)
+		current[0] += p[0]
+		current[1] += p[1]
+		current[2] += p[2]
+		left = append(left, current)
+		direction += segm.DirectionDelta
+		for direction > 360 {
+			direction -= 360
+		}
 	}
-	return left, []*Point{}
+	return left, []Point{}
 }
 
 // Round to the nearest integer
@@ -34,11 +41,12 @@ func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	// XXX
 	ΔE += 0
 
-	ΔForward += round(cosdeg(int(direction)) * float64(ts.ForwardDelta))
-	ΔForward += round(sindeg(int(direction)) * float64(ts.SidewaysDelta))
+	fdirection := float64(direction)
+	ΔForward += round(cosdeg(fdirection) * float64(ts.ForwardDelta))
+	ΔForward += round(sindeg(fdirection) * float64(ts.SidewaysDelta))
 
-	ΔSideways += round(sindeg(int(direction)) * float64(ts.ForwardDelta))
-	ΔSideways += round(cosdeg(int(direction)) * float64(ts.SidewaysDelta))
+	ΔSideways += round(sindeg(fdirection) * float64(ts.ForwardDelta))
+	ΔSideways += round(cosdeg(fdirection) * float64(ts.SidewaysDelta))
 
 	direction += ts.DirectionDelta
 	for ; direction >= 360; direction -= 360 {
@@ -48,41 +56,41 @@ func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 }
 
 // sindeg computes sines in degrees
-func sindeg(deg int) float64 {
+func sindeg(deg float64) float64 {
 	for ; deg >= 360; deg -= 360 {
 	}
-	if deg%180 == 0 {
+	if round(deg)%180 == 0 {
 		return 0
-	} else if deg == 90 {
+	} else if round(deg) == 90 {
 		return 1
-	} else if deg == 270 {
+	} else if round(deg) == 270 {
 		return -1
 	} else {
-		return math.Sin(float64(deg) * math.Pi / 180)
+		return math.Sin(deg * math.Pi / 180)
 	}
 }
 
 // computes sines in degrees
-func cosdeg(deg int) float64 {
+func cosdeg(deg float64) float64 {
 	for ; deg >= 360; deg -= 360 {
 	}
-	if deg == 0 {
+	if round(deg) == 0 {
 		return 1
-	} else if deg == 90 || deg == 270 {
+	} else if round(deg) == 90 || round(deg) == 270 {
 		return 0
-	} else if deg == 180 {
+	} else if round(deg) == 180 {
 		return -1
 	} else {
-		return math.Sin(float64(deg) * math.Pi / 180)
+		return math.Sin(deg * math.Pi / 180)
 	}
 }
 
 // PositionChange takes a travel direction in degrees and a track segment and
 // returns the distance traveled in the X, Y, and Z directions.
-func Diff(ts *tracks.Segment, direction int) *Point {
+func Diff(ts *tracks.Segment, direction tracks.DirectionDelta) *Point {
 	//rotate around the Z axis: http://stackoverflow.com/a/14609567/329700
-	x := float64(ts.ForwardDelta)*cosdeg(direction) - float64(ts.SidewaysDelta)*sindeg(direction)
-	y := float64(ts.ForwardDelta)*sindeg(direction) + float64(ts.SidewaysDelta)*cosdeg(direction)
+	x := float64(ts.ForwardDelta)*cosdeg(float64(direction)) - float64(ts.SidewaysDelta)*sindeg(float64(direction))
+	y := float64(ts.ForwardDelta)*sindeg(float64(direction)) + float64(ts.SidewaysDelta)*cosdeg(float64(direction))
 	return &Point{x, y, float64(ts.ElevationDelta)}
 }
 
