@@ -141,6 +141,17 @@ func serverHeaderHandler(h http.Handler) http.Handler {
 	})
 }
 
+func jsonStripper(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, ".json") {
+			newUrl := strings.TrimSuffix(r.URL.Path, ".json")
+			http.Redirect(w, r, newUrl, http.StatusMovedPermanently)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	directory := flag.String("directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
 	templateDirectory := flag.String("template-directory", "/usr/local/rct/server/templates", "Path to the folder storing RCT server templates (this file -> server/templates)")
@@ -149,11 +160,11 @@ func main() {
 		log.Fatalf("Usage: server [-directory DIRECTORY] ")
 	}
 	h := new(RegexpHandler)
-	renderRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*/render")
+	renderRoute, err := regexp.Compile("/experiments/.*/iterations/.+/.+/render")
 	if err != nil {
 		log.Fatal(err)
 	}
-	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.*/.*")
+	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.+/.+")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -164,5 +175,6 @@ func main() {
 	h.HandleFunc(renderRoute, renderHandler(*directory, *templateDirectory))
 	h.HandleFunc(iterationRoute, newRctHandler(*directory, *templateDirectory))
 	h.Handler(defaultRoute, http.FileServer(http.Dir(*directory)))
-	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, serverHeaderHandler(h))))
+	allHandlers := jsonStripper(serverHeaderHandler(h))
+	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, allHandlers)))
 }
