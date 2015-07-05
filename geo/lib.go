@@ -39,6 +39,7 @@ func round(f float64) int {
 }
 
 // Advance all of the values by one track segment.
+// XXX: this should return a Point instead of 3 ints
 func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
 

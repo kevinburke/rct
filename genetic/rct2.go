@@ -20,7 +20,17 @@ func CreateStation() []tracks.Element {
 	return station
 }
 
+func distanceFromStart() {
+
+}
+
+// GetScore determines how "good" a track is. Should take into account:
+//
+// - How close the track is to forming a complete loop
+// - How many collisions exist in the track
+// - Whether the car can make it all the way around the track
+//
+// As well as other components that mark a track as "interesting"
 func GetScore(t []tracks.Element) int64 {
-	// Incredibly sophisticated scoring algorithm.
 	return int64(len(t))
 }
