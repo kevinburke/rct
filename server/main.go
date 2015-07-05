@@ -155,6 +155,8 @@ func jsonStripper(h http.Handler) http.Handler {
 func main() {
 	directory := flag.String("directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
 	templateDirectory := flag.String("template-directory", "/usr/local/rct/server/templates", "Path to the folder storing RCT server templates (this file -> server/templates)")
+	staticDirectory := flag.String("static-directory", "/usr/local/rct/server/static", "Path to the folder storing RCT server templates (this file -> server/static)")
+
 	flag.Parse()
 	if len(flag.Args()) > 0 {
 		log.Fatalf("Usage: server [-directory DIRECTORY] ")
@@ -168,12 +170,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	staticRoute, err := regexp.Compile("/static")
+	if err != nil {
+		log.Fatal(err)
+	}
 	defaultRoute, err := regexp.Compile("/")
 	if err != nil {
 		log.Fatal(err)
 	}
 	h.HandleFunc(renderRoute, renderHandler(*directory, *templateDirectory))
 	h.HandleFunc(iterationRoute, newRctHandler(*directory, *templateDirectory))
+	h.Handler(staticRoute, http.StripPrefix("/static", http.FileServer(http.Dir(*staticDirectory))))
 	h.Handler(defaultRoute, http.FileServer(http.Dir(*directory)))
 	allHandlers := jsonStripper(serverHeaderHandler(h))
 	log.Fatal(http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, allHandlers)))

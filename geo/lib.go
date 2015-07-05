@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/kevinburke/rct/tracks"
@@ -16,10 +17,13 @@ func Render(elems []tracks.Element) ([]Point, []Point) {
 	direction = 0
 	for _, elem := range elems {
 		segm := tracks.TS_MAP[elem.Segment.Type]
+		fmt.Println(segm.Type)
 		p := Diff(segm, direction)
+		fmt.Println(p[2])
 		current[0] += p[0]
 		current[1] += p[1]
 		current[2] += p[2]
+		fmt.Println(current[2])
 		left = append(left, current)
 		direction += segm.DirectionDelta
 		for direction > 360 {

@@ -18,11 +18,19 @@ func (e *Element) diagonal() bool {
 		(e.Segment.Type < 0xAC && e.Segment.Type > 0x8C)
 }
 
+func (e *Element) valid() bool {
+	// Heartline and mini golf
+	if e.Segment.Type >= 0xc5 && e.Segment.Type <= 0xd0 {
+		return false
+	}
+	return true
+}
+
 // Possibilities computes all of the possible track pieces that can be built
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
-		// XXX, need to check diagonal
-		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() {
+		// XXX, figure out how to handle diagonal
+		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() && s.valid() {
 			o = append(o, Element{Segment: val, ChainLift: false})
 			if isPossibleChainLift(val) {
 				o = append(o, Element{Segment: val, ChainLift: true})
