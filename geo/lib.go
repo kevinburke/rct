@@ -1,36 +1,43 @@
 package geo
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/kevinburke/rct/tracks"
 )
 
+type Vector struct {
+	Point Point
+	Dir   tracks.DirectionDelta
+}
+
 // A Point is a representation of (x, y, z) coordinates
 type Point [3]float64
 
-func Render(elems []tracks.Element) ([]Point, []Point) {
-	current := Point{0, 0, 0}
-	left := []Point{current}
+func Vectors(elems []tracks.Element) []Vector {
 	var direction tracks.DirectionDelta
 	direction = 0
+	current := Vector{Point{0, 0, 0}, direction}
+	plist := []Vector{current}
 	for _, elem := range elems {
 		segm := tracks.TS_MAP[elem.Segment.Type]
-		fmt.Println(segm.Type)
 		p := Diff(segm, direction)
-		fmt.Println(p[2])
-		current[0] += p[0]
-		current[1] += p[1]
-		current[2] += p[2]
-		fmt.Println(current[2])
-		left = append(left, current)
+		current.Point[0] += p[0]
+		current.Point[1] += p[1]
+		current.Point[2] += p[2]
 		direction += segm.DirectionDelta
 		for direction > 360 {
 			direction -= 360
 		}
+		current.Dir = direction
+		plist = append(plist, current)
 	}
-	return left, []Point{}
+	return plist
+}
+
+func Render(elems []tracks.Element) ([]Vector, []Vector) {
+	plist := Vectors(elems)
+	return plist, []Vector{}
 }
 
 // Round to the nearest integer
@@ -40,7 +47,7 @@ func round(f float64) int {
 
 // Advance all of the values by one track segment.
 // XXX: this should return a Point instead of 3 ints
-func advanceTrack(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
+func Advance(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
 
 	// XXX
@@ -111,7 +118,7 @@ func IsCircuit(t *tracks.Data) bool {
 	}
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
-		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(
+		eΔ, forwardΔ, sidewaysΔ, direction = Advance(
 			ts, eΔ, forwardΔ, sidewaysΔ, direction)
 	}
 	return forwardΔ == 0 && sidewaysΔ == 0 && eΔ == 0
@@ -130,7 +137,7 @@ func HasCollision(t *tracks.Data) bool {
 	direction := tracks.DIR_STRAIGHT
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
-		eΔ, forwardΔ, sidewaysΔ, direction = advanceTrack(
+		eΔ, forwardΔ, sidewaysΔ, direction = Advance(
 			ts, eΔ, forwardΔ, sidewaysΔ, direction)
 		// if there already exists a piece there, we can't build.
 		if matrix[forwardΔ][sidewaysΔ][eΔ] {

@@ -6,6 +6,7 @@ test:
 install:
 	go get github.com/jmhodges/justrun
 	go install github.com/jmhodges/justrun
+	go get ./...
 	go install ./...
 
 serve:

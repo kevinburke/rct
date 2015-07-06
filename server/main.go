@@ -11,9 +11,9 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"pkg/text/template"
 	"regexp"
 	"strings"
+	"text/template"
 
 	"github.com/gorilla/handlers"
 	"github.com/kevinburke/rct"
