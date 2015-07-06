@@ -32,7 +32,57 @@ func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks
 // Returns track pieces to get the trackEnd to the same vertical height as the
 // station start.
 func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Element, geo.Vector) {
-	return []tracks.Element{}, geo.Vector{geo.Point{0, 0, 0}, 0}
+	if trackEnd.Point[2] == stationStart.Point[2] {
+		// Easy case, no ascending/descending
+		return []tracks.Element{}, trackEnd
+	}
+	if trackEnd.Point[2] < stationStart.Point[2] {
+		elevation := int(stationStart.Point[2] - trackEnd.Point[2])
+		elems := make([]tracks.Element, elevation+2)
+		// First point is simple ascender
+		elems[0] = tracks.Element{
+			ChainLift: true,
+			Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_UP],
+		}
+		for i := 0; i < elevation; i++ {
+			elems[i+1] = tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
+			}
+		}
+		elems[elevation-1] = tracks.Element{
+			ChainLift: true,
+			Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
+		}
+		return elems, geo.Vector{geo.Point{
+			trackEnd.Point[0],
+			trackEnd.Point[1],
+			trackEnd.Point[2] + float64(elevation),
+		}, trackEnd.Dir}
+	} else {
+		elevation := int(trackEnd.Point[2] - stationStart.Point[2])
+		elems := make([]tracks.Element, elevation+2)
+		// First point is simple ascender
+		elems[0] = tracks.Element{
+			ChainLift: true,
+			Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN],
+		}
+		for i := 0; i < elevation; i++ {
+			elems[i+1] = tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
+			}
+		}
+		elems[elevation-1] = tracks.Element{
+			ChainLift: true,
+			Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT],
+		}
+		return elems, geo.Vector{geo.Point{
+			trackEnd.Point[0],
+			trackEnd.Point[1],
+			trackEnd.Point[2] - float64(elevation),
+		}, trackEnd.Dir}
+	}
 }
 
 // completeTrack takes a trackEnd and a stationStart and returns a list of
