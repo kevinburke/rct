@@ -37,7 +37,6 @@ func round(f float64) int {
 
 // caller is responsible for aligning these
 func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	// directionDelta: 0, stationStart: (3, 4). ok straight points are ((x < 3), 4)
 	if trackEnd.Dir != stationStart.Dir {
 		log.Panic("track end and station start are not the same", trackEnd, stationStart)
 	}
@@ -45,8 +44,12 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 		return []tracks.Element{}
 	}
 	if stationStart.Dir == tracks.DIR_STRAIGHT {
+		// directionDelta: 0, stationStart: (3, 4). ok straight points are ((x < 3), 4)
 		if stationStart.Point[1] == trackEnd.Point[1] {
+			// points have same Y axis
 			if trackEnd.Point[0] < stationStart.Point[0] {
+				// trackEnd directly behind stationStart. proceed forward to
+				// the station!
 				elems := make([]tracks.Element, round(stationStart.Point[0]-trackEnd.Point[0]))
 				count := 0
 				for i := trackEnd.Point[0]; i < stationStart.Point[0]; i++ {
@@ -56,6 +59,34 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 					count += 1
 				}
 				return elems
+			} else {
+				// track end ahead of station start...not great, turn to the
+				// right.
+				elems := []tracks.Element{tracks.Element{
+					Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
+				}}
+				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
+				return append(elems, connect2DTrackPieces(v, stationStart)...)
+			}
+		} else if trackEnd.Point[1] < stationStart.Point[1] {
+			// trackEnd below the station start
+			if trackEnd.Point[0] < stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]-5 {
+				// Can get there with a left turn and a right turn
+				elems := []tracks.Element{tracks.Element{
+					Segment: tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES],
+				}}
+				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
+				return append(elems, connect2DTrackPieces(v, stationStart)...)
+			}
+		} else {
+			// trackEnd above the station start
+			if trackEnd.Point[0] > stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]+5 {
+				// Can get there with a right turn and a left turn
+				elems := []tracks.Element{tracks.Element{
+					Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
+				}}
+				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
+				return append(elems, connect2DTrackPieces(v, stationStart)...)
 			}
 		}
 	} else {
@@ -86,6 +117,7 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 		return []tracks.Element{}, trackEnd
 	}
 	if trackEnd.Point[2] < stationStart.Point[2] {
+		// Ascend to station
 		elevation := int(stationStart.Point[2] - trackEnd.Point[2])
 		elems := make([]tracks.Element, elevation+2)
 		// First point is simple ascender
@@ -109,6 +141,7 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 			trackEnd.Point[2] + float64(elevation),
 		}, trackEnd.Dir}
 	} else {
+		// Descend to station
 		elevation := round(trackEnd.Point[2] - stationStart.Point[2])
 		elems := make([]tracks.Element, elevation+2)
 		// First point is simple descender

@@ -1,6 +1,7 @@
 package geo
 
 import (
+	"log"
 	"math"
 
 	"github.com/kevinburke/rct/tracks"
@@ -122,6 +123,45 @@ func IsCircuit(t *tracks.Data) bool {
 			ts, eΔ, forwardΔ, sidewaysΔ, direction)
 	}
 	return forwardΔ == 0 && sidewaysΔ == 0 && eΔ == 0
+}
+
+func AdvanceVector(v Vector, s *tracks.Segment) Vector {
+	var p Point
+	if v.Dir == tracks.DIR_STRAIGHT {
+		// facing right - (forward, -sideways)
+		p = Point{
+			v.Point[0] + float64(s.ForwardDelta),
+			v.Point[1] - float64(s.SidewaysDelta),
+			v.Point[2] + float64(s.ElevationDelta),
+		}
+	} else if v.Dir == tracks.DIR_90_DEG_RIGHT {
+		// facing up - (sideways, forward)
+		p = Point{
+			v.Point[0] + float64(s.SidewaysDelta),
+			v.Point[1] + float64(s.ForwardDelta),
+			v.Point[2] + float64(s.ElevationDelta),
+		}
+	} else if v.Dir == tracks.DIR_180_DEG {
+		// facing left - (-forward, sideways)
+		p = Point{
+			v.Point[0] - float64(s.ForwardDelta),
+			v.Point[1] + float64(s.SidewaysDelta),
+			v.Point[2] + float64(s.ElevationDelta),
+		}
+	} else if v.Dir == tracks.DIR_90_DEG_LEFT {
+		// facing down - (-sideways, -forward)
+		p = Point{
+			v.Point[0] - float64(s.SidewaysDelta),
+			v.Point[1] + float64(s.ForwardDelta),
+			v.Point[2] + float64(s.ElevationDelta),
+		}
+	} else {
+		log.Panic("unsupported direction", v.Dir)
+	}
+	dir := v.Dir + s.DirectionDelta
+	for ; dir >= 360; dir -= 360 {
+	}
+	return Vector{p, dir}
 }
 
 // Detect whether the track collides with itself.
