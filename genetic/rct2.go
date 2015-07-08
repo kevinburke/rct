@@ -26,8 +26,85 @@ func CreateStation() []tracks.Element {
 	return station
 }
 
+func rightTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	// make a right turn & recursive call
+	elem := tracks.Element{
+		Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
+	}
+	v := geo.AdvanceVector(trackEnd, elem.Segment)
+	return append([]tracks.Element{elem}, connect2DTrackPieces(v, stationStart)...)
+}
+
+func leftTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	// make a left turn & recursive call
+	elem := tracks.Element{
+		Segment: tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES],
+	}
+	v := geo.AdvanceVector(trackEnd, elem.Segment)
+	return append([]tracks.Element{elem}, connect2DTrackPieces(v, stationStart)...)
+}
+
 func connect2DOppositeDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	return []tracks.Element{}
+	// if is really far to the left
+	//	if is really far behind start point
+	//   advance to station start, recursive call
+	//  else
+	//	 return X direction turn + recursive call
+	// else if really far to the right
+	//	repeat in other direction
+	// else if left of center
+	//  turn toward the outside
+	// else (slightly right of center or on center)
+	//  turn toward the outside
+	//
+
+	// this should mean that the station start is facing to the right
+	// (dir_straight) and the track end is facing to the left.
+
+	// if track end is (x, y), ok points are ( (any x), y + 5)
+	if trackEnd.Point[1] >= stationStart.Point[1] {
+		if trackEnd.Point[1] >= stationStart.Point[1]+5 {
+			if trackEnd.Point[0] > stationStart.Point[0] {
+				// go straight until you get in line
+				elems := make([]tracks.Element, round(trackEnd.Point[0]-stationStart.Point[0]))
+				count := 0
+				for i := trackEnd.Point[0]; i > stationStart.Point[0]; i-- {
+					elems[count] = tracks.Element{
+						Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
+					}
+					count += 1
+				}
+				return elems
+			} else {
+				return leftTurn(trackEnd, stationStart)
+			}
+		} else {
+			// heading the wrong way and too close to the station. make a turn
+			// to the outside
+			return rightTurn(trackEnd, stationStart)
+		}
+	} else {
+		if trackEnd.Point[1] < stationStart.Point[1]-5 {
+			if trackEnd.Point[0] > stationStart.Point[0] {
+				// go straight until you get in line
+				elems := make([]tracks.Element, round(trackEnd.Point[0]-stationStart.Point[0]))
+				count := 0
+				for i := trackEnd.Point[0]; i > stationStart.Point[0]; i-- {
+					elems[count] = tracks.Element{
+						Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
+					}
+					count += 1
+				}
+				return elems
+			} else {
+				return rightTurn(trackEnd, stationStart)
+			}
+		} else {
+			// heading the wrong way and too close to the station. make a turn
+			// to the outside
+			return leftTurn(trackEnd, stationStart)
+		}
+	}
 }
 
 // Round to the nearest integer
@@ -43,56 +120,45 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 	if stationStart.Point[0] == trackEnd.Point[0] && stationStart.Point[1] == trackEnd.Point[1] {
 		return []tracks.Element{}
 	}
-	if stationStart.Dir == tracks.DIR_STRAIGHT {
-		// directionDelta: 0, stationStart: (3, 4). ok straight points are ((x < 3), 4)
-		if stationStart.Point[1] == trackEnd.Point[1] {
-			// points have same Y axis
-			if trackEnd.Point[0] < stationStart.Point[0] {
-				// trackEnd directly behind stationStart. proceed forward to
-				// the station!
-				elems := make([]tracks.Element, round(stationStart.Point[0]-trackEnd.Point[0]))
-				count := 0
-				for i := trackEnd.Point[0]; i < stationStart.Point[0]; i++ {
-					elems[count] = tracks.Element{
-						Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
-					}
-					count += 1
+	// in theory, since the station start is always created facing straight, it
+	// should always be DIR_STRAIGHT
+	if stationStart.Dir != tracks.DIR_STRAIGHT {
+		log.Panic("stationStart direction is not straight: ", stationStart)
+	}
+	// directionDelta: 0, stationStart: (3, 4). ok straight points are ((x < 3), 4)
+	if stationStart.Point[1] == trackEnd.Point[1] {
+		// points have same Y axis
+		if trackEnd.Point[0] < stationStart.Point[0] {
+			// trackEnd directly behind stationStart. proceed forward to
+			// the station!
+			elems := make([]tracks.Element, round(stationStart.Point[0]-trackEnd.Point[0]))
+			count := 0
+			for i := trackEnd.Point[0]; i < stationStart.Point[0]; i++ {
+				elems[count] = tracks.Element{
+					Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
 				}
-				return elems
-			} else {
-				// track end ahead of station start...not great, turn to the
-				// right.
-				elems := []tracks.Element{tracks.Element{
-					Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
-				}}
-				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
-				return append(elems, connect2DTrackPieces(v, stationStart)...)
+				count += 1
 			}
-		} else if trackEnd.Point[1] < stationStart.Point[1] {
-			// trackEnd below the station start
-			if trackEnd.Point[0] < stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]-5 {
-				// Can get there with a left turn and a right turn
-				elems := []tracks.Element{tracks.Element{
-					Segment: tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES],
-				}}
-				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
-				return append(elems, connect2DTrackPieces(v, stationStart)...)
-			}
+			return elems
 		} else {
-			// trackEnd above the station start
-			if trackEnd.Point[0] > stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]+5 {
-				// Can get there with a right turn and a left turn
-				elems := []tracks.Element{tracks.Element{
-					Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
-				}}
-				v := geo.AdvanceVector(trackEnd, elems[0].Segment)
-				return append(elems, connect2DTrackPieces(v, stationStart)...)
-			}
+			// track end ahead of station start...not great, turn to the
+			// right.
+			return rightTurn(trackEnd, stationStart)
+		}
+	} else if trackEnd.Point[1] < stationStart.Point[1] {
+		// trackEnd below the station start
+		if trackEnd.Point[0] < stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]-5 {
+			// Can get there with a left turn and a right turn
+			return leftTurn(trackEnd, stationStart)
 		}
 	} else {
-		log.Panic("direction didn't match", stationStart.Dir)
+		// trackEnd above the station start
+		if trackEnd.Point[0] > stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]+5 {
+			// Can get there with a right turn and a left turn
+			return rightTurn(trackEnd, stationStart)
+		}
 	}
-	return []tracks.Element{}
+	panic("shouldn't get here")
 }
 
 // Given two vectors that exist in the same 2D plane, return a list of track
