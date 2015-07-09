@@ -44,6 +44,14 @@ func leftTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	return append([]tracks.Element{elem}, connect2DTrackPieces(v, stationStart)...)
 }
 
+func straight(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	elem := tracks.Element{
+		Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
+	}
+	v := geo.AdvanceVector(trackEnd, elem.Segment)
+	return append([]tracks.Element{elem}, connect2DTrackPieces(v, stationStart)...)
+}
+
 func connect2DOppositeDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// if is really far to the left
 	//	if is really far behind start point
@@ -161,16 +169,79 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 	panic("shouldn't get here")
 }
 
+func connect2DRightFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	// if you are 8 below:
+	//	turn left
+	// else if you are 3 above:
+	//	turn left
+	// else if you are 0-2 above:
+	//	go straight
+	// else if you are ahead or less than 3 pieces behind:
+	//	go straight
+	// else if you are 3 pieces behind:
+	//	turn right
+	// else
+	//	go straight
+	if trackEnd.Point[1] <= stationStart.Point[1]-8 {
+		return leftTurn(trackEnd, stationStart)
+	} else if trackEnd.Point[1] >= stationStart.Point[1]+3 {
+		return leftTurn(trackEnd, stationStart)
+	} else if trackEnd.Point[1] >= stationStart.Point[1] {
+		return straight(trackEnd, stationStart)
+	} else if trackEnd.Point[0] > stationStart.Point[0]-3 {
+		return straight(trackEnd, stationStart)
+	} else if trackEnd.Point[0] <= stationStart.Point[0]-3 {
+		// golden
+		return rightTurn(trackEnd, stationStart)
+	} else {
+		return straight(trackEnd, stationStart)
+	}
+}
+
+func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	// if you are 8 above:
+	//	turn right
+	// else if you are 3 below:
+	//	turn right
+	// else if you are 0-2 below:
+	//	go straight
+	// else if you are ahead or less than 3 pieces behind:
+	//	go straight
+	// else if you are 3 pieces behind:
+	//	turn left
+	// else
+	//	go straight
+	if trackEnd.Point[1] >= stationStart.Point[1]+8 {
+		return rightTurn(trackEnd, stationStart)
+	} else if trackEnd.Point[1] <= stationStart.Point[1]-3 {
+		return rightTurn(trackEnd, stationStart)
+	} else if trackEnd.Point[1] <= stationStart.Point[1] {
+		return straight(trackEnd, stationStart)
+	} else if trackEnd.Point[0] > stationStart.Point[0]-3 {
+		return straight(trackEnd, stationStart)
+	} else if trackEnd.Point[0] <= stationStart.Point[0]-3 {
+		// golden
+		return leftTurn(trackEnd, stationStart)
+	} else {
+		return straight(trackEnd, stationStart)
+	}
+}
+
 // Given two vectors that exist in the same 2D plane, return a list of track
 // pieces that can be used to connect them.
 func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	// Okay! This is not a trivial problem.
+	// Okay! This is not a trivial problem. Slightly easier if you remember
+	// that the stations are always created facing to the left.
 	if trackEnd.Dir == stationStart.Dir {
 		return connect2DSameDirTrackPieces(trackEnd, stationStart)
 	} else if trackEnd.Dir-stationStart.Dir == 180 || stationStart.Dir-trackEnd.Dir == 180 {
 		return connect2DOppositeDirTrackPieces(trackEnd, stationStart)
+	} else if stationStart.Dir == tracks.DIR_STRAIGHT && trackEnd.Dir == tracks.DIR_90_DEG_RIGHT {
+		return connect2DRightFacingTrackPieces(trackEnd, stationStart)
+	} else if stationStart.Dir == tracks.DIR_STRAIGHT && trackEnd.Dir == tracks.DIR_90_DEG_LEFT {
+		return connect2DLeftFacingTrackPieces(trackEnd, stationStart)
 	} else {
-
+		panic("hi haters")
 	}
 	return []tracks.Element{}
 }
