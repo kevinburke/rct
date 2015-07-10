@@ -1,5 +1,7 @@
 package tracks
 
+import "log"
+
 func isPossibleChainLift(val *Segment) bool {
 	// XXX, check other pieces that can be chain lifts. in theory you can also
 	// place chain lifts on straight pieces of track but this seems silly
@@ -18,6 +20,12 @@ func (e *Element) diagonal() bool {
 		(e.Segment.Type < 0xAC && e.Segment.Type > 0x8C)
 }
 
+func (s *Segment) diagonal() bool {
+	return s.DirectionDelta == DIR_DIAGONAL_RIGHT ||
+		s.DirectionDelta == DIR_DIAGONAL_LEFT ||
+		(s.Type < 0xAC && s.Type > 0x8C)
+}
+
 func (e *Element) valid() bool {
 	// Heartline and mini golf
 	if e.Segment.Type >= 0xc5 && e.Segment.Type <= 0xd0 {
@@ -30,7 +38,10 @@ func (e *Element) valid() bool {
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
 		// XXX, figure out how to handle diagonal
-		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() && s.valid() {
+		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() && !val.diagonal() && s.valid() {
+			if val.DirectionDelta != 0 && val.DirectionDelta != 90 && val.DirectionDelta != 180 && val.DirectionDelta != 270 {
+				log.Panicf("%#v", val)
+			}
 			o = append(o, Element{Segment: val, ChainLift: false})
 			if isPossibleChainLift(val) {
 				o = append(o, Element{Segment: val, ChainLift: true})
