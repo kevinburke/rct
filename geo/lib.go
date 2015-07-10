@@ -27,7 +27,7 @@ func Vectors(elems []tracks.Element) []Vector {
 		current.Point[1] += p[1]
 		current.Point[2] += p[2]
 		direction += segm.DirectionDelta
-		for direction > 360 {
+		for direction >= 360 {
 			direction -= 360
 		}
 		current.Dir = direction
@@ -152,7 +152,7 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 		// facing down - (-sideways, -forward)
 		p = Point{
 			v.Point[0] - float64(s.SidewaysDelta),
-			v.Point[1] + float64(s.ForwardDelta),
+			v.Point[1] - float64(s.ForwardDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
 	} else {

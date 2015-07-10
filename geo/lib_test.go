@@ -44,3 +44,33 @@ func TestDiffFlatRotated(t *testing.T) {
 		t.Errorf("expected flat track to be %#v, was %#v", expected, out)
 	}
 }
+
+func TestFlat90DegRotated(t *testing.T) {
+	v := Vector{Point{3, 7, 0}, tracks.DIR_90_DEG_RIGHT}
+	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
+	out := AdvanceVector(v, seg)
+	expected := Point{3, 8, 0}
+	if out.Point != expected {
+		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
+	}
+}
+
+func TestFlat180DegRotated(t *testing.T) {
+	v := Vector{Point{3, 7, 0}, tracks.DIR_180_DEG}
+	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
+	out := AdvanceVector(v, seg)
+	expected := Point{2, 7, 0}
+	if out.Point != expected {
+		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
+	}
+}
+
+func TestFlat270DegRotated(t *testing.T) {
+	v := Vector{Point{3, 7, 0}, tracks.DIR_90_DEG_LEFT}
+	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
+	out := AdvanceVector(v, seg)
+	expected := Point{3, 6, 0}
+	if out.Point != expected {
+		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
+	}
+}
