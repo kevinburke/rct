@@ -2,6 +2,7 @@
 package genetic
 
 import (
+	"fmt"
 	"log"
 	"math"
 
@@ -28,6 +29,7 @@ func CreateStation() []tracks.Element {
 
 func rightTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// make a right turn & recursive call
+	fmt.Println("right turn")
 	elem := tracks.Element{
 		Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
 	}
@@ -37,6 +39,7 @@ func rightTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 
 func leftTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// make a left turn & recursive call
+	fmt.Println("left turn")
 	elem := tracks.Element{
 		Segment: tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES],
 	}
@@ -158,12 +161,33 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 		if trackEnd.Point[0] < stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]-5 {
 			// Can get there with a left turn and a right turn
 			return leftTurn(trackEnd, stationStart)
+		} else {
+			return rightTurn(trackEnd, stationStart)
 		}
 	} else {
-		// trackEnd above the station start
-		if trackEnd.Point[0] > stationStart.Point[0]-5 && trackEnd.Point[1] < stationStart.Point[1]+5 {
-			// Can get there with a right turn and a left turn
-			return rightTurn(trackEnd, stationStart)
+		// trackEnd is above the station start
+
+		// if the track is behind the station start by enough
+		if trackEnd.Point[0] > stationStart.Point[0]-5 {
+			// if it's below the station start by enough
+			if trackEnd.Point[1] < stationStart.Point[1]-5 {
+				// Can get there with a left turn and a right turn
+				return leftTurn(trackEnd, stationStart)
+			} else if trackEnd.Point[1] > stationStart.Point[1]+5 {
+				// Can get there with a right turn and a left turn
+				return rightTurn(trackEnd, stationStart)
+			} else if trackEnd.Point[1] <= stationStart.Point[1] {
+				// below but not by far enough, turn right
+				return rightTurn(trackEnd, stationStart)
+			} else {
+				return leftTurn(trackEnd, stationStart)
+			}
+		} else {
+			if trackEnd.Point[1] < stationStart.Point[1] {
+				return rightTurn(trackEnd, stationStart)
+			} else {
+				return leftTurn(trackEnd, stationStart)
+			}
 		}
 	}
 	panic("shouldn't get here")
@@ -230,6 +254,10 @@ func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector
 // Given two vectors that exist in the same 2D plane, return a list of track
 // pieces that can be used to connect them.
 func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	if trackEnd.Point[0] == stationStart.Point[0] && trackEnd.Point[1] == stationStart.Point[1] && trackEnd.Dir == stationStart.Dir {
+		return []tracks.Element{}
+	}
+	fmt.Printf("from: (%d, %d) to: (%d, %d), initial direction: %d\n", round(trackEnd.Point[0]), round(trackEnd.Point[1]), round(stationStart.Point[0]), round(stationStart.Point[1]), trackEnd.Dir)
 	// Okay! This is not a trivial problem. Slightly easier if you remember
 	// that the stations are always created facing to the left.
 	if trackEnd.Dir == stationStart.Dir {
@@ -241,7 +269,7 @@ func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks
 	} else if stationStart.Dir == tracks.DIR_STRAIGHT && trackEnd.Dir == tracks.DIR_90_DEG_LEFT {
 		return connect2DLeftFacingTrackPieces(trackEnd, stationStart)
 	} else {
-		panic("hi haters")
+		log.Panicf("trackend dir: %s, stationstart dir: %s", trackEnd.Dir, stationStart.Dir)
 	}
 	return []tracks.Element{}
 }
@@ -309,7 +337,10 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 func completeTrack(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	levelDescend, v := descendToLevel(trackEnd, stationStart)
 	twodtrack := connect2DTrackPieces(v, stationStart)
-	return append(levelDescend, twodtrack...)
+	fmt.Println("done!")
+	fmt.Printf("track length is %d\n", len(twodtrack))
+	result := append(levelDescend, twodtrack...)
+	return result
 }
 
 // GetScore determines how "good" a track is. Should take into account:
@@ -334,6 +365,9 @@ func GetScore(t []tracks.Element) int64 {
 	vectors := geo.Vectors(t)
 	stationStart := geo.Vector{geo.Point{0, 0, 0}, 0}
 	trackEnd := vectors[len(t)-1]
+	if trackEnd.Dir >= 350 {
+		log.Panic("trackend is too high", trackEnd.Dir)
+	}
 	trackPieces := completeTrack(trackEnd, stationStart)
 	return int64(10*1000*1000 - 4000*len(trackPieces))
 }

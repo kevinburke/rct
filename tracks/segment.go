@@ -827,7 +827,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK: &Segment{

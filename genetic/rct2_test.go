@@ -1,6 +1,7 @@
 package genetic
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/kevinburke/rct/geo"
@@ -55,5 +56,22 @@ func TestOneDownhillDescender(t *testing.T) {
 	}
 	if elems[2].Segment != tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT] {
 		t.Fatalf("expected a down-to-flat piece, got %+v", elems[1])
+	}
+}
+
+func TestRightTurn(t *testing.T) {
+	trackEnd := geo.Vector{geo.Point{
+		7, 3, 0,
+	}, tracks.DIR_90_DEG_RIGHT}
+	stationStart := geo.Vector{geo.Point{
+		9, 5, 0,
+	}, tracks.DIR_STRAIGHT}
+	fmt.Println("at (7, 3) facing up. turning right. should get to 9, 5)")
+	elems := rightTurn(trackEnd, stationStart)
+	if len(elems) != 1 {
+		t.Fatalf("expected a single right turn, got %#v", elems)
+	}
+	if elems[0].Segment != tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES] {
+		t.Fatalf("expected a right turn, got %#v", elems[0])
 	}
 }
