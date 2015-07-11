@@ -16,9 +16,9 @@ func SidewaysDelta(sidewaysDeltaByte int) int {
 		return 0
 	}
 	if bits.On(sidewaysDeltaByte, 7) {
-		return -(1 + (256-sidewaysDeltaByte)>>5)
+		return 1 + (256-sidewaysDeltaByte)>>5
 	}
-	return 1 + sidewaysDeltaByte>>5
+	return -(1 + sidewaysDeltaByte>>5)
 }
 
 var reverseMap = map[tracks.DirectionDelta]string{

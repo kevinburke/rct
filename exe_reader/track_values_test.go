@@ -7,12 +7,12 @@ var sidewaysTests = []struct {
 	expected int
 }{
 	{0, 0},
-	{64, 3},
-	{96, 4},
-	{160, -4},
-	{192, -3},
-	{224, -2},
-	{32, 2},
+	{32, -2},
+	{64, -3},
+	{96, -4},
+	{160, 4},
+	{192, 3},
+	{224, 2},
 }
 
 func TestSidewaysDelta(t *testing.T) {
