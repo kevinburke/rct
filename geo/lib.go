@@ -47,12 +47,17 @@ func round(f float64) int {
 }
 
 // Advance all of the values by one track segment.
-// XXX: this should return a Point instead of 3 ints
+//
+// Positive forward = right
+// Negative forward = left
+// Positive sideways = up
+// Negative sideways = down
+
+// right = up. left = down.
 func Advance(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
 
-	// XXX
-	ΔE += 0
+	ΔE += ts.ElevationDelta
 
 	fdirection := float64(direction)
 	ΔForward += round(cosdeg(fdirection) * float64(ts.ForwardDelta))
