@@ -9,6 +9,8 @@ var sidewaysTests = []struct {
 	{0, 0},
 	{64, 3},
 	{192, -3},
+	{224, -2},
+	{32, 2},
 }
 
 func TestSidewaysDelta(t *testing.T) {

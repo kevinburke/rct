@@ -12,7 +12,6 @@ import (
 // XXX, this doesn't correctly handle s-bends, which only move sideways by 1
 // piece, I think.
 func SidewaysDelta(sidewaysDeltaByte int) int {
-	fmt.Println("input: ", sidewaysDeltaByte)
 	if bits.On(sidewaysDeltaByte, 7) {
 		return -(1 + (256-sidewaysDeltaByte)>>5)
 	}
@@ -66,6 +65,14 @@ func ElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 	return 0
 }
 
+var PRINT = false
+
+func pt(format string, val ...interface{}) {
+	if PRINT {
+		fmt.Printf(format, val...)
+	}
+}
+
 // Print out the Go code to make up a track segment
 // XXX actually build the Go datatypes instead of printing/needing to copy
 // paste
@@ -73,21 +80,24 @@ func PrintValues(typ int, elementName string, diagonalByte []byte, bankByte []by
 
 	dir := GetDiagonalFromRCTStruct(diagonalByte)
 	sidewaysDelta := SidewaysDelta(int(diagonalByte[8]))
+	if int(diagonalByte[8]) == 32 {
+		fmt.Printf("%s: sideways(%d) = %d\n", elementName, int(diagonalByte[8]), sidewaysDelta)
+	}
 	negativeHeightBit := int(diagonalByte[2])
 	positiveHeightBit := int(diagonalByte[4])
 	elevationDelta := ElevationDelta(positiveHeightBit, negativeHeightBit)
 
-	fmt.Printf("%s: &Segment{\n", elementName)
+	pt("%s: &Segment{\n", elementName)
 
-	fmt.Printf("\tType: %#x,\n", typ)
+	pt("\tType: %#x,\n", typ)
 	bitVal := int(bankByte[2])
-	fmt.Printf("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
+	pt("\tInputDegree: %s,\n", configTable1Map[2][bitVal])
 	bitVal = int(bankByte[1])
-	fmt.Printf("\tOutputDegree: %s,\n", configTable1Map[1][bitVal])
+	pt("\tOutputDegree: %s,\n", configTable1Map[1][bitVal])
 	bitVal = int(bankByte[4])
-	fmt.Printf("\tStartingBank: %s,\n", configTable1Map[4][bitVal])
+	pt("\tStartingBank: %s,\n", configTable1Map[4][bitVal])
 	bitVal = int(bankByte[3])
-	fmt.Printf("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
+	pt("\tEndingBank: %s,\n", configTable1Map[3][bitVal])
 
 	var forward int16
 	buf := bytes.NewReader(forwardByte[6:8])
@@ -96,12 +106,12 @@ func PrintValues(typ int, elementName string, diagonalByte []byte, bankByte []by
 		panic(err)
 	}
 
-	fmt.Printf("\tForwardDelta: %d,\n", forward/-32+1)
+	pt("\tForwardDelta: %d,\n", forward/-32+1)
 
-	fmt.Printf("\tDirectionDelta: %s,\n", reverseMap[dir])
-	fmt.Printf("\tSidewaysDelta: %d,\n", sidewaysDelta)
-	fmt.Printf("\tElevationDelta: %d,\n", elevationDelta)
-	fmt.Printf("},\n")
+	pt("\tDirectionDelta: %s,\n", reverseMap[dir])
+	pt("\tSidewaysDelta: %d,\n", sidewaysDelta)
+	pt("\tElevationDelta: %d,\n", elevationDelta)
+	pt("},\n")
 }
 
 // Follows the format in TrackCoordinates
