@@ -56,6 +56,7 @@ func round(f float64) int {
 // right = up. left = down.
 func Advance(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
+	panic("these functions need to be fixed, check the tests")
 
 	ΔE += ts.ElevationDelta
 
