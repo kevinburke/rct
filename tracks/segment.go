@@ -32,14 +32,14 @@ const (
 	// - 1 unit forward will move you to (1, 0)
 	DIR_STRAIGHT     DirectionDelta = 0
 	DIR_45_DEG_RIGHT                = 45
-	// will move you up on 2d graph or to (0, 1)
-	DIR_90_DEG_RIGHT = 90
+	// from straight, will move you to (1, 1)
+	DIR_90_DEG_LEFT = 90
 	// will move you to (-1, 0)
 	DIR_180_DEG = 180
-	// will move you to (0, -1)
-	DIR_90_DEG_LEFT = 270
-	DIR_45_DEG_LEFT = 315
-	DIR_DIAGONAL    = 0
+	// from straight, will move you down on 2d graph or to (1, -1)
+	DIR_90_DEG_RIGHT = 270
+	DIR_45_DEG_LEFT  = 315
+	DIR_DIAGONAL     = 0
 	// 1/8th direction change left (?)
 	DIR_DIAGONAL_LEFT = 22.5
 	// 1/8th direction change (?)

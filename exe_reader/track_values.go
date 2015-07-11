@@ -12,13 +12,13 @@ import (
 // XXX, this doesn't correctly handle s-bends, which only move sideways by 1
 // piece, I think.
 func SidewaysDelta(sidewaysDeltaByte int) int {
+	if sidewaysDeltaByte == 0 {
+		return 0
+	}
 	if bits.On(sidewaysDeltaByte, 7) {
 		return -(1 + (256-sidewaysDeltaByte)>>5)
 	}
-	if bits.On(sidewaysDeltaByte, 6) {
-		return 1 + sidewaysDeltaByte>>5
-	}
-	return 0
+	return 1 + sidewaysDeltaByte>>5
 }
 
 var reverseMap = map[tracks.DirectionDelta]string{
@@ -65,7 +65,7 @@ func ElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 	return 0
 }
 
-var PRINT = false
+var PRINT = true
 
 func pt(format string, val ...interface{}) {
 	if PRINT {
@@ -73,18 +73,28 @@ func pt(format string, val ...interface{}) {
 	}
 }
 
+func DirectionDelta(directionbit int) tracks.DirectionDelta {
+	if directionbit == 0 {
+		return tracks.DIR_STRAIGHT
+	} else if directionbit == 1 {
+		return tracks.DIR_90_DEG_RIGHT
+	} else if directionbit == 2 {
+		return tracks.DIR_180_DEG
+	} else if directionbit == 3 {
+		return tracks.DIR_90_DEG_LEFT
+	} else {
+		// XXX requires parsing more bits, see TrackCoordinates in track_data.h
+		return tracks.DIR_DIAGONAL
+	}
+}
+
 // Print out the Go code to make up a track segment
 // XXX actually build the Go datatypes instead of printing/needing to copy
 // paste
-func PrintValues(typ int, elementName string, diagonalByte []byte, bankByte []byte, forwardByte []byte) {
+func PrintValues(typ int, elementName string, direction int, sideways int, negativeHeightBit int, positiveHeightBit int, bankByte []byte, forwardByte []byte) {
 
-	dir := GetDiagonalFromRCTStruct(diagonalByte)
-	sidewaysDelta := SidewaysDelta(int(diagonalByte[8]))
-	if int(diagonalByte[8]) == 32 {
-		fmt.Printf("%s: sideways(%d) = %d\n", elementName, int(diagonalByte[8]), sidewaysDelta)
-	}
-	negativeHeightBit := int(diagonalByte[2])
-	positiveHeightBit := int(diagonalByte[4])
+	dir := DirectionDelta(direction)
+	sidewaysDelta := SidewaysDelta(sideways)
 	elevationDelta := ElevationDelta(positiveHeightBit, negativeHeightBit)
 
 	pt("%s: &Segment{\n", elementName)

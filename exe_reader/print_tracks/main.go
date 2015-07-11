@@ -7,7 +7,8 @@ import (
 	"github.com/kevinburke/rct/tracks"
 )
 
-const RCT_DIRECTION_ADDR = 0x005972bb
+// taken from track_data.h
+const RCT_DIRECTION_ADDR = 0x005968BB
 const RCT_DIRECTION_WIDTH = 10
 
 const RCT_BANK_SLOPE_ADDR = 0x00597c9d
@@ -20,6 +21,8 @@ const RCT_BANK_SLOPE_WIDTH = 8
 	sint16 z_negative;			// 0x02
 	sint16 z_positive;			// 0x04
 	sint16 x;					// 0x06
+
+	// my sideways delta
 	sint16 y;					// 0x08
 */
 const RCT_FORWARD_ADDR = 0x005968bb
@@ -49,6 +52,11 @@ func main() {
 		//fmt.Printf("\n")
 		idx := i * RCT_DIRECTION_WIDTH
 		bitSubset := b[idx : idx+RCT_DIRECTION_WIDTH]
+		// xxx - there are 2 pieces to direction change, the first one is for
+		// diagonal to straight. we're ignoring diagonals for the moment.
+		//fmt.Printf("%s: %v\n", tracks.ElementNames[i], bitSubset[0])
+
+		//fmt.Printf("%s: %v\n", tracks.ElementNames[i], bitSubset[8])
 
 		bankIdx := i * RCT_BANK_SLOPE_WIDTH
 		bankBitSubset := c[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
@@ -56,7 +64,7 @@ func main() {
 		forwardIdx := i * RCT_FORWARD_WIDTH
 		forwardBitSubset := d[forwardIdx : forwardIdx+RCT_FORWARD_WIDTH]
 
-		exe_reader.PrintValues(i, tracks.ElementNames[i], bitSubset, bankBitSubset, forwardBitSubset)
+		exe_reader.PrintValues(i, tracks.ElementNames[i], int(bitSubset[1]), int(bitSubset[8]), int(bitSubset[2]), int(bitSubset[4]), bankBitSubset, forwardBitSubset)
 	}
 
 	//fmt.Printf("%#v\n", tracks.TS_MAP)
