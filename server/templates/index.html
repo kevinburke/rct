@@ -1,0 +1,10 @@
+{{define "content"}}
+<h2>Experiments</h2>
+<ul>
+{{ range .Experiments }}
+  <li>
+    <a href="{{ .URL }}">{{ .ID }}</a>
+  </li>
+{{ end }}
+</ul>
+{{end}}

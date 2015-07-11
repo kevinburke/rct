@@ -1,0 +1,61 @@
+{{define "content"}}
+<h2>{{ .Id | truncate 17 }}</h2>
+
+Score: {{ .Score }}<br>
+Fitness: {{ .Fitness }}
+
+<div id="coaster-target"></div>
+<script src="/static/jquery.min.js"></script>
+<script src="/static/three.min.js"></script>
+<script>
+  var drawCoasterCallback = function(data) {
+    var vectors = [];
+    for (var i = 0; i < data.length; i++) {
+      var val = data[i];
+      console.log(data[i]);
+      vectors.push(new THREE.Vector3(val[0], val[1], val[2]));
+    }
+
+    var geometry = new THREE.Geometry();
+    var curve = new THREE.SplineCurve3(vectors);
+    var points = curve.getPoints( 50 );
+    geometry.vertices = points;
+    var material = new THREE.LineBasicMaterial({
+      color: 0xff0000,
+      linewidth: 100
+    });
+    var splineObject = new THREE.Line( geometry, material );
+
+    var scene = new THREE.Scene();
+
+    var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000 );
+
+    camera.position.z = 100;
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(1200, 1200);
+
+    var coasterTarget = document.getElementById( 'coaster-target' );
+    coasterTarget.appendChild( renderer.domElement );
+
+    scene.add( splineObject );
+
+    var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    var sphere = new THREE.Mesh( geometry, material );
+    scene.add( sphere );
+
+    function render() {
+      requestAnimationFrame( render );
+      renderer.render( scene, camera );
+    }
+    render();
+ }
+
+   var currentUrl = window.location.pathname;
+   $.getJSON(currentUrl+'/render', function(data) {
+     drawCoasterCallback(data);
+   });
+  </script>
+{{end}}
+
