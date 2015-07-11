@@ -1,17 +1,25 @@
-package main
+package exe_reader
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"os"
 
+	"github.com/kevinburke/rct/bits"
 	"github.com/kevinburke/rct/tracks"
 )
 
-func hasBit(n int, pos uint) bool {
-	val := n & (1 << pos)
-	return (val > 0)
+// XXX, this doesn't correctly handle s-bends, which only move sideways by 1
+// piece, I think.
+func SidewaysDelta(sidewaysDeltaByte int) int {
+	fmt.Println("input: ", sidewaysDeltaByte)
+	if bits.On(sidewaysDeltaByte, 7) {
+		return -(1 + (256-sidewaysDeltaByte)>>5)
+	}
+	if bits.On(sidewaysDeltaByte, 6) {
+		return 1 + sidewaysDeltaByte>>5
+	}
+	return 0
 }
 
 var reverseMap = map[tracks.DirectionDelta]string{
@@ -27,7 +35,7 @@ var reverseMap = map[tracks.DirectionDelta]string{
 	tracks.DIR_DIAGONAL_RIGHT: "DIR_DIAGONAL_RIGHT",
 }
 
-func getDiagonalFromRCTStruct(b []byte) tracks.DirectionDelta {
+func GetDiagonalFromRCTStruct(b []byte) tracks.DirectionDelta {
 	startingDirectionInt := int(b[0])
 	startingDirection := tracks.RCTDirectionKeys[startingDirectionInt]
 	endingDirectionInt := int(b[1])
@@ -48,19 +56,7 @@ func getDiagonalFromRCTStruct(b []byte) tracks.DirectionDelta {
 	}
 }
 
-// XXX, this doesn't correctly handle s-bends, which only move sideways by 1
-// piece, I think.
-func getSidewaysDelta(sidewaysDeltaByte int) int {
-	if hasBit(sidewaysDeltaByte, 7) {
-		return -(1 + (256-sidewaysDeltaByte)>>5)
-	}
-	if hasBit(sidewaysDeltaByte, 6) {
-		return 1 + sidewaysDeltaByte>>5
-	}
-	return 0
-}
-
-func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
+func ElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 	if positiveHeightBit > 0 {
 		return positiveHeightBit >> 3
 	}
@@ -73,13 +69,13 @@ func getElevationDelta(positiveHeightBit int, negativeHeightBit int) int {
 // Print out the Go code to make up a track segment
 // XXX actually build the Go datatypes instead of printing/needing to copy
 // paste
-func printValues(typ int, elementName string, diagonalByte []byte, bankByte []byte, forwardByte []byte) {
+func PrintValues(typ int, elementName string, diagonalByte []byte, bankByte []byte, forwardByte []byte) {
 
-	dir := getDiagonalFromRCTStruct(diagonalByte)
-	sidewaysDelta := getSidewaysDelta(int(diagonalByte[8]))
+	dir := GetDiagonalFromRCTStruct(diagonalByte)
+	sidewaysDelta := SidewaysDelta(int(diagonalByte[8]))
 	negativeHeightBit := int(diagonalByte[2])
 	positiveHeightBit := int(diagonalByte[4])
-	elevationDelta := getElevationDelta(positiveHeightBit, negativeHeightBit)
+	elevationDelta := ElevationDelta(positiveHeightBit, negativeHeightBit)
 
 	fmt.Printf("%s: &Segment{\n", elementName)
 
@@ -108,12 +104,6 @@ func printValues(typ int, elementName string, diagonalByte []byte, bankByte []by
 	fmt.Printf("},\n")
 }
 
-const RCT_DIRECTION_ADDR = 0x005972bb
-const RCT_DIRECTION_WIDTH = 10
-
-const RCT_BANK_SLOPE_ADDR = 0x00597c9d
-const RCT_BANK_SLOPE_WIDTH = 8
-
 // Follows the format in TrackCoordinates
 /*
 	sint8 rotation_negative;	// 0x00
@@ -123,9 +113,6 @@ const RCT_BANK_SLOPE_WIDTH = 8
 	sint16 x;					// 0x06
 	sint16 y;					// 0x08
 */
-const RCT_FORWARD_ADDR = 0x005968bb
-const RCT_FORWARD_WIDTH = 0x0A
-
 var configTable1Map = map[int]map[int]string{
 	0: map[int]string{
 		0:   "TRACK_FLAT",
@@ -192,42 +179,4 @@ var configTable1Map = map[int]map[int]string{
 		208: "TRACK_UNKNOWN_VERTICAL_LOOP",
 		224: "TRACK_CORKSCREW_DOWN",
 	},
-}
-
-func main() {
-	f, err := os.Open(os.Getenv("HOME") + "/code/OpenRCT2/openrct2.exe")
-	if err != nil {
-		panic(err)
-	}
-
-	defer f.Close()
-
-	b := make([]byte, 256*RCT_DIRECTION_WIDTH)
-	f.ReadAt(b, int64(RCT_DIRECTION_ADDR))
-
-	c := make([]byte, 256*RCT_BANK_SLOPE_WIDTH)
-	f.ReadAt(c, RCT_BANK_SLOPE_ADDR)
-
-	d := make([]byte, 256*RCT_FORWARD_WIDTH)
-	f.ReadAt(d, RCT_FORWARD_ADDR)
-
-	for i := 0; i < len(tracks.ElementNames); i++ {
-		//fmt.Println(i)
-		//fmt.Printf("%55s ", tracks.ElementNames[i])
-		//fmt.Printf("%4d ", b[i*WIDTH])
-		//fmt.Printf("\n")
-		idx := i * RCT_DIRECTION_WIDTH
-		bitSubset := b[idx : idx+RCT_DIRECTION_WIDTH]
-
-		bankIdx := i * RCT_BANK_SLOPE_WIDTH
-		bankBitSubset := c[bankIdx : bankIdx+RCT_BANK_SLOPE_WIDTH]
-
-		forwardIdx := i * RCT_FORWARD_WIDTH
-		forwardBitSubset := d[forwardIdx : forwardIdx+RCT_FORWARD_WIDTH]
-
-		printValues(i, tracks.ElementNames[i], bitSubset, bankBitSubset, forwardBitSubset)
-	}
-
-	//fmt.Printf("%#v\n", tracks.TS_MAP)
-	//fmt.Printf("%T\n", tracks.TS_MAP)
 }

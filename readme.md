@@ -10,6 +10,8 @@ There are a few different packages in here.
   hopefully this will be split out into useful parts, at the moment it's just
   useful to me.
 
+- `exe_reader` - Reads the RCT2 exe and prints out track segment data
+
 - `rle` - deals with run length encoding of RCT files (so they can be
 read/written in the game)
 
