@@ -530,7 +530,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_QUARTER_TURN_5_TILES: &Segment{
@@ -541,7 +541,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 0,
 	},
 	ELEM_FLAT_TO_LEFT_BANK: &Segment{
@@ -596,7 +596,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 0,
 	},
 	ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES: &Segment{
@@ -607,7 +607,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_BANK_TO_25_DEG_UP: &Segment{
@@ -728,7 +728,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 8,
 	},
 	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_UP: &Segment{
@@ -739,7 +739,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 8,
 	},
 	ELEM_LEFT_QUARTER_TURN_5_TILES_25_DEG_DOWN: &Segment{
@@ -750,7 +750,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: -8,
 	},
 	ELEM_RIGHT_QUARTER_TURN_5_TILES_25_DEG_DOWN: &Segment{
@@ -761,7 +761,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: -8,
 	},
 	ELEM_S_BEND_LEFT: &Segment{
@@ -772,7 +772,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_S_BEND_RIGHT: &Segment{
@@ -783,7 +783,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_VERTICAL_LOOP: &Segment{
@@ -794,7 +794,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_VERTICAL_LOOP: &Segment{
@@ -805,7 +805,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES: &Segment{
@@ -816,7 +816,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES: &Segment{
@@ -827,7 +827,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  2,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_BANK: &Segment{
@@ -838,7 +838,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES_BANK: &Segment{
@@ -849,7 +849,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP: &Segment{
@@ -860,7 +860,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 4,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: &Segment{
@@ -871,7 +871,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 4,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN: &Segment{
@@ -882,7 +882,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: -4,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN: &Segment{
@@ -893,7 +893,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: -4,
 	},
 	ELEM_LEFT_QUARTER_TURN_1_TILE: &Segment{
@@ -992,7 +992,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 10,
 	},
 	ELEM_RIGHT_CORKSCREW_UP: &Segment{
@@ -1003,7 +1003,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 10,
 	},
 	ELEM_LEFT_CORKSCREW_DOWN: &Segment{
@@ -1014,7 +1014,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 22,
 	},
 	ELEM_RIGHT_CORKSCREW_DOWN: &Segment{
@@ -1025,7 +1025,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 22,
 	},
 	ELEM_FLAT_TO_60_DEG_UP: &Segment{
@@ -1245,7 +1245,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_QUARTER_TURN_5_TILES_COVERED: &Segment{
@@ -1256,7 +1256,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 0,
 	},
 	ELEM_S_BEND_LEFT_COVERED: &Segment{
@@ -1267,7 +1267,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_S_BEND_RIGHT_COVERED: &Segment{
@@ -1278,7 +1278,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_COVERED: &Segment{
@@ -1289,7 +1289,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES_COVERED: &Segment{
@@ -1300,7 +1300,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_HALF_BANKED_HELIX_UP_SMALL: &Segment{
@@ -1311,7 +1311,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -4,
+		SidewaysDelta:  4,
 		ElevationDelta: 2,
 	},
 	ELEM_RIGHT_HALF_BANKED_HELIX_UP_SMALL: &Segment{
@@ -1322,7 +1322,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  4,
+		SidewaysDelta:  -4,
 		ElevationDelta: 2,
 	},
 	ELEM_LEFT_HALF_BANKED_HELIX_DOWN_SMALL: &Segment{
@@ -1333,7 +1333,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -4,
+		SidewaysDelta:  4,
 		ElevationDelta: -2,
 	},
 	ELEM_RIGHT_HALF_BANKED_HELIX_DOWN_SMALL: &Segment{
@@ -1344,7 +1344,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  4,
+		SidewaysDelta:  -4,
 		ElevationDelta: -2,
 	},
 	ELEM_LEFT_HALF_BANKED_HELIX_UP_LARGE: &Segment{
@@ -1355,7 +1355,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  4,
+		SidewaysDelta:  -4,
 		ElevationDelta: 2,
 	},
 	ELEM_RIGHT_HALF_BANKED_HELIX_UP_LARGE: &Segment{
@@ -1366,7 +1366,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -4,
+		SidewaysDelta:  4,
 		ElevationDelta: 2,
 	},
 	ELEM_LEFT_HALF_BANKED_HELIX_DOWN_LARGE: &Segment{
@@ -1377,7 +1377,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  4,
+		SidewaysDelta:  -4,
 		ElevationDelta: -2,
 	},
 	ELEM_RIGHT_HALF_BANKED_HELIX_DOWN_LARGE: &Segment{
@@ -1388,7 +1388,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -4,
+		SidewaysDelta:  4,
 		ElevationDelta: -2,
 	},
 	ELEM_LEFT_QUARTER_TURN_1_TILE_60_DEG_UP: &Segment{
@@ -1398,9 +1398,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   1,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_90_DEG_LEFT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 8,
 	},
 	ELEM_RIGHT_QUARTER_TURN_1_TILE_60_DEG_UP: &Segment{
 		Type:           0x60,
@@ -1476,7 +1476,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 2,
 	},
 	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_UP: &Segment{
@@ -1487,7 +1487,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 2,
 	},
 	ELEM_LEFT_QUARTER_BANKED_HELIX_LARGE_DOWN: &Segment{
@@ -1498,7 +1498,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: -2,
 	},
 	ELEM_RIGHT_QUARTER_BANKED_HELIX_LARGE_DOWN: &Segment{
@@ -1509,7 +1509,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: -2,
 	},
 	ELEM_LEFT_QUARTER_HELIX_LARGE_UP: &Segment{
@@ -1520,7 +1520,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: 2,
 	},
 	ELEM_RIGHT_QUARTER_HELIX_LARGE_UP: &Segment{
@@ -1531,7 +1531,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: 2,
 	},
 	ELEM_LEFT_QUARTER_HELIX_LARGE_DOWN: &Segment{
@@ -1542,7 +1542,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -3,
+		SidewaysDelta:  3,
 		ElevationDelta: -2,
 	},
 	ELEM_RIGHT_QUARTER_HELIX_LARGE_DOWN: &Segment{
@@ -1553,7 +1553,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  3,
+		SidewaysDelta:  -3,
 		ElevationDelta: -2,
 	},
 	ELEM_25_DEG_UP_LEFT_BANKED: &Segment{
@@ -1563,9 +1563,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 2,
 	},
 	ELEM_25_DEG_UP_RIGHT_BANKED: &Segment{
 		Type:           0x6f,
@@ -1574,9 +1574,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 2,
 	},
 	ELEM_WATERFALL: &Segment{
 		Type:           0x70,
@@ -1618,9 +1618,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   1,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: -2,
 	},
 	ELEM_25_DEG_DOWN_RIGHT_BANKED: &Segment{
 		Type:           0x74,
@@ -1629,9 +1629,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   1,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: -2,
 	},
 	ELEM_WATER_SPLASH: &Segment{
 		Type:           0x75,
@@ -1651,9 +1651,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 11,
 	},
 	ELEM_60_DEG_UP_TO_FLAT_LONG_BASE: &Segment{
 		Type:           0x77,
@@ -1662,9 +1662,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 11,
 	},
 	ELEM_WHIRLPOOL: &Segment{
 		Type:           0x78,
@@ -1684,9 +1684,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: -11,
 	},
 	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE: &Segment{
 		Type:           0x7a,
@@ -1695,9 +1695,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_180_DEG,
+		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: -11,
 	},
 	ELEM_CABLE_LIFT_HILL: &Segment{
 		Type:           0x7b,
@@ -1708,7 +1708,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		ForwardDelta:   4,
 		DirectionDelta: DIR_STRAIGHT,
 		SidewaysDelta:  0,
-		ElevationDelta: 12,
+		ElevationDelta: 20,
 	},
 	ELEM_REVERSE_WHOA_BELLY_SLOPE: &Segment{
 		Type:           0x7c,
@@ -1816,8 +1816,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_LEFT,
-		SidewaysDelta:  -2,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_EIGHTH_TO_DIAG: &Segment{
@@ -1827,8 +1827,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_RIGHT,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_EIGHTH_TO_ORTHOGONAL: &Segment{
@@ -1838,8 +1838,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_LEFT,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_EIGHTH_TO_ORTHOGONAL: &Segment{
@@ -1849,8 +1849,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL_RIGHT,
-		SidewaysDelta:  3,
+		DirectionDelta: DIR_90_DEG_RIGHT,
+		SidewaysDelta:  -3,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_EIGHTH_BANK_TO_DIAG: &Segment{
@@ -1860,8 +1860,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_LEFT,
-		SidewaysDelta:  -2,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_EIGHTH_BANK_TO_DIAG: &Segment{
@@ -1871,8 +1871,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_RIGHT,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_EIGHTH_BANK_TO_ORTHOGONAL: &Segment{
@@ -1882,8 +1882,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   3,
-		DirectionDelta: DIR_DIAGONAL_LEFT,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_RIGHT_EIGHTH_BANK_TO_ORTHOGONAL: &Segment{
@@ -1893,8 +1893,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL_RIGHT,
-		SidewaysDelta:  3,
+		DirectionDelta: DIR_90_DEG_RIGHT,
+		SidewaysDelta:  -3,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_FLAT: &Segment{
@@ -1904,8 +1904,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_25_DEG_UP: &Segment{
@@ -1915,8 +1915,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 2,
 	},
 	ELEM_DIAG_60_DEG_UP: &Segment{
@@ -1926,8 +1926,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 8,
 	},
 	ELEM_DIAG_FLAT_TO_25_DEG_UP: &Segment{
@@ -1937,8 +1937,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_25_DEG_UP_TO_60_DEG_UP: &Segment{
@@ -1948,8 +1948,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 4,
 	},
 	ELEM_DIAG_60_DEG_UP_TO_25_DEG_UP: &Segment{
@@ -1959,8 +1959,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 4,
 	},
 	ELEM_DIAG_25_DEG_UP_TO_FLAT: &Segment{
@@ -1970,8 +1970,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_25_DEG_DOWN: &Segment{
@@ -1981,8 +1981,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -2,
 	},
 	ELEM_DIAG_60_DEG_DOWN: &Segment{
@@ -1992,8 +1992,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -8,
 	},
 	ELEM_DIAG_FLAT_TO_25_DEG_DOWN: &Segment{
@@ -2003,8 +2003,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_25_DEG_DOWN_TO_60_DEG_DOWN: &Segment{
@@ -2014,8 +2014,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -4,
 	},
 	ELEM_DIAG_60_DEG_DOWN_TO_25_DEG_DOWN: &Segment{
@@ -2025,8 +2025,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -4,
 	},
 	ELEM_DIAG_25_DEG_DOWN_TO_FLAT: &Segment{
@@ -2036,8 +2036,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_FLAT_TO_60_DEG_UP: &Segment{
@@ -2047,8 +2047,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 3,
 	},
 	ELEM_DIAG_60_DEG_UP_TO_FLAT: &Segment{
@@ -2058,8 +2058,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 3,
 	},
 	ELEM_DIAG_FLAT_TO_60_DEG_DOWN: &Segment{
@@ -2069,8 +2069,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -3,
 	},
 	ELEM_DIAG_60_DEG_DOWN_TO_FLAT: &Segment{
@@ -2080,8 +2080,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -3,
 	},
 	ELEM_DIAG_FLAT_TO_LEFT_BANK: &Segment{
@@ -2091,8 +2091,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_FLAT_TO_RIGHT_BANK: &Segment{
@@ -2102,8 +2102,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_LEFT_BANK_TO_FLAT: &Segment{
@@ -2113,8 +2113,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_RIGHT_BANK_TO_FLAT: &Segment{
@@ -2124,8 +2124,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_LEFT_BANK_TO_25_DEG_UP: &Segment{
@@ -2135,8 +2135,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_RIGHT_BANK_TO_25_DEG_UP: &Segment{
@@ -2146,8 +2146,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_25_DEG_UP_TO_LEFT_BANK: &Segment{
@@ -2157,8 +2157,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_25_DEG_UP_TO_RIGHT_BANK: &Segment{
@@ -2168,8 +2168,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 1,
 	},
 	ELEM_DIAG_LEFT_BANK_TO_25_DEG_DOWN: &Segment{
@@ -2179,8 +2179,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_RIGHT_BANK_TO_25_DEG_DOWN: &Segment{
@@ -2190,8 +2190,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_25_DEG_DOWN_TO_LEFT_BANK: &Segment{
@@ -2201,8 +2201,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_25_DEG_DOWN_TO_RIGHT_BANK: &Segment{
@@ -2212,8 +2212,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: -1,
 	},
 	ELEM_DIAG_LEFT_BANK: &Segment{
@@ -2223,8 +2223,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_LEFT,
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_DIAG_RIGHT_BANK: &Segment{
@@ -2234,8 +2234,8 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_RIGHT,
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
-		DirectionDelta: DIR_DIAGONAL,
-		SidewaysDelta:  0,
+		DirectionDelta: DIR_STRAIGHT,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_LOG_FLUME_REVERSER: &Segment{
@@ -2312,7 +2312,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 3,
 	},
 	ELEM_RIGHT_BANK_TO_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: &Segment{
@@ -2323,7 +2323,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 3,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_LEFT_BANK: &Segment{
@@ -2334,7 +2334,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: -3,
 	},
 	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_RIGHT_BANK: &Segment{
@@ -2345,7 +2345,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: -3,
 	},
 	ELEM_POWERED_LIFT: &Segment{
@@ -2367,7 +2367,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 3,
 	},
 	ELEM_RIGHT_LARGE_HALF_LOOP_UP: &Segment{
@@ -2378,7 +2378,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 3,
 	},
 	ELEM_RIGHT_LARGE_HALF_LOOP_DOWN: &Segment{
@@ -2389,7 +2389,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   -1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 29,
 	},
 	ELEM_LEFT_LARGE_HALF_LOOP_DOWN: &Segment{
@@ -2400,7 +2400,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   -1,
 		DirectionDelta: DIR_180_DEG,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 29,
 	},
 	ELEM_LEFT_FLYER_TWIST_UP_TO_DOWN: &Segment{
@@ -2477,7 +2477,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 6,
 	},
 	ELEM_RIGHT_FLY_CORKSCREW_UP_TO_DOWN: &Segment{
@@ -2488,7 +2488,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 6,
 	},
 	ELEM_LEFT_FLY_CORKSCREW_DOWN_TO_UP: &Segment{
@@ -2499,7 +2499,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 26,
 	},
 	ELEM_RIGHT_FLY_CORKSCREW_DOWN_TO_UP: &Segment{
@@ -2510,7 +2510,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 26,
 	},
 	ELEM_HEARTLINE_TRANSFER_UP: &Segment{
@@ -2598,7 +2598,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 0,
 	},
 	ELEM_MINI_GOLF_HOLE_E: &Segment{
@@ -2609,7 +2609,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 0,
 	},
 	ELEM_INVERTED_FLAT_TO_90_DEG_DOWN_QUARTER_LOOP: &Segment{
@@ -2619,9 +2619,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_STRAIGHT,
+		DirectionDelta: DIR_180_DEG,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 20,
 	},
 	ELEM_90_DEG_UP_QUARTER_LOOP_TO_INVERTED: &Segment{
 		Type:           0xcf,
@@ -2630,9 +2630,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_NONE,
 		EndingBank:     TRACK_BANK_UPSIDE_DOWN,
 		ForwardDelta:   -1,
-		DirectionDelta: DIR_STRAIGHT,
+		DirectionDelta: DIR_180_DEG,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 16,
 	},
 	ELEM_QUARTER_LOOP_INVERT_TO_90_DEG_DOWN: &Segment{
 		Type:           0xd0,
@@ -2641,9 +2641,9 @@ var TS_MAP = map[SegmentType]*Segment{
 		StartingBank:   TRACK_BANK_UPSIDE_DOWN,
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   4,
-		DirectionDelta: DIR_STRAIGHT,
+		DirectionDelta: DIR_180_DEG,
 		SidewaysDelta:  0,
-		ElevationDelta: 0,
+		ElevationDelta: 16,
 	},
 	ELEM_LEFT_CURVED_LIFT_HILL: &Segment{
 		Type:           0xd1,
@@ -2653,7 +2653,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 2,
 	},
 	ELEM_RIGHT_CURVED_LIFT_HILL: &Segment{
@@ -2664,7 +2664,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 2,
 	},
 	ELEM_LEFT_REVERSER: &Segment{
@@ -2741,7 +2741,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_LEFT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_LEFT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  2,
 		ElevationDelta: 4,
 	},
 	ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: &Segment{
@@ -2752,7 +2752,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_RIGHT,
 		ForwardDelta:   2,
 		DirectionDelta: DIR_90_DEG_RIGHT,
-		SidewaysDelta:  0,
+		SidewaysDelta:  -2,
 		ElevationDelta: 4,
 	},
 
