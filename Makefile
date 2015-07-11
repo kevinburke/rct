@@ -2,6 +2,7 @@
 
 # need to skip the wip directory
 
+all: install test
 
 install:
 	go get github.com/jmhodges/justrun
