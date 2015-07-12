@@ -14,7 +14,7 @@ func GetOldFiles(d time.Duration) []string {
 	if err != nil {
 		panic(err)
 	}
-	oldFolders := make([]string, 0)
+	var oldFolders []string
 	now := time.Now().UTC()
 	for _, dir := range finfo {
 		metaPath := filepath.Join(expDir, dir.Name(), "meta.json")
