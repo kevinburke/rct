@@ -59,6 +59,11 @@ func renderHandler(directory string, templateDirectory string) http.HandlerFunc 
 	}
 }
 
+type tmplData struct {
+	Member *genetic.Member
+	Path   string
+}
+
 func newRctHandler(directory string, templateDirectory string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m, err := loadMember(directory, r.URL.Path)
@@ -88,7 +93,7 @@ func newRctHandler(directory string, templateDirectory string) http.HandlerFunc 
 			return
 		}
 		b := new(bytes.Buffer)
-		err = tmpl.Execute(b, m)
+		err = tmpl.Execute(b, tmplData{Member: m, Path: r.URL.Path})
 		if err == nil {
 			w.WriteHeader(http.StatusOK)
 			io.Copy(w, b)

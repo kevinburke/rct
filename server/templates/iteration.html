@@ -13,11 +13,16 @@
 		</style>
 	</head>
 	<body>
-		<h1>{{ .Id | truncate 17 }}</h1>
+		<h1>{{ .Member.Id | truncate 17 }}</h1>
 
-		Score: {{ .Score }}<br>
-		Fitness: {{ .Fitness }}
+		<p style="display: inline-block;">
+			Score: {{ .Member.Score }}<br>
+			Fitness: {{ .Member.Fitness }}
+		</p>
 
+		<form method="GET" action="{{ .Path }}/td6" style="float: right; display: inline-block;">
+			<input class="btn btn-submit" type="submit" value="download coaster file"/>
+		</form>
 		<div id="coaster-target"></div>
 
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
