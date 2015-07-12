@@ -4,3 +4,4 @@
 # don't leave binaries lying around.
 exe_reader/print_tracks/print_tracks
 genetic/run_experiment/runners
+genetic/get_old_experiments/get_old_experiments

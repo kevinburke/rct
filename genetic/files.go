@@ -2,33 +2,32 @@ package genetic
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
-func GetOldFiles() []string {
-	fmt.Println(*directory)
-	// for d in directory/experiments:
-	//	load the meta.json
-	//	if the experiment is older than 1hour:
-	//		find the iterations directory
-	//		print it
+func GetOldFiles(d time.Duration) []string {
 	expDir := filepath.Join(*directory, "experiments")
 	finfo, err := ioutil.ReadDir(expDir)
 	if err != nil {
 		panic(err)
 	}
+	oldFolders := make([]string, 0)
+	now := time.Now().UTC()
 	for _, dir := range finfo {
 		metaPath := filepath.Join(expDir, dir.Name(), "meta.json")
 		em, err := readMetadata(metaPath)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(em.Hash)
+		duration := now.Sub(em.Date)
+		if duration > d {
+			oldFolders = append(oldFolders, filepath.Join(expDir, dir.Name()))
+		}
 	}
-	return []string{}
+	return oldFolders
 }
 
 // encode writes the given interface to the disk.
