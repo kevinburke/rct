@@ -1,7 +1,9 @@
 package tracks
 
+type ElementName string
+
 // List of names of tracks in the correct order.
-var ElementNames = []string{
+var ElementNames = []ElementName{
 	"ELEM_FLAT",                                                 // 0
 	"ELEM_END_STATION",                                          // 1
 	"ELEM_BEGIN_STATION",                                        // 2

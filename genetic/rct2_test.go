@@ -59,6 +59,38 @@ func TestOneDownhillDescender(t *testing.T) {
 	}
 }
 
+func buildTrack(names []tracks.SegmentType) []tracks.Element {
+	te := make([]tracks.Element, len(names))
+	for i, name := range names {
+		te[i] = tracks.Element{Segment: tracks.TS_MAP[name]}
+	}
+	return te
+}
+
+var trackTests = []struct {
+	in       geo.Vector
+	expected []tracks.Element
+}{
+	{geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
+}
+
+func Test2DTrack(t *testing.T) {
+	stationStart := geo.Vector{geo.Point{0, 0, 0}, tracks.DIR_STRAIGHT}
+	for _, tt := range trackTests {
+		out := connect2DTrackPieces(tt.in, stationStart)
+		helper := fmt.Sprintf("trackEnd: (%d, %d, %d) %d", round(tt.in.Point[0]), round(tt.in.Point[1]), round(tt.in.Point[2]), tt.in.Dir)
+		if len(out) != len(tt.expected) {
+			t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
+		}
+		for i := range out {
+			if tt.expected[i] != out[i] {
+				t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
+			}
+		}
+	}
+}
+
 func TestRightTurn(t *testing.T) {
 	trackEnd := geo.Vector{geo.Point{
 		7, 3, 11,
