@@ -134,28 +134,28 @@ func IsCircuit(t *tracks.Data) bool {
 func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 	var p Point
 	if v.Dir == tracks.DIR_STRAIGHT {
-		// facing right - (forward, -sideways)
+		// facing right - (forward, sideways)
 		p = Point{
 			v.Point[0] + float64(s.ForwardDelta),
-			v.Point[1] - float64(s.SidewaysDelta),
+			v.Point[1] + float64(s.SidewaysDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
 	} else if v.Dir == tracks.DIR_90_DEG_LEFT {
-		// facing up - (sideways, forward)
+		// facing up - (-sideways, forward)
 		p = Point{
 			v.Point[0] - float64(s.SidewaysDelta),
 			v.Point[1] + float64(s.ForwardDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
 	} else if v.Dir == tracks.DIR_180_DEG {
-		// facing left - (-forward, sideways)
+		// facing left - (-forward, -sideways)
 		p = Point{
 			v.Point[0] - float64(s.ForwardDelta),
-			v.Point[1] + float64(s.SidewaysDelta),
+			v.Point[1] - float64(s.SidewaysDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
 	} else if v.Dir == tracks.DIR_90_DEG_RIGHT {
-		// facing down - (sideways, -forward)
+		// facing down - (-sideways, -forward)
 		p = Point{
 			v.Point[0] + float64(s.SidewaysDelta),
 			v.Point[1] - float64(s.ForwardDelta),

@@ -124,20 +124,55 @@ var advanceVectorTests = []struct {
 	},
 	{
 		Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT},
-		tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
-		Vector{Point{1, 0, -2}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_60_DEG_UP],
+		Vector{Point{1, 0, 8}, tracks.DIR_STRAIGHT},
 	},
 	{
 		Vector{Point{0, 0, 0}, tracks.DIR_90_DEG_LEFT},
 		tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
 		Vector{Point{0, 1, 2}, tracks.DIR_90_DEG_LEFT},
 	},
+	// down tests
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
+		Vector{Point{1, 0, -2}, tracks.DIR_STRAIGHT},
+	},
+
+	// left tests
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
+		Vector{Point{3, 3, 8}, tracks.DIR_90_DEG_LEFT},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_LEFT},
+		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
+		Vector{Point{-3, 3, 8}, tracks.DIR_180_DEG},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_180_DEG},
+		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
+		Vector{Point{-3, -3, 8}, tracks.DIR_90_DEG_RIGHT},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_RIGHT},
+		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
+		Vector{Point{3, -3, 8}, tracks.DIR_STRAIGHT},
+	},
+
+	{
+		Vector{Point{3, 4, 8}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
+		Vector{Point{6, 7, 8}, tracks.DIR_90_DEG_LEFT},
+	},
 }
 
 func TestAdvanceVector(t *testing.T) {
 	for _, tt := range advanceVectorTests {
 		out := AdvanceVector(tt.v, tt.seg)
-		helper := fmt.Sprintf("%s (%f, %f, %f):", tt.seg, tt.v.Point[0], tt.v.Point[1], tt.v.Point[2])
+		helper := fmt.Sprintf("%s (%d, %d, %d) %v deg:", tt.seg,
+			round(tt.v.Point[0]), round(tt.v.Point[1]), round(tt.v.Point[2]), tt.v.Dir)
 		if out.Point != tt.out.Point {
 			t.Errorf("%s expected point to be %v, was %v", helper, tt.out.Point, out.Point)
 		}
