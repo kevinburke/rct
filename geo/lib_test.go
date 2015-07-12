@@ -91,7 +91,26 @@ var advanceVectorTests = []struct {
 	seg *tracks.Segment
 	out Vector
 }{
-	{Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT}, tracks.TS_MAP[tracks.ELEM_FLAT], Vector{Point{1, 0, 0}, tracks.DIR_STRAIGHT}},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_FLAT],
+		Vector{Point{1, 0, 0}, tracks.DIR_STRAIGHT},
+	},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_90_DEG_LEFT},
+		tracks.TS_MAP[tracks.ELEM_FLAT],
+		Vector{Point{0, 1, 0}, tracks.DIR_90_DEG_LEFT},
+	},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_90_DEG_RIGHT},
+		tracks.TS_MAP[tracks.ELEM_FLAT],
+		Vector{Point{0, -1, 0}, tracks.DIR_90_DEG_RIGHT},
+	},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_180_DEG},
+		tracks.TS_MAP[tracks.ELEM_FLAT],
+		Vector{Point{-1, 0, 0}, tracks.DIR_180_DEG},
+	},
 }
 
 func TestAdvanceVector(t *testing.T) {
@@ -104,35 +123,5 @@ func TestAdvanceVector(t *testing.T) {
 		if out.Dir != tt.out.Dir {
 			t.Errorf("%s expected direction to be %v, was %v", helper, tt.out.Dir, out.Dir)
 		}
-	}
-}
-
-func TestFlat90DegRotated(t *testing.T) {
-	v := Vector{Point{3, 7, 0}, tracks.DIR_90_DEG_RIGHT}
-	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
-	out := AdvanceVector(v, seg)
-	expected := Point{3, 8, 0}
-	if out.Point != expected {
-		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
-	}
-}
-
-func TestFlat180DegRotated(t *testing.T) {
-	v := Vector{Point{3, 7, 0}, tracks.DIR_180_DEG}
-	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
-	out := AdvanceVector(v, seg)
-	expected := Point{2, 7, 0}
-	if out.Point != expected {
-		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
-	}
-}
-
-func TestFlat270DegRotated(t *testing.T) {
-	v := Vector{Point{3, 7, 0}, tracks.DIR_90_DEG_LEFT}
-	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
-	out := AdvanceVector(v, seg)
-	expected := Point{3, 6, 0}
-	if out.Point != expected {
-		t.Errorf("expected upward facing track to advance to %#v, got %#v", expected, out.Point)
 	}
 }

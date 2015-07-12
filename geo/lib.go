@@ -140,10 +140,10 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 			v.Point[1] - float64(s.SidewaysDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
-	} else if v.Dir == tracks.DIR_90_DEG_RIGHT {
+	} else if v.Dir == tracks.DIR_90_DEG_LEFT {
 		// facing up - (sideways, forward)
 		p = Point{
-			v.Point[0] + float64(s.SidewaysDelta),
+			v.Point[0] - float64(s.SidewaysDelta),
 			v.Point[1] + float64(s.ForwardDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
@@ -154,10 +154,10 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 			v.Point[1] + float64(s.SidewaysDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
-	} else if v.Dir == tracks.DIR_90_DEG_LEFT {
-		// facing down - (-sideways, -forward)
+	} else if v.Dir == tracks.DIR_90_DEG_RIGHT {
+		// facing down - (sideways, -forward)
 		p = Point{
-			v.Point[0] - float64(s.SidewaysDelta),
+			v.Point[0] + float64(s.SidewaysDelta),
 			v.Point[1] - float64(s.ForwardDelta),
 			v.Point[2] + float64(s.ElevationDelta),
 		}
