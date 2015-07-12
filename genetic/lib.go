@@ -26,7 +26,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 10
+const ITERATIONS = 300
 const PRINT_RESULTS_EVERY = 1
 
 // create a directory and ignore "directory exists" errors
@@ -128,7 +128,7 @@ type Member struct {
 func (p *Pool) Statistics(iteration int, outputDirectory string) {
 	if iteration%PRINT_RESULTS_EVERY == 0 {
 		var highestScore int64 = -1
-		var worstScore int64 = 7000
+		var worstScore int64 = 100 * 1000 * 1000
 		bestMember := new(Member)
 		for i := 0; i < len(p.Members); i++ {
 			if p.Members[i].Score > highestScore {
@@ -139,7 +139,8 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 				worstScore = p.Members[i].Score
 			}
 		}
-		fmt.Printf("Iteration %d: %d members, best member has score %d, worst has score %d\n", iteration, len(p.Members), bestMember.Score, worstScore)
+		fmt.Printf("Iteration %d: %d members, best member %s has score %d, worst has score %d\n",
+			iteration, len(p.Members), bestMember.Id, bestMember.Score, worstScore)
 	}
 	// XXX, move offline to a goroutine
 	for i := 0; i < len(p.Members); i++ {
