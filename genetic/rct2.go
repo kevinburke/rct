@@ -75,19 +75,20 @@ func connect2DOppositeDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vecto
 
 	// if track end is (x, y), ok points are ( (any x), y + 5)
 	if trackEnd.Point[1] >= stationStart.Point[1] {
-		if trackEnd.Point[1] >= stationStart.Point[1]+5 {
+		if trackEnd.Point[1] >= stationStart.Point[1]+4 {
 			if trackEnd.Point[0] > stationStart.Point[0] {
 				// go straight until you get in line
 				elems := make([]tracks.Element, round(trackEnd.Point[0]-stationStart.Point[0]))
 				count := 0
+				v := trackEnd
 				for i := trackEnd.Point[0]; i > stationStart.Point[0]; i-- {
 					elems[count] = tracks.Element{
 						Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
 					}
+					v = geo.AdvanceVector(v, elems[count].Segment)
 					count += 1
 				}
-				// XXX don't return here
-				return elems
+				return append(elems, connect2DTrackPieces(v, stationStart)...)
 			} else {
 				return leftTurn(trackEnd, stationStart)
 			}
@@ -97,7 +98,7 @@ func connect2DOppositeDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vecto
 			return rightTurn(trackEnd, stationStart)
 		}
 	} else {
-		if trackEnd.Point[1] < stationStart.Point[1]-5 {
+		if trackEnd.Point[1] < stationStart.Point[1]-4 {
 			if trackEnd.Point[0] > stationStart.Point[0] {
 				// go straight until you get in line
 				elems := make([]tracks.Element, round(trackEnd.Point[0]-stationStart.Point[0]))

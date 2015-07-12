@@ -79,6 +79,20 @@ var trackTests = []struct {
 
 	{geo.Vector{geo.Point{-1, 0, 0}, tracks.DIR_STRAIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT})},
+
+	{geo.Vector{geo.Point{-3, 0, 0}, tracks.DIR_STRAIGHT},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_FLAT})},
+
+	{geo.Vector{geo.Point{0, 4, 0}, tracks.DIR_180_DEG},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
+
+	{geo.Vector{geo.Point{1, 4, 0}, tracks.DIR_180_DEG},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
+
+	{geo.Vector{geo.Point{3, 4, 0}, tracks.DIR_180_DEG},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES,
+		})},
 }
 
 func Test2DTrack(t *testing.T) {
@@ -105,7 +119,6 @@ func TestRightTurn(t *testing.T) {
 	stationStart := geo.Vector{geo.Point{
 		5, 1, 11,
 	}, tracks.DIR_180_DEG}
-	fmt.Println("at (7, 3) facing up. turning right. should get to 9, 5)")
 	elems := rightTurn(trackEnd, stationStart)
 	if len(elems) != 1 {
 		t.Fatalf("expected a single right turn, got %#v", elems)
