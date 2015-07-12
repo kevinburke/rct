@@ -8,23 +8,36 @@ import (
 	"time"
 )
 
-func GetOldFiles(d time.Duration) []string {
+// GetExperimentFiles returns a list of directories containing experiments
+func GetExperimentFiles() (folders []string, err error) {
 	expDir := filepath.Join(*directory, "experiments")
 	finfo, err := ioutil.ReadDir(expDir)
 	if err != nil {
+		return folders, err
+	}
+	for _, dir := range finfo {
+		path := filepath.Join(expDir, dir.Name())
+		folders = append(folders, path)
+	}
+	return folders, nil
+}
+
+func GetOldFiles(d time.Duration) []string {
+	var oldFolders []string
+	files, err := GetExperimentFiles()
+	if err != nil {
 		panic(err)
 	}
-	var oldFolders []string
 	now := time.Now().UTC()
-	for _, dir := range finfo {
-		metaPath := filepath.Join(expDir, dir.Name(), "meta.json")
-		em, err := readMetadata(metaPath)
+	for _, dir := range files {
+		metaPath := filepath.Join(dir, "meta.json")
+		em, err := ReadMetadata(metaPath)
 		if err != nil {
 			panic(err)
 		}
 		duration := now.Sub(em.Date)
 		if duration > d {
-			oldFolders = append(oldFolders, filepath.Join(expDir, dir.Name()))
+			oldFolders = append(oldFolders, dir)
 		}
 	}
 	return oldFolders
@@ -41,7 +54,7 @@ func encode(name string, v interface{}) error {
 	return enc.Encode(v)
 }
 
-func readMetadata(filename string) (ExperimentMetadata, error) {
+func ReadMetadata(filename string) (ExperimentMetadata, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		panic(err)
