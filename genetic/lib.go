@@ -3,6 +3,7 @@ package genetic
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
@@ -17,6 +18,12 @@ import (
 
 	"github.com/kevinburke/rct/tracks"
 )
+
+var directory *string
+
+func init() {
+	directory = flag.String("directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
+}
 
 // constants which may be altered to affect the ride runtime
 const PARENTS = 2
@@ -60,8 +67,11 @@ type ExperimentMetadata struct {
 	MutationRate         float32
 }
 
-func Run(outputDirectory string, packageRoot string) error {
-	expDir := path.Join(outputDirectory, "experiments")
+func Run(packageRoot string) error {
+	if directory == nil {
+		return fmt.Errorf("invalid directory - need to specify it")
+	}
+	expDir := path.Join(*directory, "experiments")
 	err := mkdir(expDir)
 	if err != nil {
 		return err
@@ -106,7 +116,7 @@ func Run(outputDirectory string, packageRoot string) error {
 		if err != nil {
 			return err
 		}
-		pool.Statistics(i, outputDirectory)
+		pool.Statistics(i, *directory)
 	}
 	return nil
 }
