@@ -166,6 +166,34 @@ var advanceVectorTests = []struct {
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
 		Vector{Point{6, 7, 8}, tracks.DIR_90_DEG_LEFT},
 	},
+
+	// right tests
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
+		Vector{Point{3, -3, 8}, tracks.DIR_90_DEG_RIGHT},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_LEFT},
+		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
+		Vector{Point{3, 3, 8}, tracks.DIR_STRAIGHT},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_180_DEG},
+		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
+		Vector{Point{-3, 3, 8}, tracks.DIR_90_DEG_LEFT},
+	},
+	{
+		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_RIGHT},
+		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
+		Vector{Point{-3, -3, 8}, tracks.DIR_180_DEG},
+	},
+
+	{
+		Vector{Point{3, 4, 8}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
+		Vector{Point{6, 1, 8}, tracks.DIR_90_DEG_RIGHT},
+	},
 }
 
 func TestAdvanceVector(t *testing.T) {

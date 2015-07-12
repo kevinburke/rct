@@ -155,7 +155,7 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 			v.Point[2] + float64(s.ElevationDelta),
 		}
 	} else if v.Dir == tracks.DIR_90_DEG_RIGHT {
-		// facing down - (-sideways, -forward)
+		// facing down - (sideways, -forward)
 		p = Point{
 			v.Point[0] + float64(s.SidewaysDelta),
 			v.Point[1] - float64(s.ForwardDelta),
