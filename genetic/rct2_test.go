@@ -88,6 +88,17 @@ var trackTests = []struct {
 			tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES,
 		})},
 
+	{geo.Vector{geo.Point{-2, 8, 0}, tracks.DIR_90_DEG_RIGHT},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_LEFT_QUARTER_TURN_3_TILES,
+		})},
+
 	{geo.Vector{geo.Point{-1, 0, 0}, tracks.DIR_STRAIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT})},
 

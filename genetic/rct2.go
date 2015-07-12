@@ -200,38 +200,48 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 
 // trackEnd is facing down on conventional grid
 func connect2DRightFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	// if you are 8 above:
-	//	turn right
-	// else if you are 3 below:
-	//	turn right
-	// else if you are 0-2 below:
-	//	go straight
-	// else if you are ahead or less than 3 pieces behind:
-	//	go straight
-	// else if you are 3 pieces behind:
-	//	turn left
-	// else
-	//	go straight
-	if trackEnd.Point[1] >= stationStart.Point[1]+8 {
-		return rightTurn(trackEnd, stationStart)
-	} else if trackEnd.Point[1] <= stationStart.Point[1]-2 {
-		return rightTurn(trackEnd, stationStart)
-	} else if trackEnd.Point[1] <= stationStart.Point[1] {
+	// if you are 1 above, 1 below, or dead level, only option is to go straight
+	if -1 <= trackEnd.Point[1] && trackEnd.Point[1] <= 1 {
 		return straight(trackEnd, stationStart)
-	} else if trackEnd.Point[0] > stationStart.Point[0]-2 {
-		return straight(trackEnd, stationStart)
-	} else if trackEnd.Point[0] <= stationStart.Point[0]-2 {
-		// golden
-		return leftTurn(trackEnd, stationStart)
-	} else {
-		return straight(trackEnd, stationStart)
+	}
+
+	// if you are 2 or more below:
+	if trackEnd.Point[1] <= -2 {
+		// if you are 6 or more behind the station start:
+		if trackEnd.Point[0] <= stationStart.Point[0]-6 {
+			// left, left, right, back to station
+			return leftTurn(trackEnd, stationStart)
+		} else {
+			// 3 right turns & back to station
+			return rightTurn(trackEnd, stationStart)
+		}
+	}
+
+	// so far we've covered every square in y <= 1
+	// if you are 2 behind:
+	if trackEnd.Point[0] <= stationStart.Point[0]-2 {
+		//	if you are exactly 2 above:
+		if trackEnd.Point[1] == stationStart.Point[1]+2 {
+			// left turn puts you in line to go straight to station)
+			return leftTurn(trackEnd, stationStart)
+		} else {
+			// will turn left at 2 below & go straight to station
+			return straight(trackEnd, stationStart)
+		}
+	} else { // (you are 2 or more above & in front of station end)
+		//	if you are 4 or more above:
+		if trackEnd.Point[1] >= stationStart.Point[1]+4 {
+			// can get to station with right, left, left
+			return rightTurn(trackEnd, stationStart)
+		} else {
+			// nothing to do but straight & circle around
+			return straight(trackEnd, stationStart)
+		}
 	}
 }
 
 // trackEnd is facing up
 func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	// else:
-
 	// if you are 1 above, 1 below, or dead level, only option is to go straight
 	if -1 <= trackEnd.Point[1] && trackEnd.Point[1] <= 1 {
 		return straight(trackEnd, stationStart)
@@ -269,7 +279,6 @@ func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector
 			return straight(trackEnd, stationStart)
 		}
 	}
-
 }
 
 // Given two vectors that exist in the same 2D plane, return a list of track
