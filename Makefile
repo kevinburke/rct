@@ -11,8 +11,9 @@ install:
 	go install ./bits/... ./genetic/... ./geo/... ./image/... ./rle/... ./server/... ./td6/... ./tracks/...
 
 test:
-	go test -timeout 10s \
+	go test -timeout 1s \
 		./bits/... \
+		./genetic/... \
 		./geo/... \
 		./image/... \
 		./rle/... \
