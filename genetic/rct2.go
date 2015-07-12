@@ -2,7 +2,6 @@
 package genetic
 
 import (
-	"fmt"
 	"log"
 	"math"
 
@@ -29,7 +28,6 @@ func CreateStation() []tracks.Element {
 
 func rightTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// make a right turn & recursive call
-	fmt.Println("right turn")
 	elem := tracks.Element{
 		Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES],
 	}
@@ -39,7 +37,6 @@ func rightTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 
 func leftTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// make a left turn & recursive call
-	fmt.Println("left turn")
 	elem := tracks.Element{
 		Segment: tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES],
 	}
@@ -48,7 +45,6 @@ func leftTurn(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 }
 
 func straight(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	fmt.Println("straight")
 	elem := tracks.Element{
 		Segment: tracks.TS_MAP[tracks.ELEM_FLAT],
 	}
@@ -287,7 +283,6 @@ func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks
 	if trackEnd.Point[0] == stationStart.Point[0] && trackEnd.Point[1] == stationStart.Point[1] && trackEnd.Dir == stationStart.Dir {
 		return []tracks.Element{}
 	}
-	fmt.Printf("from: (%d, %d) to: (%d, %d), initial direction: %v\n", round(trackEnd.Point[0]), round(trackEnd.Point[1]), round(stationStart.Point[0]), round(stationStart.Point[1]), trackEnd.Dir)
 	// Okay! This is not a trivial problem. Slightly easier if you remember
 	// that the stations are always created facing to the left.
 	if trackEnd.Dir == stationStart.Dir {
@@ -367,8 +362,6 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 func completeTrack(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	levelDescend, v := descendToLevel(trackEnd, stationStart)
 	twodtrack := connect2DTrackPieces(v, stationStart)
-	fmt.Println("done!")
-	fmt.Printf("track length is %d\n", len(twodtrack))
 	result := append(levelDescend, twodtrack...)
 	return result
 }
