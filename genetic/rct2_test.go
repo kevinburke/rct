@@ -116,7 +116,6 @@ func Test2DTrack(t *testing.T) {
 			break
 		}
 		for i := range out {
-			fmt.Println(i)
 			if tt.expected[i] != out[i] {
 				t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
 			}
