@@ -153,7 +153,7 @@ func jsonStripper(h http.Handler) http.Handler {
 }
 
 func main() {
-	directory := flag.String("directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
+	directory := flag.String("server-directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
 	templateDirectory := flag.String("template-directory", "/usr/local/rct/server/templates", "Path to the folder storing RCT server templates (this file -> server/templates)")
 	staticDirectory := flag.String("static-directory", "/usr/local/rct/server/static", "Path to the folder storing RCT server templates (this file -> server/static)")
 

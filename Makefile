@@ -25,7 +25,7 @@ serve:
 	find . -name '*.go' -o -name '*.html' | justrun -stdin -v=true -c 'go run server/main.go --template-directory="$(PWD)/server/templates" --static-directory="$(PWD)/server/static"'
 
 experiment:
-	go run genetic/runners/main.go
+	run_experiment
 
 compress: install
 	get_old_experiments | bash scripts/compress.bash
