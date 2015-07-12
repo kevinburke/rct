@@ -242,13 +242,13 @@ func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector
 	//	go straight
 	if trackEnd.Point[1] <= stationStart.Point[1]-8 {
 		return leftTurn(trackEnd, stationStart)
-	} else if trackEnd.Point[1] >= stationStart.Point[1]+3 {
+	} else if trackEnd.Point[1] >= stationStart.Point[1]+2 {
 		return leftTurn(trackEnd, stationStart)
 	} else if trackEnd.Point[1] >= stationStart.Point[1] {
 		return straight(trackEnd, stationStart)
-	} else if trackEnd.Point[0] > stationStart.Point[0]-3 {
+	} else if trackEnd.Point[0] > stationStart.Point[0]-2 {
 		return straight(trackEnd, stationStart)
-	} else if trackEnd.Point[0] <= stationStart.Point[0]-3 {
+	} else if trackEnd.Point[0] <= stationStart.Point[0]-2 {
 		// golden
 		return rightTurn(trackEnd, stationStart)
 	} else {

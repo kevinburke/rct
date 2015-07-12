@@ -73,6 +73,12 @@ var trackTests = []struct {
 }{
 	{geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
+
+	{geo.Vector{geo.Point{-2, -2, 0}, tracks.DIR_90_DEG_LEFT},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES})},
+
+	{geo.Vector{geo.Point{-1, 0, 0}, tracks.DIR_STRAIGHT},
+		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT})},
 }
 
 func Test2DTrack(t *testing.T) {
@@ -88,6 +94,7 @@ func Test2DTrack(t *testing.T) {
 				t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
 			}
 		}
+		fmt.Println("one test down")
 	}
 }
 
