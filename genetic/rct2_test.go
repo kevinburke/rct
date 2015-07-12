@@ -61,11 +61,11 @@ func TestOneDownhillDescender(t *testing.T) {
 
 func TestRightTurn(t *testing.T) {
 	trackEnd := geo.Vector{geo.Point{
-		7, 3, 0,
+		7, 3, 11,
 	}, tracks.DIR_90_DEG_RIGHT}
 	stationStart := geo.Vector{geo.Point{
-		9, 5, 0,
-	}, tracks.DIR_STRAIGHT}
+		5, 1, 11,
+	}, tracks.DIR_180_DEG}
 	fmt.Println("at (7, 3) facing up. turning right. should get to 9, 5)")
 	elems := rightTurn(trackEnd, stationStart)
 	if len(elems) != 1 {
