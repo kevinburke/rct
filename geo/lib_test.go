@@ -86,6 +86,27 @@ func TestAdvance(t *testing.T) {
 	}
 }
 
+var advanceVectorTests = []struct {
+	v   Vector
+	seg *tracks.Segment
+	out Vector
+}{
+	{Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT}, tracks.TS_MAP[tracks.ELEM_FLAT], Vector{Point{1, 0, 0}, tracks.DIR_STRAIGHT}},
+}
+
+func TestAdvanceVector(t *testing.T) {
+	for _, tt := range advanceVectorTests {
+		out := AdvanceVector(tt.v, tt.seg)
+		helper := fmt.Sprintf("%s (%f, %f, %f):", tt.seg, tt.v.Point[0], tt.v.Point[1], tt.v.Point[2])
+		if out.Point != tt.out.Point {
+			t.Errorf("%s expected point to be %v, was %v", helper, tt.out.Point, out.Point)
+		}
+		if out.Dir != tt.out.Dir {
+			t.Errorf("%s expected direction to be %v, was %v", helper, tt.out.Dir, out.Dir)
+		}
+	}
+}
+
 func TestFlat90DegRotated(t *testing.T) {
 	v := Vector{Point{3, 7, 0}, tracks.DIR_90_DEG_RIGHT}
 	seg := tracks.TS_MAP[tracks.ELEM_FLAT]
