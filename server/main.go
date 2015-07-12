@@ -19,6 +19,7 @@ import (
 	"github.com/kevinburke/rct"
 	"github.com/kevinburke/rct/genetic"
 	"github.com/kevinburke/rct/geo"
+	"github.com/kevinburke/rct/td6"
 )
 
 const VERSION = "0.1"
@@ -33,6 +34,30 @@ func loadMember(directory string, pth string) (*genetic.Member, error) {
 	m := new(genetic.Member)
 	err = dec.Decode(m)
 	return m, err
+}
+
+func td6Handler(directory string, templateDirectory string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		iterPath := strings.Replace(r.URL.Path, "/td6", "", 1)
+		m, err := loadMember(directory, iterPath)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		shortName := fmt.Sprintf("%s.td6", truncate(17, m.Id))
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", shortName))
+		w.Header().Set("Content-Type", "text/td6")
+		ride := td6.CreateMineTrainRide(m.Track)
+		bits, err := td6.Marshal(ride)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(bits)
+	}
 }
 
 func renderHandler(directory string, templateDirectory string) http.HandlerFunc {
@@ -64,6 +89,17 @@ type tmplData struct {
 	Path   string
 }
 
+func truncate(l int, s string) string {
+	var numRunes = 0
+	for index, _ := range s {
+		numRunes++
+		if numRunes > l {
+			return s[:index]
+		}
+	}
+	return s
+}
+
 func newRctHandler(directory string, templateDirectory string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m, err := loadMember(directory, r.URL.Path)
@@ -74,16 +110,7 @@ func newRctHandler(directory string, templateDirectory string) http.HandlerFunc 
 		}
 
 		funcMap := template.FuncMap{
-			"truncate": func(l int, s string) string {
-				var numRunes = 0
-				for index, _ := range s {
-					numRunes++
-					if numRunes > l {
-						return s[:index]
-					}
-				}
-				return s
-			},
+			"truncate": truncate,
 		}
 
 		tmpl, err := template.New("iteration.html").Funcs(funcMap).ParseFiles(path.Join(templateDirectory, "iteration.html"))
@@ -157,6 +184,14 @@ func jsonStripper(h http.Handler) http.Handler {
 	})
 }
 
+func buildRoute(regex string) *regexp.Regexp {
+	route, err := regexp.Compile(regex)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return route
+}
+
 func main() {
 	directory := flag.String("server-directory", "/usr/local/rct", "Path to the folder storing RCT experiment data")
 	templateDirectory := flag.String("template-directory", "/usr/local/rct/server/templates", "Path to the folder storing RCT server templates (this file -> server/templates)")
@@ -167,22 +202,13 @@ func main() {
 		log.Fatalf("Usage: server [-directory DIRECTORY] ")
 	}
 	h := new(RegexpHandler)
-	renderRoute, err := regexp.Compile("/experiments/.*/iterations/.+/.+/render")
-	if err != nil {
-		log.Fatal(err)
-	}
-	iterationRoute, err := regexp.Compile("/experiments/.*/iterations/.+/.+")
-	if err != nil {
-		log.Fatal(err)
-	}
-	staticRoute, err := regexp.Compile("/static")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defaultRoute, err := regexp.Compile("/")
-	if err != nil {
-		log.Fatal(err)
-	}
+	td6Route := buildRoute("/experiments/.+/iterations/.+/.+/td6")
+	renderRoute := buildRoute("/experiments/.*/iterations/.+/.+/render")
+	iterationRoute := buildRoute("/experiments/.+/iterations/.+/.+")
+	staticRoute := buildRoute("/static")
+	defaultRoute := buildRoute("/")
+
+	h.HandleFunc(td6Route, td6Handler(*directory, *templateDirectory))
 	h.HandleFunc(renderRoute, renderHandler(*directory, *templateDirectory))
 	h.HandleFunc(iterationRoute, newRctHandler(*directory, *templateDirectory))
 	h.Handler(staticRoute, http.StripPrefix("/static", http.FileServer(http.Dir(*staticDirectory))))

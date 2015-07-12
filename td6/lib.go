@@ -85,6 +85,23 @@ const (
 	IDX_Y_SPACE    = 0x81
 )
 
+// CreateMineTrainRide takes a track and builds all the rest of the ride
+// structure around it
+func CreateMineTrainRide(elems []tracks.Element) *Ride {
+	d := tracks.Data{
+		Elements:           elems,
+		Clearance:          2,
+		ClearanceDirection: tracks.CLEARANCE_ABOVE,
+	}
+	ride := &Ride{
+		ControlFlags: &ControlFlags{
+			Load: RIDE_LOAD_ANY,
+		},
+		TrackData: d,
+	}
+	return ride
+}
+
 // Technically this is track data that gets serialized to disk. A RCT2 Ride
 // structure in memory has a different format.
 type Ride struct {
@@ -142,7 +159,22 @@ const (
 	RIDE_WOODEN              = 0x34
 )
 
+// see http://freerct.github.io/RCTTechDepot-Archive/controlFlags.html
+const (
+	RIDE_LOAD_QUARTER        = 0
+	RIDE_LOAD_HALF           = 1
+	RIDE_LOAD_THREE_QUARTERS = 2
+	RIDE_LOAD_FULL           = 3
+	RIDE_LOAD_ANY            = 4
+)
+
 type VehicleType string
+
+// 0 = wait for 1/4 load
+// 1 = 1/2 load
+// 2 = 3/4 load
+// 3 = full load
+// 4 = any load
 type LoadType int
 type OperatingMode int
 
