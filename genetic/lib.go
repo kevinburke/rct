@@ -2,7 +2,6 @@
 package genetic
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -44,16 +43,6 @@ func mkdir(name string) error {
 		return err
 	}
 	return nil
-}
-
-func encode(name string, v interface{}) error {
-	f, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	enc := json.NewEncoder(f)
-	return enc.Encode(v)
 }
 
 type ExperimentMetadata struct {

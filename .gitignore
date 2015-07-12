@@ -3,4 +3,4 @@
 # XXX should compile and run these properly instead of using "go run" so they
 # don't leave binaries lying around.
 exe_reader/print_tracks/print_tracks
-genetic/runners/runners
+genetic/run_experiment/runners
