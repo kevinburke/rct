@@ -228,9 +228,14 @@ func connect2DRightFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vecto
 	}
 }
 
+// trackEnd is facing up
 func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	// if you are 8 below:
-	//	turn left
+	//	if you are ahead or less than 3 pieces behind
+	//		turn left
+	//  else
+	//		go straight
+	//
 	// else if you are 3 above:
 	//	turn left
 	// else if you are 0-2 above:
@@ -242,7 +247,11 @@ func connect2DLeftFacingTrackPieces(trackEnd geo.Vector, stationStart geo.Vector
 	// else
 	//	go straight
 	if trackEnd.Point[1] <= stationStart.Point[1]-8 {
-		return leftTurn(trackEnd, stationStart)
+		if trackEnd.Point[0] > stationStart.Point[0]-2 {
+			return leftTurn(trackEnd, stationStart)
+		} else {
+			return straight(trackEnd, stationStart)
+		}
 	} else if trackEnd.Point[1] >= stationStart.Point[1]+2 {
 		return leftTurn(trackEnd, stationStart)
 	} else if trackEnd.Point[1] >= stationStart.Point[1] {

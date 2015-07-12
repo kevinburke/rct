@@ -77,6 +77,17 @@ var trackTests = []struct {
 	{geo.Vector{geo.Point{-2, -2, 0}, tracks.DIR_90_DEG_LEFT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES})},
 
+	{geo.Vector{geo.Point{-2, -8, 0}, tracks.DIR_90_DEG_LEFT},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_FLAT,
+			tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES,
+		})},
+
 	{geo.Vector{geo.Point{-1, 0, 0}, tracks.DIR_STRAIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT})},
 
@@ -102,8 +113,10 @@ func Test2DTrack(t *testing.T) {
 		helper := fmt.Sprintf("trackEnd: (%d, %d, %d) %d", round(tt.in.Point[0]), round(tt.in.Point[1]), round(tt.in.Point[2]), tt.in.Dir)
 		if len(out) != len(tt.expected) {
 			t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
+			break
 		}
 		for i := range out {
+			fmt.Println(i)
 			if tt.expected[i] != out[i] {
 				t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
 			}
