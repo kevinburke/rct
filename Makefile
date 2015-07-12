@@ -26,3 +26,6 @@ serve:
 
 experiment:
 	go run genetic/runners/main.go
+
+compress: install
+	get_old_experiments | bash scripts/compress.bash
