@@ -111,6 +111,27 @@ var advanceVectorTests = []struct {
 		tracks.TS_MAP[tracks.ELEM_FLAT],
 		Vector{Point{-1, 0, 0}, tracks.DIR_180_DEG},
 	},
+	{
+		Vector{Point{5, 7, 11}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_FLAT],
+		Vector{Point{6, 7, 11}, tracks.DIR_STRAIGHT},
+	},
+	// simple up tests
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
+		Vector{Point{1, 0, 2}, tracks.DIR_STRAIGHT},
+	},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT},
+		tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
+		Vector{Point{1, 0, -2}, tracks.DIR_STRAIGHT},
+	},
+	{
+		Vector{Point{0, 0, 0}, tracks.DIR_90_DEG_LEFT},
+		tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
+		Vector{Point{0, 1, 2}, tracks.DIR_90_DEG_LEFT},
+	},
 }
 
 func TestAdvanceVector(t *testing.T) {
