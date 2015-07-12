@@ -20,9 +20,10 @@
 			Fitness: {{ .Member.Fitness }}
 		</p>
 
-		<form method="GET" action="{{ .Path }}/td6" style="float: right; display: inline-block;">
-			<input class="btn btn-submit" type="submit" value="download coaster file"/>
-		</form>
+		<div style="float: right; display: inline-block">
+			<a href="{{ .Path }}/td6" download="~/tmp">download coaster file</a>
+		</div>
+
 		<div id="coaster-target"></div>
 
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

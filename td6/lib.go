@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 
 	"github.com/kevinburke/rct/bits"
+	"github.com/kevinburke/rct/geo"
 	"github.com/kevinburke/rct/rle"
 	"github.com/kevinburke/rct/tracks"
 )
@@ -85,21 +86,50 @@ const (
 	IDX_Y_SPACE    = 0x81
 )
 
+// Initialize a coaster with smarter defaults than the regular
+func NewCoaster() *Ride {
+	return &Ride{
+		OperatingMode: OPERATING_MODE_CONTINUOUS_CIRCUIT,
+		ControlFlags: &ControlFlags{
+			Load: RIDE_LOAD_ANY,
+		},
+
+		NumTrains:    2,
+		CarsPerTrain: 6,
+		MinWaitTime:  0,
+		MaxWaitTime:  0,
+	}
+}
+
 // CreateMineTrainRide takes a track and builds all the rest of the ride
 // structure around it
 func CreateMineTrainRide(elems []tracks.Element) *Ride {
-	d := tracks.Data{
+	coaster := NewCoaster()
+	coaster.RideType = RIDE_MINE_TRAIN
+	coaster.VehicleType = VEHICLE_MINE_TRAIN
+
+	x, y := geo.XYSpaceRequired(elems)
+	coaster.XSpaceRequired = x
+	coaster.YSpaceRequired = y
+
+	coaster.TrackData = tracks.Data{
 		Elements:           elems,
 		Clearance:          2,
 		ClearanceDirection: tracks.CLEARANCE_ABOVE,
 	}
-	ride := &Ride{
-		ControlFlags: &ControlFlags{
-			Load: RIDE_LOAD_ANY,
-		},
-		TrackData: d,
-	}
-	return ride
+
+	coaster.HasLoop = false
+	coaster.SteepLiftChain = false
+	coaster.CurvedLiftChain = false
+	coaster.Banking = true
+
+	coaster.SteepSlope = true
+	coaster.FlatToSteep = false
+	coaster.SlopedCurves = true
+	coaster.SteepTwist = false
+	coaster.SBends = true
+	coaster.SmallRadiusCurves = true
+	return coaster
 }
 
 // Technically this is track data that gets serialized to disk. A RCT2 Ride
@@ -150,12 +180,14 @@ type Ride struct {
 
 type RideType int
 
+// http://freerct.github.io/RCTTechDepot-Archive/rideCodes.html
 const (
 	RIDE_SPIRAL     RideType = 0x00
 	RIDE_STAND_UP            = 0x01
 	RIDE_SUSPENDED           = 0x02
 	RIDE_INVERTED            = 0x03
 	RIDE_STEEL_MINI          = 0x04
+	RIDE_MINE_TRAIN          = 0x11
 	RIDE_WOODEN              = 0x34
 )
 
@@ -170,13 +202,15 @@ const (
 
 type VehicleType string
 
-// 0 = wait for 1/4 load
-// 1 = 1/2 load
-// 2 = 3/4 load
-// 3 = full load
-// 4 = any load
 type LoadType int
+
+// Operating modes described here: http://freerct.github.io/RCTTechDepot-Archive/operatingModes.html
 type OperatingMode int
+
+const (
+	OPERATING_MODE_NORMAL             = 0
+	OPERATING_MODE_CONTINUOUS_CIRCUIT = 1
+)
 
 const (
 	VEHICLE_SPIRAL                  VehicleType = "SPDRCR"
@@ -185,6 +219,7 @@ const (
 	VEHICLE_WOODEN_4SEATER                      = "PTCT1"
 	VEHICLE_WOODEN_6SEATER                      = "PTCT2"
 	VEHICLE_WOODEN_6SEATER_REVERSED             = "PTCT2R"
+	VEHICLE_MINE_TRAIN                          = "AMT1"
 )
 
 const (
@@ -399,8 +434,6 @@ func ReadRide(filename string) *Ride {
 		}
 	}
 
-	//bits, err := Marshal(r)
-	//fmt.Println(bits)
 	return r
 }
 

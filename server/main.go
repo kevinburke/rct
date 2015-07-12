@@ -45,7 +45,8 @@ func td6Handler(directory string, templateDirectory string) http.HandlerFunc {
 			w.Write([]byte(err.Error()))
 			return
 		}
-		shortName := fmt.Sprintf("%s.td6", truncate(17, m.Id))
+		// For whatever reason RCT2 needs the extension to be in uppercase
+		shortName := fmt.Sprintf("%s.TD6", truncate(17, m.Id))
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", shortName))
 		w.Header().Set("Content-Type", "text/td6")
 		ride := td6.CreateMineTrainRide(m.Track)
