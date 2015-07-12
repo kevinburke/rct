@@ -170,6 +170,28 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 	return Vector{p, dir}
 }
 
+// XYSpaceRequired determines how big of a footprint the track has
+func XYSpaceRequired(elems []tracks.Element) (int, int) {
+	minX, minY, maxX, maxY := float64(0), float64(0), float64(0), float64(0)
+	v := Vector{Point{0, 0, 0}, tracks.DIR_STRAIGHT}
+	for _, elem := range elems {
+		v = AdvanceVector(v, elem.Segment)
+		if v.Point[0] < minX {
+			minX = v.Point[0]
+		}
+		if v.Point[0] > maxX {
+			maxX = v.Point[0]
+		}
+		if v.Point[1] < minY {
+			minY = v.Point[1]
+		}
+		if v.Point[1] > maxY {
+			maxY = v.Point[1]
+		}
+	}
+	return round(maxX - minX), round(maxY - minY)
+}
+
 // Detect whether the track collides with itself.
 func HasCollision(t *tracks.Data) bool {
 	matrix := make([][][]bool, 100)
