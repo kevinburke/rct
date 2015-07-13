@@ -10,5 +10,8 @@ func TestPossibilities(t *testing.T) {
 		if p.Segment.Type == 0xff {
 			t.Errorf("should not have contained the end of ride but did")
 		}
+		if p.Segment.Type == ELEM_END_STATION {
+			t.Errorf("should not be possible to build a station")
+		}
 	}
 }

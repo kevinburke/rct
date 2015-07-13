@@ -167,6 +167,10 @@ var blacklist = map[SegmentType]bool{
 	ELEM_BANKED_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP:  true,
 	ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: true,
 	ELEM_END_OF_RIDE:                                 true,
+
+	ELEM_BEGIN_STATION:  true,
+	ELEM_END_STATION:    true,
+	ELEM_MIDDLE_STATION: true,
 }
 
 // Possibilities computes all of the possible track pieces that can be built
