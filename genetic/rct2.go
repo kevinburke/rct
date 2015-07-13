@@ -384,5 +384,13 @@ func GetScore(t []tracks.Element) int64 {
 		log.Panic("trackend is too high", trackEnd.Dir)
 	}
 	trackPieces := completeTrack(trackEnd, stationStart)
-	return int64(10*1000*1000 - 4000*len(trackPieces))
+	startingScore := int64(700 * 1000)
+
+	data := &tracks.Data{
+		Elements:           t,
+		Clearance:          2,
+		ClearanceDirection: tracks.CLEARANCE_ABOVE,
+	}
+	numCollisions := geo.NumCollisions(data)
+	return startingScore - 4000*int64(len(trackPieces)) - 6000*int64(numCollisions)
 }

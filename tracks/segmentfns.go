@@ -1,6 +1,9 @@
 package tracks
 
-import "log"
+import (
+	"log"
+	"strings"
+)
 
 func isPossibleChainLift(val *Segment) bool {
 	// XXX, check other pieces that can be chain lifts. in theory you can also
@@ -34,10 +37,156 @@ func (e *Element) valid() bool {
 	return true
 }
 
+var blacklist = map[SegmentType]bool{
+	ELEM_LEFT_TWIST_DOWN_TO_UP:  true,
+	ELEM_RIGHT_TWIST_DOWN_TO_UP: true,
+	ELEM_LEFT_TWIST_UP_TO_DOWN:  true,
+	ELEM_RIGHT_TWIST_UP_TO_DOWN: true,
+	ELEM_HALF_LOOP_UP:           true,
+	ELEM_HALF_LOOP_DOWN:         true,
+	ELEM_LEFT_CORKSCREW_UP:      true,
+	ELEM_RIGHT_CORKSCREW_UP:     true,
+	ELEM_LEFT_CORKSCREW_DOWN:    true,
+	ELEM_RIGHT_CORKSCREW_DOWN:   true,
+
+	ELEM_FLAT_TO_60_DEG_UP:   true,
+	ELEM_60_DEG_UP_TO_FLAT:   true,
+	ELEM_FLAT_TO_60_DEG_DOWN: true,
+	ELEM_60_DEG_DOWN_TO_FLAT: true,
+
+	ELEM_TOWER_BASE:    true,
+	ELEM_TOWER_SECTION: true,
+
+	ELEM_FLAT_COVERED:                       true,
+	ELEM_25_DEG_UP_COVERED:                  true,
+	ELEM_60_DEG_UP_COVERED:                  true,
+	ELEM_FLAT_TO_25_DEG_UP_COVERED:          true,
+	ELEM_25_DEG_UP_TO_60_DEG_UP_COVERED:     true,
+	ELEM_60_DEG_UP_TO_25_DEG_UP_COVERED:     true,
+	ELEM_25_DEG_UP_TO_FLAT_COVERED:          true,
+	ELEM_25_DEG_DOWN_COVERED:                true,
+	ELEM_60_DEG_DOWN_COVERED:                true,
+	ELEM_FLAT_TO_25_DEG_DOWN_COVERED:        true,
+	ELEM_25_DEG_DOWN_TO_60_DEG_DOWN_COVERED: true,
+	ELEM_60_DEG_DOWN_TO_25_DEG_DOWN_COVERED: true,
+	ELEM_25_DEG_DOWN_TO_FLAT_COVERED:        true,
+	ELEM_LEFT_QUARTER_TURN_5_TILES_COVERED:  true,
+	ELEM_RIGHT_QUARTER_TURN_5_TILES_COVERED: true,
+	ELEM_S_BEND_LEFT_COVERED:                true,
+	ELEM_S_BEND_RIGHT_COVERED:               true,
+	ELEM_LEFT_QUARTER_TURN_3_TILES_COVERED:  true,
+	ELEM_RIGHT_QUARTER_TURN_3_TILES_COVERED: true,
+
+	ELEM_LEFT_QUARTER_TURN_1_TILE_60_DEG_UP:    true,
+	ELEM_RIGHT_QUARTER_TURN_1_TILE_60_DEG_UP:   true,
+	ELEM_LEFT_QUARTER_TURN_1_TILE_60_DEG_DOWN:  true,
+	ELEM_RIGHT_QUARTER_TURN_1_TILE_60_DEG_DOWN: true,
+
+	ELEM_ROTATION_CONTROL_TOGGLE:                 true,
+	ELEM_INVERTED_90_DEG_UP_TO_FLAT_QUARTER_LOOP: true,
+
+	ELEM_WATERFALL: true,
+	ELEM_RAPIDS:    true,
+
+	ELEM_25_DEG_DOWN_LEFT_BANKED:  true,
+	ELEM_25_DEG_DOWN_RIGHT_BANKED: true,
+
+	ELEM_WATER_SPLASH: true,
+
+	ELEM_FLAT_TO_60_DEG_UP_LONG_BASE: true,
+	ELEM_60_DEG_UP_TO_FLAT_LONG_BASE: true,
+
+	ELEM_WHIRLPOOL: true,
+
+	ELEM_60_DEG_DOWN_TO_FLAT_LONG_BASE: true,
+	ELEM_FLAT_TO_60_DEG_DOWN_LONG_BASE: true,
+
+	ELEM_CABLE_LIFT_HILL:             true,
+	ELEM_REVERSE_WHOA_BELLY_SLOPE:    true,
+	ELEM_REVERSE_WHOA_BELLY_VERTICAL: true,
+
+	ELEM_90_DEG_UP:                  true,
+	ELEM_90_DEG_DOWN:                true,
+	ELEM_60_DEG_UP_TO_90_DEG_UP:     true,
+	ELEM_90_DEG_DOWN_TO_60_DEG_DOWN: true,
+	ELEM_90_DEG_UP_TO_60_DEG_UP:     true,
+	ELEM_60_DEG_DOWN_TO_90_DEG_DOWN: true,
+	ELEM_BRAKE_FOR_DROP:             true,
+
+	ELEM_LOG_FLUME_REVERSER: true,
+	ELEM_SPINNING_TUNNEL:    true,
+
+	ELEM_LEFT_BARREL_ROLL_UP_TO_DOWN:  true,
+	ELEM_RIGHT_BARREL_ROLL_UP_TO_DOWN: true,
+	ELEM_LEFT_BARREL_ROLL_DOWN_TO_UP:  true,
+	ELEM_RIGHT_BARREL_ROLL_DOWN_TO_UP: true,
+
+	ELEM_LEFT_BANK_TO_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP:     true,
+	ELEM_RIGHT_BANK_TO_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP:   true,
+	ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_LEFT_BANK:   true,
+	ELEM_RIGHT_QUARTER_TURN_3_TILES_25_DEG_DOWN_TO_RIGHT_BANK: true,
+
+	ELEM_POWERED_LIFT: true,
+
+	ELEM_LEFT_LARGE_HALF_LOOP_UP:    true,
+	ELEM_RIGHT_LARGE_HALF_LOOP_UP:   true,
+	ELEM_RIGHT_LARGE_HALF_LOOP_DOWN: true,
+	ELEM_LEFT_LARGE_HALF_LOOP_DOWN:  true,
+
+	ELEM_LEFT_FLYER_TWIST_UP_TO_DOWN:    true,
+	ELEM_RIGHT_FLYER_TWIST_UP_TO_DOWN:   true,
+	ELEM_LEFT_FLYER_TWIST_DOWN_TO_UP:    true,
+	ELEM_RIGHT_FLYER_TWIST_DOWN_TO_UP:   true,
+	ELEM_FLYER_HALF_LOOP_UP:             true,
+	ELEM_FLYER_HALF_LOOP_DOWN:           true,
+	ELEM_LEFT_FLY_CORKSCREW_UP_TO_DOWN:  true,
+	ELEM_RIGHT_FLY_CORKSCREW_UP_TO_DOWN: true,
+	ELEM_LEFT_FLY_CORKSCREW_DOWN_TO_UP:  true,
+	ELEM_RIGHT_FLY_CORKSCREW_DOWN_TO_UP: true,
+	ELEM_HEARTLINE_TRANSFER_UP:          true,
+	ELEM_HEARTLINE_TRANSFER_DOWN:        true,
+	ELEM_LEFT_HEARTLINE_ROLL:            true,
+	ELEM_RIGHT_HEARTLINE_ROLL:           true,
+	ELEM_MINI_GOLF_HOLE_A:               true,
+	ELEM_MINI_GOLF_HOLE_B:               true,
+	ELEM_MINI_GOLF_HOLE_C:               true,
+	ELEM_MINI_GOLF_HOLE_D:               true,
+	ELEM_MINI_GOLF_HOLE_E:               true,
+
+	ELEM_INVERTED_FLAT_TO_90_DEG_DOWN_QUARTER_LOOP:   true,
+	ELEM_90_DEG_UP_QUARTER_LOOP_TO_INVERTED:          true,
+	ELEM_QUARTER_LOOP_INVERT_TO_90_DEG_DOWN:          true,
+	ELEM_LEFT_CURVED_LIFT_HILL:                       true,
+	ELEM_RIGHT_CURVED_LIFT_HILL:                      true,
+	ELEM_LEFT_REVERSER:                               true,
+	ELEM_RIGHT_REVERSER:                              true,
+	ELEM_AIR_THRUST_TOP_CAP:                          true,
+	ELEM_AIR_THRUST_VERTICAL_DOWN:                    true,
+	ELEM_AIR_THRUST_VERTICAL_DOWN_TO_LEVEL:           true,
+	ELEM_BLOCK_BRAKES:                                true,
+	ELEM_BANKED_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP:  true,
+	ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: true,
+	ELEM_END_OF_RIDE:                                 true,
+}
+
 // Possibilities computes all of the possible track pieces that can be built
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
-		// XXX, figure out how to handle diagonal
+		if _, ok := blacklist[val.Type]; ok {
+			continue
+		}
+		// XXX, figure out how to handle diagonal, different types of coasters
+		// etc.
+		name := ElementNames[val.Type]
+		if strings.Contains(string(name), "DIAG") {
+			continue
+		}
+		if strings.Contains(string(name), "GOLF") {
+			continue
+		}
+		if strings.Contains(string(name), "LOOP") {
+			continue
+		}
 		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() && !val.diagonal() && s.valid() {
 			if val.DirectionDelta != 0 && val.DirectionDelta != 90 && val.DirectionDelta != 180 && val.DirectionDelta != 270 {
 				log.Panicf("%#v", val)

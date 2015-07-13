@@ -24,7 +24,7 @@ test:
 serve:
 	find . -name '*.go' -o -name '*.html' | justrun -stdin -v=true -c 'go run server/main.go --template-directory="$(PWD)/server/templates" --static-directory="$(PWD)/server/static"'
 
-experiment:
+experiment: install
 	run_experiment
 
 compress: install

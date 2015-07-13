@@ -223,4 +223,6 @@ var ElementNames = []ElementName{
 	"ELEM_BLOCK_BRAKES",                                         // D8
 	"ELEM_BANKED_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP",           // D9
 	"ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP",          // DA
+
+	// can't do END_OF_RIDE here because elements are in order
 }
