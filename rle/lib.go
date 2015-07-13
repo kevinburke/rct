@@ -44,6 +44,7 @@ func min(a int, b int) int {
 
 // Compute the checksum for a given series of bytes.
 func checksum(ride []byte) uint32 {
+
 	summation := uint32(0)
 	for i := range ride {
 		tmp := summation + uint32(ride[i])

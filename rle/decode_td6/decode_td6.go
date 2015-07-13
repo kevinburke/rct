@@ -1,3 +1,5 @@
+// Decode a TD6 file and print the results to stdout. It's going to be a blob
+// of binary data, you probably want to redirect it to a file.
 package main
 
 import (
@@ -21,6 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 	reader := rle.NewReader(f)
+	// xxx is there a better way to do this?
 	rr := io.TeeReader(reader, os.Stdout)
 	var bitbuffer bytes.Buffer
 	bitbuffer.ReadFrom(rr)
