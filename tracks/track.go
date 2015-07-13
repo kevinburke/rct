@@ -129,7 +129,6 @@ func Unmarshal(buf []byte, d *Data) error {
 			}
 			return err
 		}
-		fmt.Println(elem.Segment)
 		d.Elements = append(d.Elements, elem)
 	}
 

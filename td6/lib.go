@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/kevinburke/rct/bits"
 	"github.com/kevinburke/rct/geo"
@@ -58,8 +59,8 @@ const (
 	IDX_VEHICLE_TYPE = 0x1
 
 	// XXX these are not right for TD6 tracks.
-	IDX_FEATURES_0 = 0x1
-	IDX_FEATURES_1 = 0x1
+	//IDX_FEATURES_0 = 0x1
+	//IDX_FEATURES_1 = 0x1
 
 	IDX_COST             = 0x2
 	IDX_OPERATING_MODE   = 0x06
@@ -124,22 +125,32 @@ func CreateMineTrainRide(elems []tracks.Element) *Ride {
 	coaster.HasLoop = false
 	coaster.SteepLiftChain = false
 	coaster.CurvedLiftChain = false
-	coaster.Banking = true
+	coaster.Banking = false
 
-	coaster.SteepSlope = true
+	coaster.SteepSlope = false
 	coaster.FlatToSteep = false
-	coaster.SlopedCurves = true
+	coaster.SlopedCurves = false
 	coaster.SteepTwist = false
-	coaster.SBends = true
-	coaster.SmallRadiusCurves = true
+	coaster.SBends = false
+	coaster.SmallRadiusCurves = false
 	return coaster
 }
+
+// http://freerct.github.io/RCTTechDepot-Archive/TD6.html
+type VehicleColorScheme int
+
+const (
+	SCHEME_SAME_COLOR             = 0
+	SCHEME_TRAINS_DIFFERENT_COLOR = 1
+	SCHEME_CARS_DIFFERENT_COLOR   = 2
+)
 
 // Technically this is track data that gets serialized to disk. A RCT2 Ride
 // structure in memory has a different format.
 type Ride struct {
-	RideType    RideType
-	VehicleType VehicleType
+	RideType RideType
+
+	VehicleColorScheme VehicleColorScheme
 
 	XSpaceRequired int
 	YSpaceRequired int
@@ -170,6 +181,8 @@ type Ride struct {
 	NumInversions uint8
 	MaxSpeed      uint8
 	AverageSpeed  uint8
+
+	VehicleType VehicleType
 
 	// This is a little bit of a copout
 	DatData []byte
@@ -251,22 +264,24 @@ func Unmarshal(buf []byte, r *Ride) error {
 	}
 	r.RideType = RideType(buf[IDX_RIDE_TYPE])
 
-	featuresBit0 := int(buf[IDX_FEATURES_0])
-	r.SteepLiftChain = bits.On(featuresBit0, BIT_STEEP_LIFT_CHAIN)
-	r.CurvedLiftChain = bits.On(featuresBit0, BIT_CURVED_LIFT_CHAIN)
-	r.Banking = bits.On(featuresBit0, BIT_BANKING)
-	r.HasLoop = bits.On(featuresBit0, BIT_VERTICAL_LOOP)
+	//featuresBit0 := int(buf[IDX_FEATURES_0])
+	//r.SteepLiftChain = bits.On(featuresBit0, BIT_STEEP_LIFT_CHAIN)
+	//r.CurvedLiftChain = bits.On(featuresBit0, BIT_CURVED_LIFT_CHAIN)
+	//r.Banking = bits.On(featuresBit0, BIT_BANKING)
+	//r.HasLoop = bits.On(featuresBit0, BIT_VERTICAL_LOOP)
 
-	featuresBit1 := int(buf[IDX_FEATURES_1])
-	r.SteepSlope = bits.On(featuresBit1, BIT_STEEP_SLOPE)
-	r.FlatToSteep = bits.On(featuresBit1, BIT_FLAT_TO_STEEP)
-	r.SlopedCurves = bits.On(featuresBit1, BIT_SLOPED_CURVES)
-	r.SteepTwist = bits.On(featuresBit1, BIT_STEEP_TWIST)
-	r.SBends = bits.On(featuresBit1, BIT_S_BENDS)
-	r.SmallRadiusCurves = bits.On(featuresBit1, BIT_SMALL_RADIUS_CURVES)
-	r.SmallRadiusBanked = bits.On(featuresBit1, BIT_SMALL_RADIUS_BANKED)
+	//featuresBit1 := int(buf[IDX_FEATURES_1])
+	//r.SteepSlope = bits.On(featuresBit1, BIT_STEEP_SLOPE)
+	//r.FlatToSteep = bits.On(featuresBit1, BIT_FLAT_TO_STEEP)
+	//r.SlopedCurves = bits.On(featuresBit1, BIT_SLOPED_CURVES)
+	//r.SteepTwist = bits.On(featuresBit1, BIT_STEEP_TWIST)
+	//r.SBends = bits.On(featuresBit1, BIT_S_BENDS)
+	//r.SmallRadiusCurves = bits.On(featuresBit1, BIT_SMALL_RADIUS_CURVES)
+	//r.SmallRadiusBanked = bits.On(featuresBit1, BIT_SMALL_RADIUS_BANKED)
 
 	r.OperatingMode = OperatingMode(buf[IDX_OPERATING_MODE])
+	// Color scheme stored in bits 0 and 1. Bit 3 is always on for RCT2
+	r.VehicleColorScheme = VehicleColorScheme(buf[IDX_COLOR_SCHEME] & 0x3)
 	r.ControlFlags = unmarshalControlFlags(int(buf[IDX_CONTROL_FLAG]))
 	r.NumTrains = uint8(buf[IDX_NUM_TRAINS])
 	r.CarsPerTrain = uint8(buf[IDX_CARS_PER_TRAIN])
@@ -312,39 +327,42 @@ func Marshal(r *Ride) ([]byte, error) {
 
 	rideb[IDX_RIDE_TYPE] = byte(r.RideType)
 
-	copy(rideb[IDX_VEHICLE_TYPE_STRING:IDX_VEHICLE_TYPE_STRING+LENGTH_VEHICLE_TYPE], r.VehicleType)
-	featureBit0 := 0
-	if r.SteepLiftChain {
-		bits.Set(featureBit0, BIT_STEEP_LIFT_CHAIN)
-	}
-	if r.CurvedLiftChain {
-		bits.Set(featureBit0, BIT_CURVED_LIFT_CHAIN)
-	}
-	if r.Banking {
-		bits.Set(featureBit0, BIT_BANKING)
-	}
-	if r.HasLoop {
-		bits.Set(featureBit0, BIT_VERTICAL_LOOP)
-	}
-	rideb[IDX_FEATURES_0] = byte(featureBit0)
-
+	// XXX this code is not in the right place
+	//featureBit0 := 0
+	//if r.SteepLiftChain {
+	//bits.Set(featureBit0, BIT_STEEP_LIFT_CHAIN)
+	//}
+	//if r.CurvedLiftChain {
+	//bits.Set(featureBit0, BIT_CURVED_LIFT_CHAIN)
+	//}
+	//if r.Banking {
+	//bits.Set(featureBit0, BIT_BANKING)
+	//}
+	//if r.HasLoop {
+	//bits.Set(featureBit0, BIT_VERTICAL_LOOP)
+	//}
+	//rideb[IDX_FEATURES_0] = byte(featureBit0)
 	// Features bit 1
-	featureBit1 := 0
-	if r.SteepSlope {
-		bits.Set(featureBit1, BIT_STEEP_SLOPE)
-	}
-	if r.FlatToSteep {
-		bits.Set(featureBit1, BIT_FLAT_TO_STEEP)
-	}
-	if r.SlopedCurves {
-		bits.Set(featureBit1, BIT_SLOPED_CURVES)
-	}
-	if r.SteepTwist {
-		bits.Set(featureBit1, BIT_STEEP_TWIST)
-	}
-	rideb[IDX_FEATURES_1] = byte(featureBit1)
+	//featureBit1 := 0
+	//if r.SteepSlope {
+	//bits.Set(featureBit1, BIT_STEEP_SLOPE)
+	//}
+	//if r.FlatToSteep {
+	//bits.Set(featureBit1, BIT_FLAT_TO_STEEP)
+	//}
+	//if r.SlopedCurves {
+	//bits.Set(featureBit1, BIT_SLOPED_CURVES)
+	//}
+	//if r.SteepTwist {
+	//bits.Set(featureBit1, BIT_STEEP_TWIST)
+	//}
+	//rideb[IDX_FEATURES_1] = byte(featureBit1)
 
 	rideb[IDX_OPERATING_MODE] = byte(r.OperatingMode)
+	rideb[IDX_COLOR_SCHEME] = byte(r.VehicleColorScheme)
+	// bit 3 indicates RCT2
+	rideb[IDX_COLOR_SCHEME] = byte(bits.Set(int(rideb[IDX_COLOR_SCHEME]), 3))
+
 	rideb[IDX_CONTROL_FLAG] = byte(marshalControlFlags(*r.ControlFlags))
 	rideb[IDX_NUM_TRAINS] = byte(r.NumTrains)
 	rideb[IDX_CARS_PER_TRAIN] = byte(r.CarsPerTrain)
@@ -356,13 +374,16 @@ func Marshal(r *Ride) ([]byte, error) {
 	rideb[IDX_MAX_SPEED] = byte(r.MaxSpeed)
 	rideb[IDX_AVERAGE_SPEED] = byte(r.AverageSpeed)
 
+	copy(rideb[IDX_VEHICLE_TYPE_STRING:IDX_VEHICLE_TYPE_STRING+LENGTH_VEHICLE_TYPE], r.VehicleType)
+
 	// XXX The below information hasn't been parsed into ride data yet - this
 	// is just writing data to the file so it parses
 
-	// Color scheme, 3rd bit is RCT2 flag
-	rideb[7] = 1 << 3
-	// Set a colorscheme (taken from Mischief)
-	rideb[8] = 18
+	// this is taken from the mine train ride
+	rideb[1] = 0x1d
+
+	os.Stderr.Write([]byte(fmt.Sprintf("%v\n", rideb[:10])))
+
 	// air time
 	rideb[0x4a] = 0x13
 	// max speed

@@ -19,6 +19,7 @@ import (
 	"github.com/kevinburke/rct"
 	"github.com/kevinburke/rct/genetic"
 	"github.com/kevinburke/rct/geo"
+	"github.com/kevinburke/rct/rle"
 	"github.com/kevinburke/rct/td6"
 )
 
@@ -51,13 +52,16 @@ func td6Handler(directory string, templateDirectory string) http.HandlerFunc {
 		w.Header().Set("Content-Type", "text/td6")
 		ride := td6.CreateMineTrainRide(m.Track)
 		bits, err := td6.Marshal(ride)
+		paddedBits := td6.Pad(bits)
+		rleWriter := rle.NewWriter(w)
+
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(err.Error()))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write(bits)
+		rleWriter.Write(paddedBits)
 	}
 }
 
