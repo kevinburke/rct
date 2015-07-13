@@ -133,6 +133,24 @@ func CreateMineTrainRide(elems []tracks.Element) *Ride {
 	coaster.SteepTwist = false
 	coaster.SBends = false
 	coaster.SmallRadiusCurves = false
+
+	// copied from whatever this value is in mine-train.td6
+	coaster.DatData = []uint8{0x80,
+		0x46,
+		0xc1,
+		0x8,
+		0x41,
+		0x4d,
+		0x54,
+		0x31,
+		0x20,
+		0x20,
+		0x20,
+		0x20,
+		0xad,
+		0x74,
+		0xec,
+		0xe8}
 	return coaster
 }
 
@@ -229,13 +247,13 @@ const (
 )
 
 const (
-	VEHICLE_SPIRAL                  VehicleType = "SPDRCR"
-	VEHICLE_STAND_UP                            = "TOGST"
-	VEHICLE_WOODEN_ARTICULATED                  = "MFT"
-	VEHICLE_WOODEN_4SEATER                      = "PTCT1"
-	VEHICLE_WOODEN_6SEATER                      = "PTCT2"
-	VEHICLE_WOODEN_6SEATER_REVERSED             = "PTCT2R"
-	VEHICLE_MINE_TRAIN                          = "AMT1"
+	VEHICLE_SPIRAL                  VehicleType = "SPDRCR  "
+	VEHICLE_STAND_UP                            = "TOGST   "
+	VEHICLE_WOODEN_ARTICULATED                  = "MFT     "
+	VEHICLE_WOODEN_4SEATER                      = "PTCT1   "
+	VEHICLE_WOODEN_6SEATER                      = "PTCT2   "
+	VEHICLE_WOODEN_6SEATER_REVERSED             = "PTCT2R  "
+	VEHICLE_MINE_TRAIN                          = "AMT1    "
 )
 
 const (

@@ -35,3 +35,12 @@ read/written in the game)
 - image of track in isometric view, same as used in RCT2
 
 - actually write the genetic algorithm/fitness function
+
+## as of july 12
+
+- the RLE encoding is good and roundtrip diffs between it and files generated
+by the game might be off in parts due to the #s read but they can still be
+loaded in the game.
+
+- round tripping a valid ride between td6.Unmarshal and td6.Marshal can still
+  generate a valid ride at the other end.

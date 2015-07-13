@@ -51,6 +51,7 @@ func td6Handler(directory string, templateDirectory string) http.HandlerFunc {
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", shortName))
 		w.Header().Set("Content-Type", "text/td6")
 		ride := td6.CreateMineTrainRide(m.Track)
+		fmt.Printf("%#v\n", ride)
 		bits, err := td6.Marshal(ride)
 		paddedBits := td6.Pad(bits)
 		rleWriter := rle.NewWriter(w)
