@@ -54,10 +54,13 @@ func marshalControlFlags(c ControlFlags) (n int) {
 
 // Where to find various pieces of information in the decoded ride.
 const (
-	IDX_RIDE_TYPE        = 0x0
-	IDX_VEHICLE_TYPE     = 0x1
-	IDX_FEATURES_0       = 0x1
-	IDX_FEATURES_1       = 0x1
+	IDX_RIDE_TYPE    = 0x0
+	IDX_VEHICLE_TYPE = 0x1
+
+	// XXX these are not right for TD6 tracks.
+	IDX_FEATURES_0 = 0x1
+	IDX_FEATURES_1 = 0x1
+
 	IDX_COST             = 0x2
 	IDX_OPERATING_MODE   = 0x06
 	IDX_COLOR_SCHEME     = 0x07
@@ -309,7 +312,7 @@ func Marshal(r *Ride) ([]byte, error) {
 
 	rideb[IDX_RIDE_TYPE] = byte(r.RideType)
 
-	copy(rideb[IDX_VEHICLE_TYPE:IDX_VEHICLE_TYPE+8], r.VehicleType)
+	copy(rideb[IDX_VEHICLE_TYPE_STRING:IDX_VEHICLE_TYPE_STRING+LENGTH_VEHICLE_TYPE], r.VehicleType)
 	featureBit0 := 0
 	if r.SteepLiftChain {
 		bits.Set(featureBit0, BIT_STEEP_LIFT_CHAIN)
