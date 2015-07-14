@@ -1,7 +1,6 @@
 package geo
 
 import (
-	"fmt"
 	"log"
 	"math"
 
@@ -198,20 +197,19 @@ func XYSpaceRequired(elems []tracks.Element) (int, int) {
 // This isn't perfect - it doesn't nail all of the clearances - but it'll get
 // us close enough.
 func NumCollisions(t *tracks.Data) int {
-	matrix := make([][][]bool, 100)
+	matrix := make([][][]bool, 200)
 	for i := range matrix {
-		matrix[i] = make([][]bool, 100)
+		matrix[i] = make([][]bool, 200)
 		for j := range matrix[i] {
-			matrix[i][j] = make([]bool, 300)
+			matrix[i][j] = make([]bool, 400)
 		}
 	}
-	v := Vector{Point{50, 50, 150}, tracks.DIR_STRAIGHT}
+	v := Vector{Point{100, 100, 200}, tracks.DIR_STRAIGHT}
 	count := 0
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
 		v = AdvanceVector(v, ts)
 		// if there already exists a piece there, we can't build.
-		fmt.Printf("segment: %v, position: arr[%d][%d][%d]\n", ts, round(v.Point[0]), round(v.Point[1]), round(v.Point[2]))
 		if matrix[round(v.Point[0])][round(v.Point[1])][round(v.Point[2])] {
 			count++
 		}

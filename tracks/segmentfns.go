@@ -185,6 +185,9 @@ func (s *Element) Possibilities() (o []Element) {
 		if strings.Contains(string(name), "DIAG") {
 			continue
 		}
+		if strings.Contains(string(name), "EIGHTH") {
+			continue
+		}
 		if strings.Contains(string(name), "GOLF") {
 			continue
 		}
