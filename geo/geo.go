@@ -15,6 +15,8 @@ type Vector struct {
 // A Point is a representation of (x, y, z) coordinates
 type Point [3]float64
 
+var matrix [200][200][400]bool
+
 func Vectors(elems []tracks.Element) []Vector {
 	var direction tracks.DirectionDelta
 	direction = 0
@@ -192,18 +194,23 @@ func XYSpaceRequired(elems []tracks.Element) (int, int) {
 	return round(maxX - minX), round(maxY - minY)
 }
 
+// reset the matrix, XXX add some kind of lock mechanism here...
+func reset() {
+	for i := range matrix {
+		for j := range matrix[i] {
+			for k := range matrix[i][j] {
+				matrix[i][j][k] = false
+			}
+		}
+	}
+}
+
 // NumCollisions finds the number of collisions the track has with itself.
 //
 // This isn't perfect - it doesn't nail all of the clearances - but it'll get
 // us close enough.
 func NumCollisions(t *tracks.Data) int {
-	matrix := make([][][]bool, 200)
-	for i := range matrix {
-		matrix[i] = make([][]bool, 200)
-		for j := range matrix[i] {
-			matrix[i][j] = make([]bool, 400)
-		}
-	}
+	reset()
 	v := Vector{Point{100, 100, 200}, tracks.DIR_STRAIGHT}
 	count := 0
 	for i := range t.Elements {

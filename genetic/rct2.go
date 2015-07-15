@@ -393,4 +393,5 @@ func GetScore(t []tracks.Element) int64 {
 	}
 	numCollisions := geo.NumCollisions(data)
 	return startingScore - 4000*int64(len(trackPieces)) - 6000*int64(numCollisions)
+	//return startingScore - 4000*int64(len(trackPieces))
 }

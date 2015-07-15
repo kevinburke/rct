@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -124,12 +125,27 @@ type Member struct {
 	Track   []tracks.Element
 }
 
+type scoresArray [500]int64
+
+func (a *scoresArray) Len() int {
+	return len(a)
+}
+
+func (a *scoresArray) Swap(i int, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+func (a *scoresArray) Less(i, j int) bool {
+	return a[i] < a[j]
+}
+
 func (p *Pool) Statistics(iteration int, outputDirectory string) {
 	if iteration%PRINT_RESULTS_EVERY == 0 {
+		var scores scoresArray
 		var highestScore int64 = -1
 		var worstScore int64 = 100 * 1000 * 1000
 		bestMember := new(Member)
 		for i := 0; i < len(p.Members); i++ {
+			scores[i] = p.Members[i].Score
 			if p.Members[i].Score > highestScore {
 				highestScore = p.Members[i].Score
 				bestMember = p.Members[i]
@@ -138,8 +154,11 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 				worstScore = p.Members[i].Score
 			}
 		}
-		fmt.Printf("Iteration %d: %d members, best member %s has score %d, worst has score %d\n",
-			iteration, len(p.Members), bestMember.Id, bestMember.Score, worstScore)
+		middle := len(scores) / 2
+		median := (scores[middle] + scores[middle-1]) / 2
+		sort.Sort(&scores)
+		fmt.Printf("Iteration %d: %d members, best member %s has score %d, median %d, worst has score %d\n",
+			iteration, len(p.Members), bestMember.Id, bestMember.Score, median, worstScore)
 	}
 	// XXX, move offline to a goroutine
 	for i := 0; i < len(p.Members); i++ {
