@@ -299,6 +299,65 @@ func connect2DTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) []tracks
 	return []tracks.Element{}
 }
 
+// Add pieces to the track to remove the slope and the bank
+func straightenTrack(trackPiece tracks.Element, trackEnd geo.Vector) ([]tracks.Element, geo.Vector) {
+	if trackPiece.Segment.EndingBank == tracks.TRACK_BANK_NONE &&
+		trackPiece.Segment.OutputDegree == tracks.TRACK_NONE {
+		return []tracks.Element{}, trackEnd
+	}
+	// XXX Mine Train Coaster can't have a slope and a bank at the same time.
+	// Other coasters might.
+	if trackPiece.Segment.OutputDegree == tracks.TRACK_UP_60 {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_60_DEG_UP_TO_25_DEG_UP],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	} else if trackPiece.Segment.OutputDegree == tracks.TRACK_UP_25 {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	} else if trackPiece.Segment.OutputDegree == tracks.TRACK_DOWN_25 {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	} else if trackPiece.Segment.OutputDegree == tracks.TRACK_DOWN_60 {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_60_DEG_DOWN_TO_25_DEG_DOWN],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	}
+
+	// For Mine train can only get a bank on a piece without a slope
+	if trackPiece.Segment.EndingBank == tracks.TRACK_BANK_LEFT {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_LEFT_BANK_TO_FLAT],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	} else if trackPiece.Segment.EndingBank == tracks.TRACK_BANK_RIGHT {
+		elem := tracks.Element{
+			Segment: tracks.TS_MAP[tracks.ELEM_RIGHT_BANK_TO_FLAT],
+		}
+		v := geo.AdvanceVector(trackEnd, elem.Segment)
+		result, finalV := straightenTrack(elem, v)
+		return append([]tracks.Element{elem}, result...), finalV
+	}
+
+	// possible cases that could hit this: 90 deg up or down, inverted
+	panic("unknown output degree")
+}
+
 // Returns track pieces to get the trackEnd to the same vertical height as the
 // station start.
 func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Element, geo.Vector) {
@@ -387,11 +446,10 @@ func GetScore(t []tracks.Element) int64 {
 	startingScore := int64(700 * 1000)
 
 	data := &tracks.Data{
-		Elements:           t,
+		Elements:           trackPieces,
 		Clearance:          2,
 		ClearanceDirection: tracks.CLEARANCE_ABOVE,
 	}
 	numCollisions := geo.NumCollisions(data)
 	return startingScore - 4000*int64(len(trackPieces)) - 6000*int64(numCollisions)
-	//return startingScore - 4000*int64(len(trackPieces))
 }

@@ -33,7 +33,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 300
+const ITERATIONS = 10
 const PRINT_RESULTS_EVERY = 1
 
 // create a directory and ignore "directory exists" errors

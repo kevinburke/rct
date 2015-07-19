@@ -67,6 +67,10 @@ func buildTrack(names []tracks.SegmentType) []tracks.Element {
 	return te
 }
 
+func buildOneTrack(name tracks.SegmentType) tracks.Element {
+	return buildTrack([]tracks.SegmentType{name})[0]
+}
+
 var trackTests = []struct {
 	in       geo.Vector
 	expected []tracks.Element
@@ -148,5 +152,60 @@ func TestRightTurn(t *testing.T) {
 	}
 	if elems[0].Segment != tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES] {
 		t.Fatalf("expected a right turn, got %#v", elems[0])
+	}
+}
+
+var straightenTests = []struct {
+	in       tracks.Element
+	inv      geo.Vector
+	expected []tracks.Element
+}{
+	{buildOneTrack(tracks.ELEM_FLAT),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+		[]tracks.Element{}},
+
+	{buildOneTrack(tracks.ELEM_60_DEG_UP),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_60_DEG_UP_TO_25_DEG_UP,
+			tracks.ELEM_25_DEG_UP_TO_FLAT,
+		})},
+
+	{buildOneTrack(tracks.ELEM_25_DEG_UP),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+		[]tracks.Element{buildOneTrack(tracks.ELEM_25_DEG_UP_TO_FLAT)}},
+
+	{buildOneTrack(tracks.ELEM_25_DEG_DOWN),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_LEFT},
+		[]tracks.Element{buildOneTrack(tracks.ELEM_25_DEG_DOWN_TO_FLAT)}},
+
+	{buildOneTrack(tracks.ELEM_60_DEG_DOWN),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_LEFT},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_60_DEG_DOWN_TO_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN_TO_FLAT,
+		})},
+
+	{buildOneTrack(tracks.ELEM_BANKED_LEFT_QUARTER_TURN_5_TILES),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_LEFT},
+		[]tracks.Element{buildOneTrack(tracks.ELEM_LEFT_BANK_TO_FLAT)}},
+
+	{buildOneTrack(tracks.ELEM_BANKED_RIGHT_QUARTER_TURN_5_TILES),
+		geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+		[]tracks.Element{buildOneTrack(tracks.ELEM_RIGHT_BANK_TO_FLAT)}},
+}
+
+func TestStraighten(t *testing.T) {
+	for _, tt := range straightenTests {
+		pieces, _ := straightenTrack(tt.in, tt.inv)
+		if len(pieces) != len(tt.expected) {
+			t.Errorf("%v expected track to be %v, was %v", tt.in, tt.expected, pieces)
+			break
+		}
+		for i := range pieces {
+			if tt.expected[i] != pieces[i] {
+				t.Errorf("%v expected track to be %v, was %v", tt.in, tt.expected, pieces)
+			}
+		}
 	}
 }
