@@ -29,13 +29,14 @@ button.
 
 ## What needs to get done?
 
-- The fitness function does not have enough inputs. Specifically, it currently
-checks whether a track is a complete loop and doesn't collide with itself. It
-*could* check:
+- [The fitness function][fitness] does not have enough inputs. Specifically, it
+currently checks whether a track is a complete loop and doesn't collide with
+itself. It *could* check:
 
-    - Excitement. The easiest heuristic for excitement is what's used to
-      compute excitement in the game Roller Coaster Tycoon 2; would take into
-      account the number of drops, the speed, G forces etc.
+    - Excitement. The easiest heuristic for excitement is [what's
+    used to compute excitement in the game Roller Coaster Tycoon
+    2][openrct2-excitement]; would take into account the number of drops, the
+    speed, G forces etc.
 
     - Physics - whether the car can make it around the track.
 
@@ -55,6 +56,9 @@ track data outside of the game.
 
 - The genetic algorithm will probably need some tweaking once the fitness
 function has more parameters. This is hard to evaluate right now.
+
+[fitness]: https://github.com/kevinburke/rct/blob/master/genetic/rct2.go#L436
+[openrct2-excitement]: https://github.com/OpenRCT2/OpenRCT2/blob/develop/src/ride/ride_ratings.c#L2106
 
 ## Installation
 
