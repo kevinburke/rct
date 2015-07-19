@@ -418,11 +418,12 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 
 // completeTrack takes a trackEnd and a stationStart and returns a list of
 // track pieces needed to join them.
-func completeTrack(trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
-	levelDescend, v := descendToLevel(trackEnd, stationStart)
+func completeTrack(trackPiece tracks.Element, trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+	straighterTrack, v := straightenTrack(trackPiece, trackEnd)
+	levelDescend, v := descendToLevel(v, stationStart)
+	straighteners := append(straighterTrack, levelDescend...)
 	twodtrack := connect2DTrackPieces(v, stationStart)
-	result := append(levelDescend, twodtrack...)
-	return result
+	return append(straighteners, twodtrack...)
 }
 
 // GetScore determines how "good" a track is. Should take into account:
@@ -442,7 +443,7 @@ func GetScore(t []tracks.Element) int64 {
 	if trackEnd.Dir >= 350 {
 		log.Panic("trackend is too high", trackEnd.Dir)
 	}
-	trackPieces := completeTrack(trackEnd, stationStart)
+	trackPieces := completeTrack(t[len(t)-1], trackEnd, stationStart)
 	startingScore := int64(700 * 1000)
 
 	data := &tracks.Data{
