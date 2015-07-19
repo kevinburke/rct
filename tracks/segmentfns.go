@@ -173,25 +173,32 @@ var blacklist = map[SegmentType]bool{
 	ELEM_MIDDLE_STATION: true,
 }
 
+func Valid(val *Segment) bool {
+	if _, ok := blacklist[val.Type]; ok {
+		return false
+	}
+	// XXX, figure out how to handle diagonal, different types of coasters
+	// etc.
+	name := ElementNames[val.Type]
+	if strings.Contains(string(name), "DIAG") {
+		return false
+	}
+	if strings.Contains(string(name), "EIGHTH") {
+		return false
+	}
+	if strings.Contains(string(name), "GOLF") {
+		return false
+	}
+	if strings.Contains(string(name), "LOOP") {
+		return false
+	}
+	return true
+}
+
 // Possibilities computes all of the possible track pieces that can be built
 func (s *Element) Possibilities() (o []Element) {
 	for _, val := range TS_MAP {
-		if _, ok := blacklist[val.Type]; ok {
-			continue
-		}
-		// XXX, figure out how to handle diagonal, different types of coasters
-		// etc.
-		name := ElementNames[val.Type]
-		if strings.Contains(string(name), "DIAG") {
-			continue
-		}
-		if strings.Contains(string(name), "EIGHTH") {
-			continue
-		}
-		if strings.Contains(string(name), "GOLF") {
-			continue
-		}
-		if strings.Contains(string(name), "LOOP") {
+		if !Valid(val) {
 			continue
 		}
 		if val.InputDegree == s.Segment.OutputDegree && val.StartingBank == s.Segment.EndingBank && !s.diagonal() && !val.diagonal() && s.valid() {

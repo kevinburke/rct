@@ -10,3 +10,4 @@ genetic/get_latest_track/get_latest_track
 server/server
 rle/decode_td6/decode_td6
 rle/encode_td6/encode_td6
+tracks/branch_factor/branch_factor

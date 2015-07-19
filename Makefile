@@ -25,7 +25,7 @@ serve:
 	find . -name '*.go' -o -name '*.html' | justrun -stdin -v=true -c 'go run server/main.go --template-directory="$(PWD)/server/templates" --static-directory="$(PWD)/server/static"'
 
 experiment: install
-	run_experiment
+	run_experiment --package-root ~/code/go/src/github.com/kevinburke/rct
 
 compress: install
 	get_old_experiments | bash scripts/compress.bash
