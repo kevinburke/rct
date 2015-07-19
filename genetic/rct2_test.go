@@ -211,3 +211,66 @@ func TestStraighten(t *testing.T) {
 		}
 	}
 }
+
+var descendTests = []struct {
+	end      geo.Vector
+	expected []tracks.Element
+}{
+	{geo.Vector{geo.Point{24, -2, 1}, 180},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_FLAT_TO_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN_TO_FLAT,
+		})},
+	{geo.Vector{geo.Point{24, -2, 4}, 180},
+		buildTrack([]tracks.SegmentType{
+			tracks.ELEM_FLAT_TO_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN,
+			tracks.ELEM_25_DEG_DOWN_TO_FLAT,
+		})},
+	{geo.Vector{geo.Point{24, -2, -1}, 180},
+		[]tracks.Element{
+			tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_UP],
+			},
+			tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
+			},
+		},
+	},
+	{geo.Vector{geo.Point{24, -2, -2}, 180},
+		[]tracks.Element{
+			tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_UP],
+			},
+			tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
+			},
+			tracks.Element{
+				ChainLift: true,
+				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
+			},
+		},
+	},
+}
+
+func TestDescend(t *testing.T) {
+	stationStart := geo.Vector{geo.Point{0, 0, 0}, tracks.DIR_STRAIGHT}
+	for _, tt := range descendTests {
+		out, _ := descendToLevel(tt.end, stationStart)
+		if len(out) != len(tt.expected) {
+			t.Errorf("%v expected track to be %v, was %v", tt.end, tt.expected, out)
+			break
+		}
+		for i := range out {
+			if tt.expected[i] != out[i] {
+				t.Errorf("%v piece %d: expected track to be %v, was %v", tt.end, i, tt.expected, out)
+			}
+		}
+	}
+}

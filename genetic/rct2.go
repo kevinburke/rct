@@ -368,19 +368,28 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 	if trackEnd.Point[2] < stationStart.Point[2] {
 		// Ascend to station
 		elevation := int(stationStart.Point[2] - trackEnd.Point[2])
-		elems := make([]tracks.Element, elevation+2)
+		// elevation 1:
+		// elevation 2:
+		//    put slope in array element 1
+		//    put flattener in array element 2
+		// elevation 3:
+		//    start in array 0
+		//    slope in array 1
+		//    slope in array 2
+		//    flattener in array 3
+		elems := make([]tracks.Element, elevation+1)
 		// First point is simple ascender
 		elems[0] = tracks.Element{
 			ChainLift: true,
 			Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_UP],
 		}
-		for i := 0; i < elevation; i++ {
-			elems[i+1] = tracks.Element{
+		for i := 1; i < elevation; i++ {
+			elems[i] = tracks.Element{
 				ChainLift: true,
 				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
 			}
 		}
-		elems[elevation-1] = tracks.Element{
+		elems[elevation] = tracks.Element{
 			ChainLift: true,
 			Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
 		}
@@ -392,21 +401,18 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 	} else {
 		// Descend to station
 		elevation := round(trackEnd.Point[2] - stationStart.Point[2])
-		elems := make([]tracks.Element, elevation+2)
+		elems := make([]tracks.Element, elevation+1)
 		// First point is simple descender
 		elems[0] = tracks.Element{
-			ChainLift: true,
-			Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN],
+			Segment: tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN],
 		}
-		for i := 0; i < elevation; i++ {
-			elems[i+1] = tracks.Element{
-				ChainLift: true,
-				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
+		for i := 1; i < elevation; i++ {
+			elems[i] = tracks.Element{
+				Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
 			}
 		}
 		elems[elevation] = tracks.Element{
-			ChainLift: true,
-			Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT],
+			Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT],
 		}
 		return elems, geo.Vector{geo.Point{
 			trackEnd.Point[0],
@@ -446,8 +452,10 @@ func GetScore(t []tracks.Element) int64 {
 	trackPieces := completeTrack(t[len(t)-1], trackEnd, stationStart)
 	startingScore := int64(700 * 1000)
 
+	completedTrack := append(t, trackPieces...)
+
 	data := &tracks.Data{
-		Elements:           trackPieces,
+		Elements:           completedTrack,
 		Clearance:          2,
 		ClearanceDirection: tracks.CLEARANCE_ABOVE,
 	}
