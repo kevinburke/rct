@@ -106,9 +106,22 @@ ok  	github.com/kevinburke/rct/tracks	0.008s
 ## Running experiments
 
 You should be able to run new experiments by typing `make experiment`. This
-will place new experiments in subdirectories in `/usr/local/rct`. Start the
-server by running `make serve` and you should be able to view your experiment
-by browsing at `localhost:8080`.
+will place new experiments in subdirectories in `/usr/local/rct`. It should
+also give output in the console that looks like this:
+
+```
+run_experiment --package-root ~/code/go/src/github.com/kevinburke/rct
+Experiment exp_ddc75161-8370-4ead-aa76-71ebdb59f1d5
+======================================
+Iteration 0: 500 members, best member iter_d667e484-ef33-40cd-ad30-52d5e6a90036 has score 1680000, median 1527000, worst has score 172000
+Iteration 1: 500 members, best member iter_d667e484-ef33-40cd-ad30-52d5e6a90036 has score 1680000, median 1517000, worst has score 172000
+Iteration 2: 500 members, best member iter_7f34d78b-4e1e-4be2-b17f-d46b51fa065d has score 1672000, median 1443000, worst has score 172000
+Iteration 3: 500 members, best member iter_9cbedb01-9447-40b0-9973-aeb4af67faf5 has score 1672000, median 1443000, worst has score 172000
+Iteration 4: 500 members, best member iter_9cbedb01-9447-40b0-9973-aeb4af67faf5 has score 1672000, median 1554000, worst has score 172000
+```
+
+Start the server by running `make serve` and you should be able to view your
+experiment by browsing at `localhost:8080`.
 
 ### Package Layout
 

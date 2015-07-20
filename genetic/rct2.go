@@ -450,7 +450,7 @@ func GetScore(t []tracks.Element) int64 {
 		log.Panic("trackend is too high", trackEnd.Dir)
 	}
 	trackPieces := completeTrack(t[len(t)-1], trackEnd, stationStart)
-	startingScore := int64(700 * 1000)
+	startingScore := int64(1700 * 1000)
 
 	completedTrack := append(t, trackPieces...)
 

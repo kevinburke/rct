@@ -15,7 +15,7 @@ type Vector struct {
 // A Point is a representation of (x, y, z) coordinates
 type Point [3]float64
 
-var matrix [200][200][400]bool
+var matrix [100][100][300]bool
 
 func Vectors(elems []tracks.Element) []Vector {
 	var direction tracks.DirectionDelta
@@ -211,16 +211,33 @@ func reset() {
 // us close enough.
 func NumCollisions(t *tracks.Data) int {
 	reset()
-	v := Vector{Point{100, 100, 200}, tracks.DIR_STRAIGHT}
+	v := Vector{Point{50, 50, 150}, tracks.DIR_STRAIGHT}
 	count := 0
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
 		v = AdvanceVector(v, ts)
+		closestX := round(v.Point[0])
+		closestY := round(v.Point[1])
+		closestZ := round(v.Point[2])
+
+		// Too wide of a track is a "collision"
+		if closestX < 0 || closestX >= 100 {
+			count++
+			continue
+		}
+		if closestY < 0 || closestY >= 100 {
+			count++
+			continue
+		}
+		if closestZ < 0 || closestZ >= 300 {
+			count++
+			continue
+		}
 		// if there already exists a piece there, we can't build.
-		if matrix[round(v.Point[0])][round(v.Point[1])][round(v.Point[2])] {
+		if matrix[closestX][closestY][closestZ] {
 			count++
 		}
-		matrix[round(v.Point[0])][round(v.Point[1])][round(v.Point[2])] = true
+		matrix[closestX][closestY][closestZ] = true
 	}
 	return count
 }
