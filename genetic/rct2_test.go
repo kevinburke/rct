@@ -28,7 +28,7 @@ func TestStraightConnector(t *testing.T) {
 
 func TestSimpleDescender(t *testing.T) {
 	trackEnd := geo.Vector{geo.Point{
-		3, 4, 3,
+		3, 4, 4,
 	}, tracks.DIR_STRAIGHT}
 	stationStart := geo.Vector{geo.Point{
 		5, 4, 2,
@@ -38,13 +38,13 @@ func TestSimpleDescender(t *testing.T) {
 		t.Fatalf("expected a down piece, got %+v", elems[0])
 	}
 	if elems[1].Segment != tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT] {
-		t.Fatalf("expected a down-to-flat piece, got %+v", elems[1])
+		t.Fatalf("expected a down-to-flat piece, got %#v", elems[1])
 	}
 }
 
 func TestOneDownhillDescender(t *testing.T) {
 	trackEnd := geo.Vector{geo.Point{
-		2, 4, 4,
+		2, 4, 6,
 	}, tracks.DIR_STRAIGHT}
 	stationStart := geo.Vector{geo.Point{
 		5, 4, 2,
@@ -137,7 +137,6 @@ func Test2DTrack(t *testing.T) {
 				t.Errorf("%s expected track to be %v, was %v", helper, tt.expected, out)
 			}
 		}
-		fmt.Println("one test down")
 	}
 }
 
@@ -216,12 +215,12 @@ var descendTests = []struct {
 	end      geo.Vector
 	expected []tracks.Element
 }{
-	{geo.Vector{geo.Point{24, -2, 1}, 180},
+	{geo.Vector{geo.Point{24, -2, 2}, 180},
 		buildTrack([]tracks.SegmentType{
 			tracks.ELEM_FLAT_TO_25_DEG_DOWN,
 			tracks.ELEM_25_DEG_DOWN_TO_FLAT,
 		})},
-	{geo.Vector{geo.Point{24, -2, 4}, 180},
+	{geo.Vector{geo.Point{24, -2, 8}, 180},
 		buildTrack([]tracks.SegmentType{
 			tracks.ELEM_FLAT_TO_25_DEG_DOWN,
 			tracks.ELEM_25_DEG_DOWN,
@@ -229,7 +228,7 @@ var descendTests = []struct {
 			tracks.ELEM_25_DEG_DOWN,
 			tracks.ELEM_25_DEG_DOWN_TO_FLAT,
 		})},
-	{geo.Vector{geo.Point{24, -2, -1}, 180},
+	{geo.Vector{geo.Point{24, -2, -2}, 180},
 		[]tracks.Element{
 			tracks.Element{
 				ChainLift: true,
@@ -241,7 +240,7 @@ var descendTests = []struct {
 			},
 		},
 	},
-	{geo.Vector{geo.Point{24, -2, -2}, 180},
+	{geo.Vector{geo.Point{24, -2, -4}, 180},
 		[]tracks.Element{
 			tracks.Element{
 				ChainLift: true,

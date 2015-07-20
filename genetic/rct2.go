@@ -365,31 +365,37 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 		// Easy case, no ascending/descending
 		return []tracks.Element{}, trackEnd
 	}
+	if round(trackEnd.Point[2]-stationStart.Point[2])%2 != 0 {
+		log.Panic("invalid elevation change: %v to %v", trackEnd, stationStart)
+	}
 	if trackEnd.Point[2] < stationStart.Point[2] {
 		// Ascend to station
 		elevation := int(stationStart.Point[2] - trackEnd.Point[2])
-		// elevation 1:
 		// elevation 2:
+		//    put ascender in array element 0
+		//    put flattener in array element 1
+		// elevation 4:
+		//    put ascender in array element 0
 		//    put slope in array element 1
 		//    put flattener in array element 2
-		// elevation 3:
+		// elevation 6:
 		//    start in array 0
 		//    slope in array 1
 		//    slope in array 2
 		//    flattener in array 3
-		elems := make([]tracks.Element, elevation+1)
+		elems := make([]tracks.Element, elevation/2+1)
 		// First point is simple ascender
 		elems[0] = tracks.Element{
 			ChainLift: true,
 			Segment:   tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_UP],
 		}
-		for i := 1; i < elevation; i++ {
+		for i := 1; i < elevation/2; i++ {
 			elems[i] = tracks.Element{
 				ChainLift: true,
 				Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP],
 			}
 		}
-		elems[elevation] = tracks.Element{
+		elems[elevation/2] = tracks.Element{
 			ChainLift: true,
 			Segment:   tracks.TS_MAP[tracks.ELEM_25_DEG_UP_TO_FLAT],
 		}
@@ -401,17 +407,17 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 	} else {
 		// Descend to station
 		elevation := round(trackEnd.Point[2] - stationStart.Point[2])
-		elems := make([]tracks.Element, elevation+1)
+		elems := make([]tracks.Element, elevation/2+1)
 		// First point is simple descender
 		elems[0] = tracks.Element{
 			Segment: tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN],
 		}
-		for i := 1; i < elevation; i++ {
+		for i := 1; i < elevation/2; i++ {
 			elems[i] = tracks.Element{
 				Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN],
 			}
 		}
-		elems[elevation] = tracks.Element{
+		elems[elevation/2] = tracks.Element{
 			Segment: tracks.TS_MAP[tracks.ELEM_25_DEG_DOWN_TO_FLAT],
 		}
 		return elems, geo.Vector{geo.Point{
