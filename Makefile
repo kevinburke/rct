@@ -16,6 +16,7 @@ test:
 		./genetic/... \
 		./geo/... \
 		./image/... \
+		./physics/... \
 		./rle/... \
 		./server/... \
 		./td6/... \

@@ -17,7 +17,7 @@ func TestStraightConnector(t *testing.T) {
 	stationStart := geo.Vector{geo.Point{
 		5, 4, 2,
 	}, tracks.DIR_STRAIGHT}
-	elems := completeTrack(flat, trackEnd, stationStart)
+	elems := CompleteTrack(flat, trackEnd, stationStart)
 	if elems[0].Segment != tracks.TS_MAP[tracks.ELEM_FLAT] {
 		t.Fatalf("expected two straight flat pieces, got %#v", elems[0].Segment)
 	}
@@ -33,7 +33,7 @@ func TestSimpleDescender(t *testing.T) {
 	stationStart := geo.Vector{geo.Point{
 		5, 4, 2,
 	}, tracks.DIR_STRAIGHT}
-	elems := completeTrack(flat, trackEnd, stationStart)
+	elems := CompleteTrack(flat, trackEnd, stationStart)
 	if elems[0].Segment != tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN] {
 		t.Fatalf("expected a down piece, got %+v", elems[0])
 	}
@@ -49,7 +49,7 @@ func TestOneDownhillDescender(t *testing.T) {
 	stationStart := geo.Vector{geo.Point{
 		5, 4, 2,
 	}, tracks.DIR_STRAIGHT}
-	elems := completeTrack(flat, trackEnd, stationStart)
+	elems := CompleteTrack(flat, trackEnd, stationStart)
 	if elems[0].Segment != tracks.TS_MAP[tracks.ELEM_FLAT_TO_25_DEG_DOWN] {
 		t.Fatalf("expected a down piece, got %+v", elems[0])
 	}
