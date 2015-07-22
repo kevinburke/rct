@@ -55,7 +55,8 @@ const (
 )
 
 func (te Element) String() string {
-	return fmt.Sprintf("%s: %s", hex.EncodeToString([]byte{byte(te.Segment.Type)}), string(ElementNames[te.Segment.Type]))
+	return fmt.Sprintf("%s: %s", hex.EncodeToString([]byte{byte(te.Segment.Type)}),
+		string(ElementNames[te.Segment.Type]))
 }
 
 var EndOfRide = errors.New("End of ride")

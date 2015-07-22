@@ -9,8 +9,8 @@ import (
 	"github.com/kevinburke/rct/tracks"
 )
 
-const STATION_LENGTH = 3
-const INITIAL_TRACK_LENGTH = 5
+const STATION_LENGTH = 8
+const INITIAL_TRACK_LENGTH = 40
 
 // Create a station of length 10
 func CreateStation() []tracks.Element {
