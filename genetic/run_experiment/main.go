@@ -13,5 +13,8 @@ func main() {
 	if len(flag.Args()) > 0 {
 		log.Fatalf("Usage: genetic [-directory DIRECTORY] ")
 	}
-	genetic.Run(*packageRoot)
+	err := genetic.Run(*packageRoot)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

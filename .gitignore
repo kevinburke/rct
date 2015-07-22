@@ -5,6 +5,7 @@
 # don't leave binaries lying around.
 exe_reader/print_tracks/print_tracks
 genetic/run_experiment/runners
+genetic/run_experiment/run_experiment
 genetic/get_old_experiments/get_old_experiments
 genetic/get_latest_track/get_latest_track
 server/server
