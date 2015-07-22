@@ -229,6 +229,7 @@ func NumCollisions(t *tracks.Data) int {
 			count++
 			continue
 		}
+		// XXX: Car can only go 20 pieces above the ground
 		if closestZ < 0 || closestZ >= 300 {
 			count++
 			continue

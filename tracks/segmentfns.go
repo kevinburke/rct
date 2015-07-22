@@ -153,17 +153,22 @@ var blacklist = map[SegmentType]bool{
 	ELEM_MINI_GOLF_HOLE_D:               true,
 	ELEM_MINI_GOLF_HOLE_E:               true,
 
-	ELEM_INVERTED_FLAT_TO_90_DEG_DOWN_QUARTER_LOOP:   true,
-	ELEM_90_DEG_UP_QUARTER_LOOP_TO_INVERTED:          true,
-	ELEM_QUARTER_LOOP_INVERT_TO_90_DEG_DOWN:          true,
-	ELEM_LEFT_CURVED_LIFT_HILL:                       true,
-	ELEM_RIGHT_CURVED_LIFT_HILL:                      true,
-	ELEM_LEFT_REVERSER:                               true,
-	ELEM_RIGHT_REVERSER:                              true,
-	ELEM_AIR_THRUST_TOP_CAP:                          true,
-	ELEM_AIR_THRUST_VERTICAL_DOWN:                    true,
-	ELEM_AIR_THRUST_VERTICAL_DOWN_TO_LEVEL:           true,
-	ELEM_BLOCK_BRAKES:                                true,
+	ELEM_INVERTED_FLAT_TO_90_DEG_DOWN_QUARTER_LOOP: true,
+	ELEM_90_DEG_UP_QUARTER_LOOP_TO_INVERTED:        true,
+	ELEM_QUARTER_LOOP_INVERT_TO_90_DEG_DOWN:        true,
+	ELEM_LEFT_CURVED_LIFT_HILL:                     true,
+	ELEM_RIGHT_CURVED_LIFT_HILL:                    true,
+	ELEM_LEFT_REVERSER:                             true,
+	ELEM_RIGHT_REVERSER:                            true,
+	ELEM_AIR_THRUST_TOP_CAP:                        true,
+	ELEM_AIR_THRUST_VERTICAL_DOWN:                  true,
+	ELEM_AIR_THRUST_VERTICAL_DOWN_TO_LEVEL:         true,
+
+	// XXX - would like to allow these at some point but they mess with
+	// acceleration
+	ELEM_BRAKES:       true,
+	ELEM_BLOCK_BRAKES: true,
+
 	ELEM_BANKED_LEFT_QUARTER_TURN_3_TILES_25_DEG_UP:  true,
 	ELEM_BANKED_RIGHT_QUARTER_TURN_3_TILES_25_DEG_UP: true,
 	ELEM_END_OF_RIDE:                                 true,
@@ -187,6 +192,12 @@ func Valid(val *Segment) bool {
 		return false
 	}
 	if strings.Contains(string(name), "GOLF") {
+		return false
+	}
+	if strings.Contains(string(name), "COVERED") {
+		return false
+	}
+	if strings.Contains(string(name), "BRAKES") {
 		return false
 	}
 	if strings.Contains(string(name), "LOOP") {
