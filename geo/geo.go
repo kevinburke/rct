@@ -48,6 +48,22 @@ func round(f float64) int {
 	return int(math.Floor(f + 0.5))
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+
 // Advance all of the values by one track segment.
 //
 // Positive forward = right
@@ -212,13 +228,18 @@ func reset() {
 func NumCollisions(t *tracks.Data) int {
 	reset()
 	v := Vector{Point{50, 50, 150}, tracks.DIR_STRAIGHT}
+	closestX, closestY, closestZ := 0, 0, 0
+	oldX, oldY, oldZ := 0, 0, 0
 	count := 0
 	for i := range t.Elements {
 		ts := t.Elements[i].Segment
+		oldX = closestX
+		oldY = closestY
+		oldZ = closestZ
 		v = AdvanceVector(v, ts)
-		closestX := round(v.Point[0])
-		closestY := round(v.Point[1])
-		closestZ := round(v.Point[2])
+		closestX = round(v.Point[0])
+		closestY = round(v.Point[1])
+		closestZ = round(v.Point[2])
 
 		// Too wide of a track is a "collision"
 		if closestX < 0 || closestX >= 100 {
@@ -234,14 +255,32 @@ func NumCollisions(t *tracks.Data) int {
 			count++
 			continue
 		}
-		// fill in in between points
-		// if there already exists a piece there, we can't build.
-		if matrix[closestX][closestY][closestZ] {
-			count++
+
+		lowX := min(oldX, closestX)
+		highX := max(oldX, closestX)
+		lowY := min(oldY, closestY)
+		highY := max(oldY, closestY)
+		lowZ := min(oldZ, closestZ)
+		highZ := max(oldZ, closestZ)
+
+		// fill in in between points. assume everything is at ending elevation
+		// - not great, meh. probably need a third loop
+		// Ugh, this might not fill properly based on high/low ordering. might
+		// be ok since it's ok to fill space more than once
+		collision := false
+		for i := lowX; i < highX && !collision; i++ {
+			for j := lowY; j < highY && !collision; j++ {
+				for k := lowZ; k < highZ && !collision; k++ {
+					if matrix[i][j][k] {
+						count++
+						// only count one track piece once.
+						collision = true
+						break
+					}
+					matrix[i][j][k] = true
+				}
+			}
 		}
-		matrix[closestX][closestY][closestZ] = true
-		matrix[closestX][closestY][closestZ+1] = true
-		matrix[closestX][closestY][closestZ+2] = true
 	}
 	return count
 }
