@@ -186,11 +186,9 @@ func SeedPool(size int) *Pool {
 	members := make([]*Member, POOL_SIZE)
 	for i := 0; i < POOL_SIZE; i++ {
 		track := CreateStation()
-		idx := STATION_LENGTH - 1
-		for j := 0; j < INITIAL_TRACK_LENGTH-STATION_LENGTH; j++ {
-			poss := track[idx].Possibilities()
+		for j := STATION_LENGTH - 1; j < INITIAL_TRACK_LENGTH-STATION_LENGTH; j++ {
+			poss := track[j].Possibilities()
 			track = append(track, poss[rand.Intn(len(poss))])
-			idx++
 		}
 		score, d := GetScore(track)
 		members[i] = &Member{

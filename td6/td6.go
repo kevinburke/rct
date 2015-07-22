@@ -125,6 +125,12 @@ func CreateMineTrainRide(elems []tracks.Element, complete bool) *Ride {
 		stationStart := geo.Vector{geo.Point{0, 0, 0}, 0}
 		trackEnd := vectors[len(elems)-1]
 		completeTrack := genetic.CompleteTrack(elems[len(elems)-1], trackEnd, stationStart)
+		fmt.Println(elems[len(elems)-1])
+		fmt.Printf("%#v\n", trackEnd)
+		for i := 0; i < len(completeTrack); i++ {
+			fmt.Println(tracks.ElementNames[completeTrack[i].Segment.Type])
+		}
+		fmt.Println("====")
 		coaster.TrackData = tracks.Data{
 			Elements:           append(elems, completeTrack...),
 			Clearance:          2,

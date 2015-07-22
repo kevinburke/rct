@@ -24,15 +24,11 @@ func Vectors(elems []tracks.Element) []Vector {
 	plist := []Vector{current}
 	for _, elem := range elems {
 		segm := tracks.TS_MAP[elem.Segment.Type]
-		p := Diff(segm, direction)
-		current.Point[0] += p[0]
-		current.Point[1] += p[1]
-		current.Point[2] += p[2]
-		direction += segm.DirectionDelta
-		for direction >= 360 {
-			direction -= 360
-		}
-		current.Dir = direction
+		newVector := AdvanceVector(current, segm)
+		current.Point[0] = newVector.Point[0]
+		current.Point[1] = newVector.Point[1]
+		current.Point[2] = newVector.Point[2]
+		current.Dir = newVector.Dir
 		plist = append(plist, current)
 	}
 	return plist
@@ -72,6 +68,8 @@ func max(a, b int) int {
 // Negative sideways = down
 
 // right = up. left = down.
+
+// DEPRECATED
 func Advance(ts *tracks.Segment, ΔE int, ΔForward int, ΔSideways int,
 	direction tracks.DirectionDelta) (int, int, int, tracks.DirectionDelta) {
 	panic("these functions need to be fixed, check the tests")
@@ -241,27 +239,28 @@ func NumCollisions(t *tracks.Data) int {
 		closestY = round(v.Point[1])
 		closestZ = round(v.Point[2])
 
-		// Too wide of a track is a "collision"
-		if closestX < 0 || closestX >= 100 {
-			count++
-			continue
-		}
-		if closestY < 0 || closestY >= 100 {
-			count++
-			continue
-		}
-		// XXX: Car can only go 20 pieces above the ground
-		if closestZ < 0 || closestZ+2 >= 300 {
-			count++
-			continue
-		}
-
+		// XXX - take helixes into account
 		lowX := min(oldX, closestX)
 		highX := max(oldX, closestX)
 		lowY := min(oldY, closestY)
 		highY := max(oldY, closestY)
 		lowZ := min(oldZ, closestZ)
 		highZ := max(oldZ, closestZ)
+
+		// Too wide of a track is a "collision"
+		if lowX < 0 || highX >= 100 {
+			count++
+			continue
+		}
+		if lowY < 0 || highY >= 100 {
+			count++
+			continue
+		}
+		// XXX: Car can only go 20 pieces above the ground
+		if lowZ < 0 || highZ+2 >= 300 {
+			count++
+			continue
+		}
 
 		// fill in in between points. assume everything is at ending elevation
 		// - not great, meh. probably need a third loop
@@ -270,7 +269,8 @@ func NumCollisions(t *tracks.Data) int {
 		collision := false
 		for i := lowX; i < highX && !collision; i++ {
 			for j := lowY; j < highY && !collision; j++ {
-				for k := lowZ; k < highZ && !collision; k++ {
+				for k := lowZ; k < highZ+2 && !collision; k++ {
+					//fmt.Printf("%d %d %d\n", i, j, k)
 					if matrix[i][j][k] {
 						count++
 						// only count one track piece once.

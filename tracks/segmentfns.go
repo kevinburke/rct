@@ -194,6 +194,12 @@ func Valid(val *Segment) bool {
 	if strings.Contains(string(name), "GOLF") {
 		return false
 	}
+	if strings.Contains(string(name), "QUARTER_HELIX") {
+		return false
+	}
+	if strings.Contains(string(name), "TURN_1_TILE") {
+		return false
+	}
 	if strings.Contains(string(name), "COVERED") {
 		return false
 	}
