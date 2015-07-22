@@ -120,9 +120,10 @@ type Member struct {
 	Id    string
 	Score int64
 	// Advantage or disadvantage in reproducing
-	Fitness float64
-	Runtime time.Duration
-	Track   []tracks.Element
+	Fitness   float64
+	Runtime   time.Duration
+	Track     []tracks.Element
+	ScoreData scoreData
 }
 
 type scoresArray [500]int64
@@ -185,11 +186,12 @@ func SeedPool(size int) *Pool {
 			poss := track[idx].Possibilities()
 			track = append(track, poss[rand.Intn(len(poss))])
 		}
-		score := GetScore(track)
+		score, d := GetScore(track)
 		members[i] = &Member{
-			Id:    fmt.Sprintf("iter_%s", uuid.New()),
-			Track: track,
-			Score: score,
+			Id:        fmt.Sprintf("iter_%s", uuid.New()),
+			Track:     track,
+			Score:     score,
+			ScoreData: d,
 		}
 	}
 	return &Pool{Members: members}
@@ -208,7 +210,7 @@ func (p *Pool) Mutate(rate float64) {
 // Assign scores for every member of the pool
 func (p *Pool) Evaluate() {
 	for i := 0; i < POOL_SIZE; i++ {
-		p.Members[i].Score = GetScore(p.Members[i].Track)
+		p.Members[i].Score, p.Members[i].ScoreData = GetScore(p.Members[i].Track)
 	}
 
 	// Assign fitness for every member. For now, every member gets a fitness of
