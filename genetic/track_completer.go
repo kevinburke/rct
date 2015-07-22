@@ -366,7 +366,7 @@ func descendToLevel(trackEnd geo.Vector, stationStart geo.Vector) ([]tracks.Elem
 
 // completeTrack takes a trackEnd and a stationStart and returns a list of
 // track pieces needed to join them.
-func completeTrack(trackPiece tracks.Element, trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
+func CompleteTrack(trackPiece tracks.Element, trackEnd geo.Vector, stationStart geo.Vector) []tracks.Element {
 	straighterTrack, v := straightenTrack(trackPiece, trackEnd)
 	levelDescend, v := descendToLevel(v, stationStart)
 	straighteners := append(straighterTrack, levelDescend...)

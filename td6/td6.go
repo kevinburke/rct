@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/kevinburke/rct/bits"
+	"github.com/kevinburke/rct/genetic"
 	"github.com/kevinburke/rct/geo"
 	"github.com/kevinburke/rct/rle"
 	"github.com/kevinburke/rct/tracks"
@@ -107,7 +108,10 @@ func NewCoaster() *Ride {
 
 // CreateMineTrainRide takes a track and builds all the rest of the ride
 // structure around it
-func CreateMineTrainRide(elems []tracks.Element) *Ride {
+//
+// complete: Whether to return a completed track or a partial one. Note RCT2
+// will crash unless you return a complete track
+func CreateMineTrainRide(elems []tracks.Element, complete bool) *Ride {
 	coaster := NewCoaster()
 	coaster.RideType = RIDE_MINE_TRAIN
 	coaster.VehicleType = VEHICLE_MINE_TRAIN
@@ -116,10 +120,22 @@ func CreateMineTrainRide(elems []tracks.Element) *Ride {
 	coaster.XSpaceRequired = x
 	coaster.YSpaceRequired = y
 
-	coaster.TrackData = tracks.Data{
-		Elements:           elems,
-		Clearance:          2,
-		ClearanceDirection: tracks.CLEARANCE_ABOVE,
+	if complete {
+		vectors := geo.Vectors(elems)
+		stationStart := geo.Vector{geo.Point{0, 0, 0}, 0}
+		trackEnd := vectors[len(elems)-1]
+		completeTrack := genetic.CompleteTrack(elems[len(elems)-1], trackEnd, stationStart)
+		coaster.TrackData = tracks.Data{
+			Elements:           append(elems, completeTrack...),
+			Clearance:          2,
+			ClearanceDirection: tracks.CLEARANCE_ABOVE,
+		}
+	} else {
+		coaster.TrackData = tracks.Data{
+			Elements:           elems,
+			Clearance:          2,
+			ClearanceDirection: tracks.CLEARANCE_ABOVE,
+		}
 	}
 
 	coaster.HasLoop = false

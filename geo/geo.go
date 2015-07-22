@@ -230,15 +230,18 @@ func NumCollisions(t *tracks.Data) int {
 			continue
 		}
 		// XXX: Car can only go 20 pieces above the ground
-		if closestZ < 0 || closestZ >= 300 {
+		if closestZ < 0 || closestZ+2 >= 300 {
 			count++
 			continue
 		}
+		// fill in in between points
 		// if there already exists a piece there, we can't build.
 		if matrix[closestX][closestY][closestZ] {
 			count++
 		}
 		matrix[closestX][closestY][closestZ] = true
+		matrix[closestX][closestY][closestZ+1] = true
+		matrix[closestX][closestY][closestZ+2] = true
 	}
 	return count
 }

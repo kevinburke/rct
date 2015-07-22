@@ -49,7 +49,7 @@ func GetScore(t []tracks.Element) (int64, scoreData) {
 	if trackEnd.Dir >= 350 {
 		log.Panic("trackend is too high", trackEnd.Dir)
 	}
-	trackPieces := completeTrack(t[len(t)-1], trackEnd, stationStart)
+	trackPieces := CompleteTrack(t[len(t)-1], trackEnd, stationStart)
 	startingScore := int64(1700 * 1000)
 
 	completedTrack := append(t, trackPieces...)
@@ -62,7 +62,8 @@ func GetScore(t []tracks.Element) (int64, scoreData) {
 	numCollisions := geo.NumCollisions(data)
 	numNegativeSpeed := physics.NumNegativeSpeed(data)
 	return startingScore - 4000*int64(len(trackPieces)) - 6000*int64(numCollisions) - 5000*int64(numNegativeSpeed), scoreData{
-		Collisions: numCollisions,
-		Distance:   len(trackPieces),
+		Collisions:    numCollisions,
+		Distance:      len(trackPieces),
+		NegativeSpeed: numNegativeSpeed,
 	}
 }

@@ -21,9 +21,10 @@ import (
 	"github.com/kevinburke/rct/geo"
 	"github.com/kevinburke/rct/rle"
 	"github.com/kevinburke/rct/td6"
+	"github.com/kevinburke/rct/tracks"
 )
 
-const VERSION = "0.1"
+const VERSION = "0.2"
 
 func loadMember(directory string, pth string) (*genetic.Member, error) {
 	p := path.Join(directory, fmt.Sprintf("%s.json", pth))
@@ -46,12 +47,17 @@ func td6Handler(directory string, templateDirectory string) http.HandlerFunc {
 			w.Write([]byte(err.Error()))
 			return
 		}
+		query := r.URL.Query()
+		completeParam := query.Get("complete")
+		complete := completeParam == "true"
 		// For whatever reason RCT2 needs the extension to be in uppercase
 		shortName := fmt.Sprintf("%s.TD6", truncate(17, m.Id))
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", shortName))
 		w.Header().Set("Content-Type", "text/td6")
-		ride := td6.CreateMineTrainRide(m.Track)
-		fmt.Printf("%#v\n", ride)
+		ride := td6.CreateMineTrainRide(m.Track, complete)
+		for i := 0; i < len(ride.TrackData.Elements); i++ {
+			fmt.Println(tracks.ElementNames[ride.TrackData.Elements[i].Segment.Type])
+		}
 		bits, err := td6.Marshal(ride)
 		paddedBits := td6.Pad(bits)
 		rleWriter := rle.NewWriter(w)

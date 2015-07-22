@@ -33,7 +33,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 10
+const ITERATIONS = 50
 const PRINT_RESULTS_EVERY = 1
 
 // create a directory and ignore "directory exists" errors
@@ -158,8 +158,13 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 		middle := len(scores) / 2
 		median := (scores[middle] + scores[middle-1]) / 2
 		sort.Sort(&scores)
-		fmt.Printf("Iteration %d: %d members, best member %s has score %d, median %d, worst has score %d\n",
-			iteration, len(p.Members), bestMember.Id, bestMember.Score, median, worstScore)
+		bestScorer := fmt.Sprintf("\t(collisions: %d, to completion: %d, negative speed points: %d)\n",
+			bestMember.ScoreData.Collisions, bestMember.ScoreData.Distance,
+			bestMember.ScoreData.NegativeSpeed)
+		fmt.Printf("Iteration %d: %d members, best member %s has score %d, "+
+			"median %d, worst has score %d\n%s",
+			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
+			worstScore, bestScorer)
 	}
 	// XXX, move offline to a goroutine
 	for i := 0; i < len(p.Members); i++ {
