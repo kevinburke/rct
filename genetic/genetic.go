@@ -158,7 +158,7 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 		middle := len(scores) / 2
 		median := (scores[middle] + scores[middle-1]) / 2
 		sort.Sort(&scores)
-		bestScorer := fmt.Sprintf("\t(collisions: %d, to completion: %d, negative speed points: %d)\n",
+		bestScorer := fmt.Sprintf("\t(collisions: %d, to completion: %d, negative speed points: %d)\n\n",
 			bestMember.ScoreData.Collisions, bestMember.ScoreData.Distance,
 			bestMember.ScoreData.NegativeSpeed)
 		fmt.Printf("Iteration %d: %d members, best member %s has score %d, "+
