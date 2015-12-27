@@ -12,7 +12,7 @@ import (
 	"os"
 
 	"github.com/kevinburke/rct/td6"
-	"github.com/llgcode/draw2d"
+	"github.com/llgcode/draw2d/draw2dimg"
 )
 
 func SaveToPngFile(filePath string, m image.Image) {
@@ -48,7 +48,7 @@ func Draw(r *td6.Ride) image.Image {
 	i := image.NewRGBA(rect)
 	c := color.RGBA{0xff, 0xff, 0xff, 0xff}
 	draw.Draw(i, i.Bounds(), &image.Uniform{c}, image.ZP, draw.Src)
-	gc := draw2d.NewGraphicContext(i)
+	gc := draw2dimg.NewGraphicContext(i)
 	x := float64(PIECE_WIDTH)
 	y := float64(IMG_HEIGHT) - 20.0
 	for j := 0; j < len(r.TrackData.Elements); j++ {
