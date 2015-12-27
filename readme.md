@@ -29,6 +29,13 @@ button.
 
 ## What needs to get done?
 
+- Tracks currently don't load in the game because the collision detection
+algorithm isn't correct. The experiment runner will report 0 collisions,
+but tracks will fail to load because there is actually a collision. You can
+verify this by printing out the individual track pieces, starting the game and
+attempting to rebuild the track. I'm not sure how best to fix this than by
+attempting to fix individual instances as they pop up.
+
 - [The fitness function][fitness] does not have enough inputs. Specifically, it
 currently checks whether a track is a complete loop and doesn't collide with
 itself. It *could* check:
@@ -47,12 +54,12 @@ itself. It *could* check:
 - The fitness function is currently **very slow**. Need to run the code with
 `pprof` to figure out what exactly is slow, and then improve its performance.
 The existing code is extremely dumb - it runs sequentially in one thread.
-Likely there are some improvements to be made by using more than one CPU at a
-time.
+Likely there are some easy improvements to be made by using more than one CPU
+at a time.
 
-- The server can display track data but the camera is not right, so sometimes
-the track is not visible. It would be really neat to be able to better see
-track data outside of the game.
+- The server can display track data but the camera is out of position, so
+sometimes the track is not visible. It would be really neat to be able to
+better see track data outside of the game.
 
 - The genetic algorithm will probably need some tweaking once the fitness
 function has more parameters. This is hard to evaluate right now.
@@ -62,14 +69,15 @@ function has more parameters. This is hard to evaluate right now.
 
 ## Installation
 
-You need to have Go installed (I use Go 1.4, but it should work with any
+You need to have Go installed (I use Go 1.5, but it should work with any
 version). Once you do that, run:
 
 ```bash
 go get github.com/kevinburke/rct
 ```
 
-You may or may not need to run `make install` after this.
+Once you've downloaded the source code, run `make install` to ensure all third
+party dependencies are downloaded.
 
 Check you have a valid install by running: `make test`. You should get output
 like this:
