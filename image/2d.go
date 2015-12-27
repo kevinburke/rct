@@ -11,8 +11,8 @@ import (
 	"log"
 	"os"
 
-	"code.google.com/p/draw2d/draw2d"
 	"github.com/kevinburke/rct/td6"
+	"github.com/llgcode/draw2d"
 )
 
 func SaveToPngFile(filePath string, m image.Image) {
