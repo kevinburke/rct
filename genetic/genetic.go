@@ -12,6 +12,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/pborman/uuid"
@@ -166,15 +167,21 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
 			worstScore, bestScorer)
 	}
-	// XXX, move offline to a goroutine
-	for i := 0; i < len(p.Members); i++ {
-		pth := path.Join(outputDirectory, "experiments", p.Id,
-			"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", p.Members[i].Id))
-		err := encode(pth, p.Members[i])
-		if err != nil {
-			log.Print(err)
-		}
+
+	var wg sync.WaitGroup
+	for _, member := range p.Members {
+		wg.Add(1)
+		go func(member *Member) {
+			pth := path.Join(outputDirectory, "experiments", p.Id,
+				"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", member.Id))
+			err := encode(pth, member)
+			if err != nil {
+				log.Print(err)
+			}
+			wg.Done()
+		}(member)
 	}
+	wg.Wait()
 }
 
 // Create an initial pool
@@ -213,13 +220,18 @@ func (p *Pool) Mutate(rate float64) {
 
 // Assign scores for every member of the pool
 func (p *Pool) Evaluate() {
+	var wg sync.WaitGroup
 	for i := 0; i < POOL_SIZE; i++ {
-		p.Members[i].Score, p.Members[i].ScoreData = GetScore(p.Members[i].Track)
+		wg.Add(1)
+		go func(i int, track []tracks.Element) {
+			p.Members[i].Score, p.Members[i].ScoreData = GetScore(track)
+			wg.Done()
+		}(i, p.Members[i].Track)
 	}
+	wg.Wait()
 
-	// Assign fitness for every member. For now, every member gets a fitness of
-	// 1. In the future, consider sorting/giving higher score members a better
-	// chance of reproducing.
+	// Assign fitness for every member. In the future, consider a smarter
+	// algorithm higher score members a better chance of reproducing.
 	for i := 0; i < POOL_SIZE; i++ {
 		p.Members[i].Fitness = float64(p.Members[i].Score)
 	}
