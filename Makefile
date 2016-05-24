@@ -5,9 +5,7 @@
 all: install test
 
 install:
-	go get github.com/jmhodges/justrun
 	go install github.com/jmhodges/justrun
-	go get ./bits/... ./genetic/... ./geo/... ./image/... ./rle/... ./server/... ./td6/... ./tracks/...
 	go install ./bits/... ./genetic/... ./geo/... ./image/... ./rle/... ./server/... ./td6/... ./tracks/...
 
 test:

@@ -24,3 +24,19 @@ func TestNotPossible(t *testing.T) {
 		}
 	}
 }
+
+func TestCompatible(t *testing.T) {
+	testCases := []struct {
+		first      Element
+		second     Element
+		compatible bool
+	}{
+		{elem(ELEM_FLAT_TO_25_DEG_UP), elem(ELEM_LEFT_QUARTER_TURN_5_TILES), false},
+	}
+	for _, tt := range testCases {
+		compat := Compatible(tt.first, tt.second)
+		if compat != tt.compatible {
+			t.Errorf("Compatible: first: %s, next: %s, want %t, got %t", tt.first.Segment.String(), tt.second.Segment.String(), tt.compatible, compat)
+		}
+	}
+}

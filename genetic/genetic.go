@@ -33,19 +33,9 @@ const MUTATION_RATE = 0.05
 
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
-const POOL_SIZE = 500
-const ITERATIONS = 100
+const POOL_SIZE = 5
+const ITERATIONS = 6
 const PRINT_RESULTS_EVERY = 1
-
-// create a directory and ignore "directory exists" errors
-func mkdir(name string) error {
-	err := os.Mkdir(name, 0755)
-	// ugh
-	if err != nil && err.(*os.PathError).Err.Error() != "file exists" {
-		return err
-	}
-	return nil
-}
 
 type ExperimentMetadata struct {
 	Hash                 string
@@ -63,18 +53,18 @@ func Run(packageRoot string) error {
 		return fmt.Errorf("invalid directory - need to specify it")
 	}
 	expDir := path.Join(*directory, "experiments")
-	err := mkdir(expDir)
+	err := os.MkdirAll(expDir, 0755)
 	if err != nil {
 		return err
 	}
 	id := fmt.Sprintf("exp_%s", uuid.New())
 	expIdDir := path.Join(expDir, id)
-	err = mkdir(expIdDir)
+	err = os.MkdirAll(expIdDir, 0755)
 	if err != nil {
 		return err
 	}
 	iterationsDir := path.Join(expIdDir, "iterations")
-	err = mkdir(iterationsDir)
+	err = os.MkdirAll(iterationsDir, 0755)
 	if err != nil {
 		return err
 	}
@@ -106,7 +96,7 @@ func Run(packageRoot string) error {
 		pool.Mutate(MUTATION_RATE)
 		pool.Evaluate()
 		iterationDir := path.Join(iterationsDir, strconv.Itoa(i))
-		err = mkdir(iterationDir)
+		err = os.MkdirAll(iterationDir, 0755)
 		if err != nil {
 			return err
 		}
@@ -169,11 +159,14 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 			"median %d, worst has score %d\n%s",
 			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
 			worstScore, bestScorer)
-		if iteration%20 == 0 && iteration > 0 {
-			for _, elem := range bestMember.Track {
-				fmt.Println(elem.Segment.String())
-			}
-		}
+		//if iteration%20 == 0 && iteration > 0 {
+		//for _, member := range p.Members {
+		//for _, elem := range member.Track {
+		//fmt.Println(elem.Segment.String())
+		//}
+		//fmt.Println("==================")
+		//}
+		//}
 	}
 
 	var wg sync.WaitGroup
@@ -212,6 +205,12 @@ func SeedPool(size int) *Pool {
 			Score:     score,
 			ScoreData: d,
 		}
+		//if i%100 == 0 {
+		//for _, elem := range track {
+		//fmt.Println(elem.Segment.String())
+		//}
+		//fmt.Printf("========\n")
+		//}
 	}
 	return &Pool{Members: members}
 }
@@ -241,6 +240,7 @@ func (p *Pool) Evaluate() {
 	// Assign fitness for every member. In the future, consider a smarter
 	// algorithm higher score members a better chance of reproducing.
 	for i := 0; i < POOL_SIZE; i++ {
+		fmt.Println(p.Members[i].Score)
 		p.Members[i].Fitness = float64(p.Members[i].Score)
 	}
 }
@@ -297,10 +297,25 @@ func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
 		}
 	}
 	//	swap the track pieces at the chosen point on track A and track B
-	if foundMatch {
-		return Swap(parent1, parent2, crossPoint1, crossPoint2)
+	if foundMatch && crossPoint1 > 4 {
+		fmt.Println("swapped at", crossPoint1, crossPoint2)
+		fmt.Println("parent1")
+		printTrack(parent1.Track)
+		fmt.Println("parent2")
+		printTrack(parent2.Track)
+		c1, c2 := Swap(parent1, parent2, crossPoint1, crossPoint2)
+		fmt.Println("child1")
+		printTrack(c1.Track)
+		fmt.Println("child2")
+		printTrack(c2.Track)
 	}
 	return parent1, parent2
+}
+
+func printTrack(t []tracks.Element) {
+	for i, elem := range t {
+		fmt.Printf("%d %s\n", i, elem.Segment.String())
+	}
 }
 
 // Crossover chooses two members of a pool and joins them at random.
@@ -311,6 +326,10 @@ func (p *Pool) Crossover() *Pool {
 		idx1, parent1 := p.Select()
 		idx2, parent2 := p.Select()
 		if idx1 == -1 || idx2 == -1 {
+			continue
+		}
+		if idx1 == idx2 {
+			// No point in crossing over with ourself
 			continue
 		}
 		if rand.Float64() < CROSSOVER_PROBABILITY {
