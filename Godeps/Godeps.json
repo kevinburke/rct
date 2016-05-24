@@ -1,0 +1,51 @@
+{
+	"ImportPath": "github.com/kevinburke/rct",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v70",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/golang/freetype/raster",
+			"Comment": "release-120-gf29eb11",
+			"Rev": "f29eb116deb328d02ee5c573f02d442ca67d5532"
+		},
+		{
+			"ImportPath": "github.com/golang/freetype/truetype",
+			"Comment": "release-120-gf29eb11",
+			"Rev": "f29eb116deb328d02ee5c573f02d442ca67d5532"
+		},
+		{
+			"ImportPath": "github.com/gorilla/handlers",
+			"Rev": "a24b39a6a2c8a7af2fe664dd4573205c99904035"
+		},
+		{
+			"ImportPath": "github.com/llgcode/draw2d",
+			"Comment": "v1-65-g9ffe0e7",
+			"Rev": "9ffe0e7eb54c1b3d28eb45a24b578dc2d1bdb6b3"
+		},
+		{
+			"ImportPath": "github.com/llgcode/draw2d/draw2dbase",
+			"Comment": "v1-65-g9ffe0e7",
+			"Rev": "9ffe0e7eb54c1b3d28eb45a24b578dc2d1bdb6b3"
+		},
+		{
+			"ImportPath": "github.com/llgcode/draw2d/draw2dimg",
+			"Comment": "v1-65-g9ffe0e7",
+			"Rev": "9ffe0e7eb54c1b3d28eb45a24b578dc2d1bdb6b3"
+		},
+		{
+			"ImportPath": "github.com/pborman/uuid",
+			"Rev": "dee7705ef7b324f27ceb85a121c61f2c2e8ce988"
+		},
+		{
+			"ImportPath": "golang.org/x/image/font",
+			"Rev": "baddd3465a05d84a6d8d3507547a91cb188c81ea"
+		},
+		{
+			"ImportPath": "golang.org/x/image/math/fixed",
+			"Rev": "baddd3465a05d84a6d8d3507547a91cb188c81ea"
+		}
+	]
+}

@@ -15,8 +15,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/gorilla/handlers"
 	"github.com/kevinburke/rct"
+	"github.com/kevinburke/rct/Godeps/_workspace/src/github.com/gorilla/handlers"
 	"github.com/kevinburke/rct/genetic"
 	"github.com/kevinburke/rct/geo"
 	"github.com/kevinburke/rct/rle"

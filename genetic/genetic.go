@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pborman/uuid"
+	"github.com/kevinburke/rct/Godeps/_workspace/src/github.com/pborman/uuid"
 
 	"github.com/kevinburke/rct/tracks"
 )
