@@ -11,10 +11,7 @@ func main() {
 	packageRoot := flag.String("package-root", "/", "Path to the folder running github.com/kevinburke/rct (for finding commit hashes)")
 	flag.Parse()
 	if len(flag.Args()) > 0 {
-		log.Fatalf("Usage: genetic [-directory DIRECTORY] ")
+		log.Fatal("Usage: genetic [-directory DIRECTORY] ")
 	}
-	err := genetic.Run(*packageRoot)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(genetic.Run(*packageRoot))
 }
