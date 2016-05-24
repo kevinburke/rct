@@ -32,6 +32,7 @@ func TestCompatible(t *testing.T) {
 		compatible bool
 	}{
 		{elem(ELEM_FLAT_TO_25_DEG_UP), elem(ELEM_LEFT_QUARTER_TURN_5_TILES), false},
+		{elem(ELEM_LEFT_QUARTER_TURN_3_TILES_25_DEG_DOWN), elem(ELEM_LEFT_BANK), false},
 	}
 	for _, tt := range testCases {
 		compat := Compatible(tt.first, tt.second)

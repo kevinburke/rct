@@ -272,10 +272,7 @@ func min(a int, b int) int {
 	return b
 }
 
-func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
-	//	choose a random point between the beginning and the end
-	minval := min(len(parent1.Track), len(parent2.Track))
-	crossPoint1 := rand.Intn(minval)
+func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Member, *Member) {
 	crossPoint2 := crossPoint1
 	foundMatch := false
 	for {
@@ -297,19 +294,29 @@ func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
 		}
 	}
 	//	swap the track pieces at the chosen point on track A and track B
-	if foundMatch && crossPoint1 > 4 {
-		fmt.Println("swapped at", crossPoint1, crossPoint2)
-		fmt.Println("parent1")
-		printTrack(parent1.Track)
-		fmt.Println("parent2")
-		printTrack(parent2.Track)
+	if foundMatch {
 		c1, c2 := Swap(parent1, parent2, crossPoint1, crossPoint2)
-		fmt.Println("child1")
-		printTrack(c1.Track)
-		fmt.Println("child2")
-		printTrack(c2.Track)
+		if crossPoint1 > 4 {
+			fmt.Println("swapped at", crossPoint1, crossPoint2)
+			fmt.Println("parent1")
+			printTrack(parent1.Track)
+			fmt.Println("parent2")
+			printTrack(parent2.Track)
+			fmt.Println("child1")
+			printTrack(c1.Track)
+			fmt.Println("child2")
+			printTrack(c2.Track)
+		}
+		return c1, c2
 	}
 	return parent1, parent2
+}
+
+func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
+	//	choose a random point between the beginning and the end
+	minval := min(len(parent1.Track), len(parent2.Track))
+	crossPoint1 := rand.Intn(minval)
+	return crossoverAtPoint(parent1, parent2, crossPoint1)
 }
 
 func printTrack(t []tracks.Element) {
