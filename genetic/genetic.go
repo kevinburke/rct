@@ -81,6 +81,9 @@ func Run(packageRoot string) error {
 	cmd := exec.Command("git", "rev-parse", "HEAD")
 	cmd.Dir = packageRoot
 	hashb, err := cmd.Output()
+	if err != nil {
+		return err
+	}
 	mtd := ExperimentMetadata{
 		Hash:                 strings.TrimSpace(string(hashb)),
 		Date:                 time.Now().UTC(),
@@ -166,6 +169,11 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 			"median %d, worst has score %d\n%s",
 			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
 			worstScore, bestScorer)
+		if iteration%20 == 0 && iteration > 0 {
+			for _, elem := range bestMember.Track {
+				fmt.Println(elem.Segment.String())
+			}
+		}
 	}
 
 	var wg sync.WaitGroup
