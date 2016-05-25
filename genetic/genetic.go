@@ -272,11 +272,17 @@ func min(a int, b int) int {
 	return b
 }
 
+// crossPoint1 = splice point in parent1.
 func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Member, *Member) {
-	crossPoint2 := crossPoint1
+	// crossPoint2 = splice point in parent2.
+	crossPoint2 := crossPoint1 + 1
 	foundMatch := false
 	for {
+		// say cross point 1 = 3, track length = 6
+		// parent 1 == 0-3, parent 2 = 4-5
 		if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
+			// Increment so we splice *after* the cross point in parent 1
+			crossPoint1++
 			foundMatch = true
 			break
 		}
@@ -286,6 +292,7 @@ func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Membe
 		}
 		if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
 			foundMatch = true
+			crossPoint2++
 			break
 		}
 		crossPoint2++
@@ -312,11 +319,15 @@ func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Membe
 	return parent1, parent2
 }
 
-func crossoverOne(parent1 *Member, parent2 *Member) (*Member, *Member) {
+// crossoverOne crosses over the parent tracks. if point is -1, a random point
+// is chosen. (point is used for testing)
+func crossoverOne(parent1 *Member, parent2 *Member, point int) (*Member, *Member) {
 	//	choose a random point between the beginning and the end
-	minval := min(len(parent1.Track), len(parent2.Track))
-	crossPoint1 := rand.Intn(minval)
-	return crossoverAtPoint(parent1, parent2, crossPoint1)
+	if point == -1 {
+		minval := min(len(parent1.Track), len(parent2.Track))
+		point = rand.Intn(minval)
+	}
+	return crossoverAtPoint(parent1, parent2, point)
 }
 
 func printTrack(t []tracks.Element) {
@@ -341,7 +352,7 @@ func (p *Pool) Crossover() *Pool {
 		}
 		if rand.Float64() < CROSSOVER_PROBABILITY {
 			// XXX delete parents
-			child1, child2 := crossoverOne(parent1, parent2)
+			child1, child2 := crossoverOne(parent1, parent2, -1)
 			p.Members[idx1] = child1
 			p.Members[idx2] = child2
 		}
@@ -353,15 +364,20 @@ func (p *Pool) Crossover() *Pool {
 // the given cross points. The sum of the two track lengths may be the same,
 // but the tracks themselves will change.
 func Swap(parent1 *Member, parent2 *Member, crossPoint1 int, crossPoint2 int) (*Member, *Member) {
-	child1len := crossPoint1 + (len(parent2.Track) - crossPoint1)
-	child2len := crossPoint2 + (len(parent1.Track) - crossPoint2)
-	// XXX, probably something fancy you can do with xor, or a temporary array.
+	child1len := crossPoint1 + (len(parent2.Track) - crossPoint2)
+	child2len := crossPoint2 + (len(parent1.Track) - crossPoint1)
+
 	child1track := make([]tracks.Element, child1len)
 	child2track := make([]tracks.Element, child2len)
+
 	copy(child1track[:crossPoint1], parent1.Track[:crossPoint1])
-	copy(child1track[crossPoint1:], parent2.Track[crossPoint1:])
+	// if we filled in to child1 from [crossPoint2:] we might have gaps in the
+	// track. fill from the end of cross point 1, with the contents of cross
+	// point 2.
+	copy(child1track[crossPoint1:], parent2.Track[crossPoint2:])
+
 	copy(child2track[:crossPoint2], parent2.Track[:crossPoint2])
-	copy(child2track[crossPoint2:], parent1.Track[crossPoint2:])
+	copy(child2track[crossPoint2:], parent1.Track[crossPoint1:])
 	child1 := &Member{
 		Id:    fmt.Sprintf("iter_%s", uuid.New()),
 		Track: child1track,

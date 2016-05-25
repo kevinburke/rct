@@ -1,7 +1,6 @@
 package genetic
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/kevinburke/rct/tracks"
@@ -85,16 +84,19 @@ func TestCrossover(t *testing.T) {
 			elem(tracks.ELEM_LEFT_HALF_BANKED_HELIX_UP_SMALL),
 		},
 	}
-	child1, child2 := crossoverAtPoint(parent1, parent2, 11)
 	checkCompatible := func(track []tracks.Element) {
 		for i, elem := range track[:len(track)-1] {
-			fmt.Printf("checking compatible: %s => %s\n", elem.Segment.String(), track[i+1].Segment.String())
 			if tracks.Compatible(elem, track[i+1]) == false {
 				t.Errorf("Crossover generated incompatible segments: %s, %s", elem.Segment.String(), track[i+1].Segment.String())
 			}
 		}
 	}
+	child1, child2 := crossoverOne(parent1, parent2, 11)
 	checkCompatible(child1.Track)
 	checkCompatible(child2.Track)
-	t.Fail()
+
+	// Reverse and try again.
+	child1, child2 = crossoverOne(parent2, parent1, 10)
+	checkCompatible(child1.Track)
+	checkCompatible(child2.Track)
 }
