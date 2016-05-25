@@ -10,7 +10,7 @@ import (
 )
 
 const STATION_LENGTH = 5
-const INITIAL_TRACK_LENGTH = 20
+const INITIAL_TRACK_LENGTH = 50
 
 // Create a station of length 10
 func CreateStation() []tracks.Element {

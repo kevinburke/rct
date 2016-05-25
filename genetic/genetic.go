@@ -33,9 +33,9 @@ const MUTATION_RATE = 0.05
 
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
-const POOL_SIZE = 5
-const ITERATIONS = 6
-const PRINT_RESULTS_EVERY = 1
+const POOL_SIZE = 500
+const ITERATIONS = 300
+const PRINT_RESULTS_EVERY = 5
 
 type ExperimentMetadata struct {
 	Hash                 string
@@ -159,14 +159,14 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 			"median %d, worst has score %d\n%s",
 			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
 			worstScore, bestScorer)
-		//if iteration%20 == 0 && iteration > 0 {
-		//for _, member := range p.Members {
-		//for _, elem := range member.Track {
-		//fmt.Println(elem.Segment.String())
-		//}
-		//fmt.Println("==================")
-		//}
-		//}
+		if os.Getenv("DEBUG_BEST_TRACK") == "true" {
+			if iteration%20 == 0 && iteration > 0 {
+				for _, elem := range bestMember.Track {
+					fmt.Println(elem.Segment.String())
+				}
+				fmt.Println("==================")
+			}
+		}
 	}
 
 	var wg sync.WaitGroup
@@ -240,7 +240,6 @@ func (p *Pool) Evaluate() {
 	// Assign fitness for every member. In the future, consider a smarter
 	// algorithm higher score members a better chance of reproducing.
 	for i := 0; i < POOL_SIZE; i++ {
-		fmt.Println(p.Members[i].Score)
 		p.Members[i].Fitness = float64(p.Members[i].Score)
 	}
 }
@@ -304,7 +303,7 @@ func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Membe
 	//	swap the track pieces at the chosen point on track A and track B
 	if foundMatch {
 		c1, c2 := Swap(parent1, parent2, crossPoint1, crossPoint2)
-		if crossPoint1 > 4 {
+		if os.Getenv("DEBUG_SWAPS") == "true" && crossPoint1 > 4 {
 			fmt.Println("swapped at", crossPoint1, crossPoint2)
 			fmt.Println("parent1")
 			printTrack(parent1.Track)
@@ -325,7 +324,7 @@ func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Membe
 func crossoverOne(parent1 *Member, parent2 *Member, point int) (*Member, *Member) {
 	//	choose a random point between the beginning and the end
 	if point == -1 {
-		minval := min(len(parent1.Track), len(parent2.Track))
+		minval := min(len(parent1.Track)-1, len(parent2.Track)-1)
 		point = rand.Intn(minval)
 	}
 	return crossoverAtPoint(parent1, parent2, point)
