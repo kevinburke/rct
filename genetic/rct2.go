@@ -3,6 +3,7 @@ package genetic
 
 import (
 	"log"
+	"math"
 
 	"github.com/kevinburke/rct/geo"
 	"github.com/kevinburke/rct/physics"
@@ -30,6 +31,19 @@ type scoreData struct {
 	Collisions    int
 	Distance      int
 	NegativeSpeed int
+	Length        int
+}
+
+func intpow(x int64, y float64) int64 {
+	val := math.Pow(float64(x), y)
+	return int64(val)
+}
+
+func maxint(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
 
 // GetScore determines how "good" a track is. Should take into account:
@@ -50,7 +64,7 @@ func GetScore(t []tracks.Element) (int64, scoreData) {
 		log.Panic("trackend is too high", trackEnd.Dir)
 	}
 	trackPieces := CompleteTrack(t[len(t)-1], trackEnd, stationStart)
-	startingScore := int64(2700 * 1000)
+	startingScore := int64(maxint(len(t), 70) * 300 * 1000)
 
 	completedTrack := append(t, trackPieces...)
 
@@ -61,9 +75,10 @@ func GetScore(t []tracks.Element) (int64, scoreData) {
 	}
 	numCollisions := geo.NumCollisions(data)
 	numNegativeSpeed := physics.NumNegativeSpeed(data)
-	return startingScore - 8000*int64(len(trackPieces)) - 10000*int64(numCollisions) - 5000*int64(numNegativeSpeed), scoreData{
+	return startingScore - intpow(30000*int64(len(trackPieces)), 1.0001) - intpow(50000*int64(numCollisions), 1.007) - intpow(22000*int64(numNegativeSpeed), 1.0001), scoreData{
 		Collisions:    numCollisions,
 		Distance:      len(trackPieces),
 		NegativeSpeed: numNegativeSpeed,
+		Length:        len(t),
 	}
 }

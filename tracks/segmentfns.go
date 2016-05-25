@@ -9,10 +9,13 @@ func isPossibleChainLift(val *Segment) bool {
 	// XXX, check other pieces that can be chain lifts. in theory you can also
 	// place chain lifts on straight pieces of track but this seems silly
 	// (maybe a super in-future optimization will allow this)
-	return val.InputDegree == TRACK_UP_25 &&
-		(val.OutputDegree == TRACK_UP_25 || val.OutputDegree == TRACK_NONE) &&
-		val.StartingBank == TRACK_BANK_NONE &&
-		val.EndingBank == TRACK_BANK_NONE
+	return val.Type == ELEM_25_DEG_UP || val.Type == ELEM_FLAT_TO_25_DEG_UP || val.Type == ELEM_25_DEG_UP_TO_FLAT
+
+	// Use these rules for coasters like steel chain lifts that can have curves
+	//return val.InputDegree == TRACK_UP_25 &&
+	//(val.OutputDegree == TRACK_UP_25 || val.OutputDegree == TRACK_NONE) &&
+	//val.StartingBank == TRACK_BANK_NONE &&
+	//val.EndingBank == TRACK_BANK_NONE
 }
 
 func (e *Element) diagonal() bool {

@@ -32,7 +32,8 @@ var accelerationMap = map[int]float64{
 
 	// negative values have slightly higher friction coefficients. the game
 	// does something fancy I think to mitigate this/ make it always possible
-	// to climb within 2 heights of your last height. instead do the dumb thing
+	// to climb within 2 heights of your last height. instead, do the dumb
+	// thing
 	-1: -0.75,
 	-2: -1.45,
 	-4: -2.40,

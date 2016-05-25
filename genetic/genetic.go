@@ -34,7 +34,7 @@ const MUTATION_RATE = 0.05
 // crossover with a probability of 0.6 (taken from the book & De Jong 1975)
 const CROSSOVER_PROBABILITY = 0.6
 const POOL_SIZE = 500
-const ITERATIONS = 300
+const ITERATIONS = 1000
 const PRINT_RESULTS_EVERY = 5
 
 type ExperimentMetadata struct {
@@ -134,27 +134,29 @@ func (a *scoresArray) Less(i, j int) bool {
 }
 
 func (p *Pool) Statistics(iteration int, outputDirectory string) {
-	if iteration%PRINT_RESULTS_EVERY == 0 {
-		var scores scoresArray
-		var highestScore int64 = -1
-		var worstScore int64 = 100 * 1000 * 1000
-		bestMember := new(Member)
-		for i := 0; i < len(p.Members); i++ {
-			scores[i] = p.Members[i].Score
-			if p.Members[i].Score > highestScore {
-				highestScore = p.Members[i].Score
-				bestMember = p.Members[i]
-			}
-			if p.Members[i].Score < worstScore {
-				worstScore = p.Members[i].Score
-			}
+	var scores scoresArray
+	var highestScore int64 = -1
+	var worstScore int64 = 1000 * 1000 * 1000
+	bestMember := new(Member)
+	worstMember := new(Member)
+	for i := 0; i < len(p.Members); i++ {
+		scores[i] = p.Members[i].Score
+		if p.Members[i].Score > highestScore {
+			highestScore = p.Members[i].Score
+			bestMember = p.Members[i]
 		}
+		if p.Members[i].Score < worstScore {
+			worstScore = p.Members[i].Score
+			worstMember = p.Members[i]
+		}
+	}
+	if iteration%PRINT_RESULTS_EVERY == 0 {
 		middle := len(scores) / 2
 		median := (scores[middle] + scores[middle-1]) / 2
 		sort.Sort(&scores)
-		bestScorer := fmt.Sprintf("\t(collisions: %d, to completion: %d, negative speed points: %d)\n\n",
-			bestMember.ScoreData.Collisions, bestMember.ScoreData.Distance,
-			bestMember.ScoreData.NegativeSpeed)
+		bestScorer := fmt.Sprintf("\t(length: %d, collisions: %d, to completion: %d, negative speed points: %d)\n\n",
+			bestMember.ScoreData.Length, bestMember.ScoreData.Collisions,
+			bestMember.ScoreData.Distance, bestMember.ScoreData.NegativeSpeed)
 		fmt.Printf("Iteration %d: %d members, best member %s has score %d, "+
 			"median %d, worst has score %d\n%s",
 			iteration, len(p.Members), bestMember.Id, bestMember.Score, median,
@@ -162,27 +164,25 @@ func (p *Pool) Statistics(iteration int, outputDirectory string) {
 		if os.Getenv("DEBUG_BEST_TRACK") == "true" {
 			if iteration%20 == 0 && iteration > 0 {
 				for _, elem := range bestMember.Track {
-					fmt.Println(elem.Segment.String())
+					fmt.Printf("%s %t\n", elem.Segment.String(), elem.ChainLift)
 				}
 				fmt.Println("==================")
 			}
 		}
 	}
 
-	var wg sync.WaitGroup
-	for _, member := range p.Members {
-		wg.Add(1)
-		go func(member *Member) {
-			pth := path.Join(outputDirectory, "experiments", p.Id,
-				"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", member.Id))
-			err := encode(pth, member)
-			if err != nil {
-				log.Print(err)
-			}
-			wg.Done()
-		}(member)
+	pth := path.Join(outputDirectory, "experiments", p.Id,
+		"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", bestMember.Id))
+	err := encode(pth, bestMember)
+	if err != nil {
+		log.Print(err)
 	}
-	wg.Wait()
+	pth = path.Join(outputDirectory, "experiments", p.Id,
+		"iterations", strconv.Itoa(iteration), fmt.Sprintf("%s.json", worstMember.Id))
+	err = encode(pth, worstMember)
+	if err != nil {
+		log.Print(err)
+	}
 }
 
 // Create an initial pool
@@ -252,7 +252,7 @@ func (p *Pool) Select() (int, *Member) {
 	var weightedTotal float64 = 0
 	totals := make([]float64, len(p.Members))
 	for i := 0; i < len(p.Members); i++ {
-		weightedTotal += p.Members[i].Fitness
+		weightedTotal += max(p.Members[i].Fitness, 0)
 		totals[i] = weightedTotal
 	}
 	rnd := rand.Float64() * weightedTotal
@@ -266,6 +266,13 @@ func (p *Pool) Select() (int, *Member) {
 
 func min(a int, b int) int {
 	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a float64, b float64) float64 {
+	if a > b {
 		return a
 	}
 	return b
