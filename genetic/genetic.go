@@ -292,7 +292,8 @@ func crossoverAtPoint(parent1 *Member, parent2 *Member, crossPoint1 int) (*Membe
 		}
 		if tracks.Compatible(parent1.Track[crossPoint1], parent2.Track[crossPoint2]) {
 			foundMatch = true
-			crossPoint2++
+			// Increment so we splice *after* the cross point in parent 1
+			crossPoint1++
 			break
 		}
 		crossPoint2++
