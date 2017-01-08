@@ -159,3 +159,9 @@ file data into Go structs.
 dealing with track data. Shouldn't need to touch this, we might need to clean
 it up at some point because Go complains about the number of `main` files in
 this folder.
+
+## Donating
+
+Donations free up time to make improvements to the project, and respond to
+bug reports. You can send donations via Paypal's "Send Money" feature to
+kev@inburke.com. Donations are not tax deductible in the USA.
