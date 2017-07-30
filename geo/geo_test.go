@@ -209,3 +209,31 @@ func TestAdvanceVector(t *testing.T) {
 		}
 	}
 }
+
+func TestCompoundAdvanceVector (t *testing.T) {
+	// Donut test
+	left := Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT}
+	right := Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT}
+	// - Small turns
+	for i := 0; i < 4; i++ {
+		left = AdvanceVector(left, tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES])
+		right = AdvanceVector(right, tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES])
+	}
+	if left.Point != (Point{0, 0, 8}) {
+		t.Errorf("Left donut test failed. Result: %v", left.Point)
+	}
+	if right.Point != (Point{0, 0, 8}) {
+		t.Errorf("Right donut test failed. Result: %v", right.Point)
+	}
+	// - Medium turns
+	for i := 0; i < 4; i++ {
+		left = AdvanceVector(left, tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES])
+		right = AdvanceVector(right, tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES])
+	}
+	if left.Point != (Point{0, 0, 8}) {
+		t.Errorf("Left donut test failed. Result: %v", left.Point)
+	}
+	if right.Point != (Point{0, 0, 8}) {
+		t.Errorf("Right donut test failed. Result: %v", right.Point)
+	}
+}
