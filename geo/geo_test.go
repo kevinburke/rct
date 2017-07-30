@@ -167,12 +167,6 @@ var advanceVectorTests = []struct {
 		Vector{Point{5, 7, 8}, tracks.DIR_90_DEG_LEFT},
 	},
 
-	{
-		Vector{Point{3, 4, 8}, tracks.DIR_STRAIGHT},
-		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{6, 7, 8}, tracks.DIR_90_DEG_LEFT},
-	},
-
 	// right tests
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT},
