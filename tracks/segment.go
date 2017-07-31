@@ -771,7 +771,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  2,
+		SidewaysDelta:  1,
 		ElevationDelta: 0,
 	},
 	ELEM_S_BEND_RIGHT: &Segment{
@@ -782,7 +782,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  -1,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_VERTICAL_LOOP: &Segment{
@@ -1266,7 +1266,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  2,
+		SidewaysDelta:  1,
 		ElevationDelta: 0,
 	},
 	ELEM_S_BEND_RIGHT_COVERED: &Segment{
@@ -1277,7 +1277,7 @@ var TS_MAP = map[SegmentType]*Segment{
 		EndingBank:     TRACK_BANK_NONE,
 		ForwardDelta:   3,
 		DirectionDelta: DIR_STRAIGHT,
-		SidewaysDelta:  -2,
+		SidewaysDelta:  -1,
 		ElevationDelta: 0,
 	},
 	ELEM_LEFT_QUARTER_TURN_3_TILES_COVERED: &Segment{
