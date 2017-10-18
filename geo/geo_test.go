@@ -67,7 +67,7 @@ var advanceTests = []struct {
 }
 
 func TestAdvance(t *testing.T) {
-	t.Skip("These tests don't work for turns...")
+	t.Skip("Advance has been deprecated...")
 	for _, tt := range advanceTests {
 		eout, fout, sout, dout := Advance(tt.seg, tt.e, tt.forward, tt.sideways, tt.direction)
 		header := fmt.Sprintf("%s (init %d, %d, %d, %s):", tt.seg, tt.e, tt.forward, tt.sideways, tt.direction)
