@@ -67,7 +67,7 @@ var advanceTests = []struct {
 }
 
 func TestAdvance(t *testing.T) {
-	t.Skip("These tests don't work for turns...")
+	t.Skip("Advance has been deprecated...")
 	for _, tt := range advanceTests {
 		eout, fout, sout, dout := Advance(tt.seg, tt.e, tt.forward, tt.sideways, tt.direction)
 		header := fmt.Sprintf("%s (init %d, %d, %d, %s):", tt.seg, tt.e, tt.forward, tt.sideways, tt.direction)
@@ -143,56 +143,56 @@ var advanceVectorTests = []struct {
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT},
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{3, 3, 8}, tracks.DIR_90_DEG_LEFT},
+		Vector{Point{2, 3, 8}, tracks.DIR_90_DEG_LEFT},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_LEFT},
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{-3, 3, 8}, tracks.DIR_180_DEG},
+		Vector{Point{-3, 2, 8}, tracks.DIR_180_DEG},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_180_DEG},
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{-3, -3, 8}, tracks.DIR_90_DEG_RIGHT},
+		Vector{Point{-2, -3, 8}, tracks.DIR_90_DEG_RIGHT},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_RIGHT},
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{3, -3, 8}, tracks.DIR_STRAIGHT},
+		Vector{Point{3, -2, 8}, tracks.DIR_STRAIGHT},
 	},
 
 	{
 		Vector{Point{3, 4, 8}, tracks.DIR_STRAIGHT},
 		tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES],
-		Vector{Point{6, 7, 8}, tracks.DIR_90_DEG_LEFT},
+		Vector{Point{5, 7, 8}, tracks.DIR_90_DEG_LEFT},
 	},
 
 	// right tests
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT},
 		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
-		Vector{Point{3, -3, 8}, tracks.DIR_90_DEG_RIGHT},
+		Vector{Point{2, -3, 8}, tracks.DIR_90_DEG_RIGHT},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_LEFT},
 		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
-		Vector{Point{3, 3, 8}, tracks.DIR_STRAIGHT},
+		Vector{Point{3, 2, 8}, tracks.DIR_STRAIGHT},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_180_DEG},
 		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
-		Vector{Point{-3, 3, 8}, tracks.DIR_90_DEG_LEFT},
+		Vector{Point{-2, 3, 8}, tracks.DIR_90_DEG_LEFT},
 	},
 	{
 		Vector{Point{0, 0, 8}, tracks.DIR_90_DEG_RIGHT},
 		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
-		Vector{Point{-3, -3, 8}, tracks.DIR_180_DEG},
+		Vector{Point{-3, -2, 8}, tracks.DIR_180_DEG},
 	},
 
 	{
 		Vector{Point{3, 4, 8}, tracks.DIR_STRAIGHT},
 		tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES],
-		Vector{Point{6, 1, 8}, tracks.DIR_90_DEG_RIGHT},
+		Vector{Point{5, 1, 8}, tracks.DIR_90_DEG_RIGHT},
 	},
 }
 
@@ -207,5 +207,33 @@ func TestAdvanceVector(t *testing.T) {
 		if out.Dir != tt.out.Dir {
 			t.Errorf("%s expected direction to be %v, was %v", helper, tt.out.Dir, out.Dir)
 		}
+	}
+}
+
+func TestCompoundAdvanceVector (t *testing.T) {
+	// Donut test
+	left := Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT}
+	right := Vector{Point{0, 0, 8}, tracks.DIR_STRAIGHT}
+	// - Small turns
+	for i := 0; i < 4; i++ {
+		left = AdvanceVector(left, tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_3_TILES])
+		right = AdvanceVector(right, tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES])
+	}
+	if left.Point != (Point{0, 0, 8}) {
+		t.Errorf("Left donut test failed. Result: %v", left.Point)
+	}
+	if right.Point != (Point{0, 0, 8}) {
+		t.Errorf("Right donut test failed. Result: %v", right.Point)
+	}
+	// - Medium turns
+	for i := 0; i < 4; i++ {
+		left = AdvanceVector(left, tracks.TS_MAP[tracks.ELEM_LEFT_QUARTER_TURN_5_TILES])
+		right = AdvanceVector(right, tracks.TS_MAP[tracks.ELEM_RIGHT_QUARTER_TURN_5_TILES])
+	}
+	if left.Point != (Point{0, 0, 8}) {
+		t.Errorf("Left donut test failed. Result: %v", left.Point)
+	}
+	if right.Point != (Point{0, 0, 8}) {
+		t.Errorf("Right donut test failed. Result: %v", right.Point)
 	}
 }

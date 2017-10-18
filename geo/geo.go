@@ -17,6 +17,18 @@ type Point [3]float64
 
 var matrix [100][100][300]bool
 
+// From OpenRCT2: https://github.com/OpenRCT2/OpenRCT2/blob/db438a27b79d3c29b5f7f9100995612e69f798dd/test/testpaint/compat.c#L41
+var TILE_DIRECTION_DELTA = [8][2]float64{
+	{-1,   0},
+	{0,    1},
+	{1,    0},
+	{0,   -1},
+	{-1,  1},
+	{1,   1},
+	{1,  -1},
+	{-1, -1},
+};
+
 func Vectors(elems []tracks.Element) []Vector {
 	var direction tracks.DirectionDelta
 	direction = 0
@@ -183,6 +195,18 @@ func AdvanceVector(v Vector, s *tracks.Segment) Vector {
 	dir := v.Dir + s.DirectionDelta
 	for ; dir >= 360; dir -= 360 {
 	}
+
+	if s.DirectionDelta > 0 {
+		// Based on OpenRCT2 algorithm: https://github.com/OpenRCT2/OpenRCT2/blob/46de90df8699bc74f1da15fdb16c4a0e2ac1e435/src/openrct2/windows/track_place.c#L547
+		// +4 to prevent negative numbers
+		// +1 is a magic number
+		var dirIndex = int((dir + (dir - v.Dir)) / 90 + 5) % 4
+
+		// Coordinate system here is flipped from OpenRCT2
+		p[0] += TILE_DIRECTION_DELTA[dirIndex][1]
+		p[1] += TILE_DIRECTION_DELTA[dirIndex][0]
+	}
+
 	return Vector{p, dir}
 }
 
