@@ -98,7 +98,7 @@ func connect2DSameDirTrackPieces(trackEnd geo.Vector, stationStart geo.Vector) [
 	}
 
 	if stationStart.Dir != tracks.DIR_STRAIGHT {
-		// log.Panic("stationStart direction is not straight: ", stationStart)
+		log.Panic("stationStart direction is not straight: ", stationStart)
 	}
 
 	if stationStart.Point[1] == trackEnd.Point[1] {
