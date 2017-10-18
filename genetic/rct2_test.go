@@ -77,13 +77,13 @@ var trackTests = []struct {
 	in       geo.Vector
 	expected []tracks.Element
 }{
-	{geo.Vector{geo.Point{-2, 2, 0}, tracks.DIR_90_DEG_RIGHT},
+	{geo.Vector{geo.Point{-2, 1, 0}, tracks.DIR_90_DEG_RIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
 
-	{geo.Vector{geo.Point{-2, -2, 0}, tracks.DIR_90_DEG_LEFT},
+	{geo.Vector{geo.Point{-2, -1, 0}, tracks.DIR_90_DEG_LEFT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES})},
 
-	{geo.Vector{geo.Point{-2, -8, 0}, tracks.DIR_90_DEG_LEFT},
+	{geo.Vector{geo.Point{-2, -7, 0}, tracks.DIR_90_DEG_LEFT},
 		buildTrack([]tracks.SegmentType{
 			tracks.ELEM_FLAT,
 			tracks.ELEM_FLAT,
@@ -94,7 +94,7 @@ var trackTests = []struct {
 			tracks.ELEM_RIGHT_QUARTER_TURN_3_TILES,
 		})},
 
-	{geo.Vector{geo.Point{-2, 8, 0}, tracks.DIR_90_DEG_RIGHT},
+	{geo.Vector{geo.Point{-2, 7, 0}, tracks.DIR_90_DEG_RIGHT},
 		buildTrack([]tracks.SegmentType{
 			tracks.ELEM_FLAT,
 			tracks.ELEM_FLAT,
@@ -111,13 +111,13 @@ var trackTests = []struct {
 	{geo.Vector{geo.Point{-3, 0, 0}, tracks.DIR_STRAIGHT},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_FLAT})},
 
-	{geo.Vector{geo.Point{0, 4, 0}, tracks.DIR_180_DEG},
+	{geo.Vector{geo.Point{-1, 3, 0}, tracks.DIR_180_DEG},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
 
-	{geo.Vector{geo.Point{1, 4, 0}, tracks.DIR_180_DEG},
+	{geo.Vector{geo.Point{0, 3, 0}, tracks.DIR_180_DEG},
 		buildTrack([]tracks.SegmentType{tracks.ELEM_FLAT, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES})},
 
-	{geo.Vector{geo.Point{3, 4, 0}, tracks.DIR_180_DEG},
+	{geo.Vector{geo.Point{2, 3, 0}, tracks.DIR_180_DEG},
 		buildTrack([]tracks.SegmentType{
 			tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_FLAT, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES, tracks.ELEM_LEFT_QUARTER_TURN_3_TILES,
 		})},
@@ -141,6 +141,7 @@ func Test2DTrack(t *testing.T) {
 }
 
 func TestRightTurn(t *testing.T) {
+  t.Skip("Non-straight stations aren't supported")
 	trackEnd := geo.Vector{geo.Point{
 		7, 3, 11,
 	}, tracks.DIR_90_DEG_RIGHT}
